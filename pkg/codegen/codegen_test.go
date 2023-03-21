@@ -31,7 +31,6 @@ func checkLint(t *testing.T, filename string, code []byte) {
 }
 
 func TestExamplePetStoreCodeGeneration(t *testing.T) {
-
 	// Input vars for code generation:
 	packageName := "api"
 	opts := Configuration{
@@ -76,7 +75,6 @@ func TestExamplePetStoreCodeGeneration(t *testing.T) {
 }
 
 func TestExamplePetStoreCodeGenerationWithUserTemplates(t *testing.T) {
-
 	userTemplates := map[string]string{"typedef.tmpl": "//blah"}
 
 	// Input vars for code generation:
@@ -112,7 +110,6 @@ func TestExamplePetStoreCodeGenerationWithUserTemplates(t *testing.T) {
 }
 
 func TestExamplePetStoreParseFunction(t *testing.T) {
-
 	bodyBytes := []byte(`{"id": 5, "name": "testpet", "tag": "cat"}`)
 
 	cannedResponse := &http.Response{
@@ -132,7 +129,6 @@ func TestExamplePetStoreParseFunction(t *testing.T) {
 }
 
 func TestExampleOpenAPICodeGeneration(t *testing.T) {
-
 	// Input vars for code generation:
 	packageName := "testswagger"
 	opts := Configuration{
@@ -184,10 +180,10 @@ type GetTestByNameResponse struct {
 
 	// Check the client method signatures:
 	assert.Contains(t, code, "type GetTestByNameParams struct {")
-	assert.Contains(t, code, "Top *int `form:\"$top,omitempty\" json:\"$top,omitempty\"`")
+	assert.Contains(t, code, "Top *int `form:\"$top,omitempty\" json:\"$top,omitempty\"")
 	assert.Contains(t, code, "func (c *Client) GetTestByName(ctx context.Context, name string, params *GetTestByNameParams, reqEditors ...RequestEditorFn) (*http.Response, error) {")
 	assert.Contains(t, code, "func (c *ClientWithResponses) GetTestByNameWithResponse(ctx context.Context, name string, params *GetTestByNameParams, reqEditors ...RequestEditorFn) (*GetTestByNameResponse, error) {")
-	assert.Contains(t, code, "DeadSince *time.Time    `json:\"dead_since,omitempty\" tag1:\"value1\" tag2:\"value2\"`")
+	assert.Contains(t, code, "DeadSince *time.Time    `json:\"dead_since,omitempty\" tag1:\"value1\" tag2:\"value2\"")
 
 	// Make sure the generated code is valid:
 	checkLint(t, "test.gen.go", []byte(code))
@@ -237,7 +233,6 @@ func TestGoTypeImport(t *testing.T) {
 
 	// Make sure the generated code is valid:
 	checkLint(t, "test.gen.go", []byte(code))
-
 }
 
 func TestRemoteExternalReference(t *testing.T) {
@@ -298,7 +293,6 @@ func (t *ExampleSchema_Item) FromExternalRef0NewPet(v externalRef0.NewPet) error
 
 	// Make sure the generated code is valid:
 	checkLint(t, "test.gen.go", []byte(code))
-
 }
 
 //go:embed test_spec.yaml
