@@ -7,8 +7,23 @@
         // As{{ .Method }} returns the union data inside the {{$typeName}} as a {{.}}
         func (t {{$typeName}}) As{{ .Method }}() ({{.}}, error) {
             var body {{.}}
-            err := json.Unmarshal(t.union, &body)
-            return body, err
+
+            if len(t.union) > 0 {
+                err := json.Unmarshal(t.union, &body)
+                if err != nil {
+                    return body, err
+                }
+            }
+
+
+            if len(t.xunion) > 0 {
+                err := xml.Unmarshal(t.xunion, &body)
+                if err != nil {
+                    return body, err
+                }
+            }
+
+            return body, nil
         }
 
         // From{{ .Method }} overwrites any union data inside the {{$typeName}} as the provided {{.}}
@@ -28,8 +43,18 @@
                 {{end -}}
             {{end -}}
             b, err := json.Marshal(v)
+            if err != nil {
+                return err
+            }
             t.union = b
-            return err
+
+            b, err = xml.Marshal(v)
+            if err != nil {
+                return err
+            }
+            t.xunion = b
+
+            return nil
         }
 
         // Merge{{ .Method }} performs a merge with any union data inside the {{$typeName}}, using the provided {{.}}
@@ -53,7 +78,7 @@
               return err
             }
 
-            merged, err := runtime.JsonMerge(t.union, b)
+            merged, err := runtime.JsonMerge(b, t.union)
             t.union = merged
             return err
         }
@@ -62,9 +87,18 @@
     {{if $discriminator}}
         func (t {{.TypeName}}) Discriminator() (string, error) {
             var discriminator struct {
-                Discriminator string {{$discriminator.JSONTag}}
+                Discriminator string {{$discriminator.JSONTag}} {{$discriminator.XMLTag}}
             }
             err := json.Unmarshal(t.union, &discriminator)
+            if err != nil {
+                return "", err
+            }
+
+            err = xml.Unmarshal(t.xunion, &discriminator)
+            if err != nil {
+                return "", err
+            }
+
             return discriminator.Discriminator, err
         }
 
@@ -135,6 +169,18 @@
             {{end}}
         {{end -}}
         return err
+    }
+
+    // UnmarshalJSON unmarshals the xunion data into the {{$typeName}} type
+    func (t *{{$typeName}}) UnmarshalXML(d *xml.Decoder, start xml.StartElement) error {
+        var err error
+
+        t.xunion, err = UnmarshalXML(d, start)
+        if err != nil {
+            return err
+        }
+
+        return nil
     }
     {{end}}
 {{end}}
