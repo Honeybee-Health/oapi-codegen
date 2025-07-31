@@ -91,6 +91,7 @@ func GenStructFromAllOf(allOf []*openapi3.SchemaRef, path []string) (string, err
 				return "", err
 			}
 			objectParts = append(objectParts, "   // Embedded fields due to inline allOf schema")
+			objectParts = appendXMLNameField(objectParts, goSchema)
 			objectParts = append(objectParts, GenFieldsFromProperties(goSchema.Properties)...)
 
 			if goSchema.HasAdditionalProperties {

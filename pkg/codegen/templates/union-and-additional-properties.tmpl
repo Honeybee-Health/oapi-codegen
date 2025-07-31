@@ -39,6 +39,59 @@ func (a *{{.TypeName}}) UnmarshalJSON(b []byte) error {
 	return nil
 }
 
+// Override default XML handling for {{.TypeName}} to handle AdditionalProperties and union
+func (a *{{.TypeName}}) UnmarshalXML(d *xml.Decoder, start xml.StartElement) error {
+    err := a.union.UnmarshalXML(d, start)
+    if err != nil {
+        return err
+    }
+    
+    // Decode the XML element into a temporary map to capture all attributes and child elements
+    var tempMap map[string]interface{}
+    err = d.DecodeElement(&tempMap, &start)
+    if err != nil {
+        return err
+    }
+    
+{{range .Schema.Properties}}
+    if val, found := tempMap["{{.XmlProps.Name}}"]; found {
+        // Direct assignment for XML values
+        switch v := val.(type) {
+        case string:
+            // Handle string values directly
+            if err := a.{{.GoFieldName}}.UnmarshalText([]byte(v)); err != nil {
+                return fmt.Errorf("error reading '{{.XmlProps.Name}}': %w", err)
+            }
+        default:
+            // For other types, try direct assignment
+            a.{{.GoFieldName}} = val.({{.TypeDecl}})
+        }
+        delete(tempMap, "{{.XmlProps.Name}}")
+    }
+{{end}}
+
+    // Handle additional properties
+    if len(tempMap) != 0 {
+        a.AdditionalProperties = make(map[string]{{$addType}})
+        for fieldName, fieldVal := range tempMap {
+            // Direct assignment for XML values
+            switch v := fieldVal.(type) {
+            case string:
+                // Handle string values directly
+                var typedVal {{$addType}}
+                if err := typedVal.UnmarshalText([]byte(v)); err != nil {
+                    return fmt.Errorf("error unmarshaling field %s: %w", fieldName, err)
+                }
+                a.AdditionalProperties[fieldName] = typedVal
+            default:
+                // For other types, try direct assignment
+                a.AdditionalProperties[fieldName] = fieldVal.({{$addType}})
+            }
+        }
+    }
+    return nil
+}
+
 // Override default JSON handling for {{.TypeName}} to handle AdditionalProperties and union
 func (a {{.TypeName}}) MarshalJSON() ([]byte, error) {
     var err error

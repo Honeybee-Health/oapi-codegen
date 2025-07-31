@@ -25,7 +25,8 @@ type Schema struct {
 
 	SkipOptionalPointer bool // Some types don't need a * in front when they're optional
 
-	Description string // The description of the element
+	Description string    // The description of the element
+	XmlProps    *XmlProps // Used for XML marshalling / unmarshalling
 
 	UnionElements []UnionElement // Possible elements of oneOf/anyOf union
 	Discriminator *Discriminator // Describes which value is stored in a union
@@ -39,6 +40,11 @@ type Schema struct {
 
 	// The original OpenAPIv3 Schema.
 	OAPISchema *openapi3.Schema
+}
+
+type XmlProps struct {
+	Name      string
+	Attribute bool
 }
 
 func (s Schema) IsRef() bool {
@@ -88,6 +94,7 @@ type Property struct {
 	ReadOnly      bool
 	WriteOnly     bool
 	NeedsFormTag  bool
+	XmlProps      *XmlProps
 	Extensions    map[string]interface{}
 	Deprecated    bool
 }
@@ -225,6 +232,10 @@ func (d *Discriminator) JSONTag() string {
 	return fmt.Sprintf("`json:\"%s\"`", d.Property)
 }
 
+func (d *Discriminator) XMLTag() string {
+	return fmt.Sprintf("`xml:\"%s\"`", d.Property)
+}
+
 func (d *Discriminator) PropertyName() string {
 	return SchemaNameToTypeName(d.Property)
 }
@@ -287,6 +298,7 @@ func GenerateGoSchema(sref *openapi3.SchemaRef, path []string) (Schema, error) {
 			DefineViaAlias:      true,
 			OAPISchema:          schema,
 			SkipOptionalPointer: skipOptionalPointer,
+			XmlProps:            readXmlProps(schema.XML),
 		}, nil
 	}
 
@@ -443,6 +455,7 @@ func GenerateGoSchema(sref *openapi3.SchemaRef, path []string) (Schema, error) {
 					WriteOnly:     p.Value.WriteOnly,
 					Extensions:    p.Value.Extensions,
 					Deprecated:    p.Value.Deprecated,
+					XmlProps:      readXmlProps(p.Value.XML),
 				}
 				outSchema.Properties = append(outSchema.Properties, prop)
 				if len(pSchema.AdditionalTypes) > 0 {
@@ -759,6 +772,20 @@ func GenFieldsFromProperties(props []Property) []string {
 			stringOrEmpty(omitEmpty, ",omitempty") +
 			stringOrEmpty(omitZero, ",omitzero")
 
+		// if we have XML properties use them, otherwise fallback to JSON field name
+		if p.XmlProps != nil {
+			if p.XmlProps.Name != "" {
+				fieldTags["xml"] = p.XmlProps.Name
+			} else {
+				fieldTags["xml"] = p.JsonFieldName
+			}
+			if p.XmlProps.Attribute {
+				fieldTags["xml"] += ",attr"
+			}
+		} else {
+			fieldTags["xml"] = p.JsonFieldName
+		}
+
 		if globalState.options.OutputOptions.EnableYamlTags {
 			fieldTags["yaml"] = p.JsonFieldName + stringOrEmpty(omitEmpty, ",omitempty")
 		}
@@ -809,6 +836,7 @@ func GenStructFromSchema(schema Schema) string {
 	// Start out with struct {
 	objectParts := []string{"struct {"}
 	// Append all the field definitions
+	objectParts = appendXMLNameField(objectParts, schema)
 	objectParts = append(objectParts, GenFieldsFromProperties(schema.Properties)...)
 	// Close the struct
 	if schema.HasAdditionalProperties {
@@ -818,6 +846,7 @@ func GenStructFromSchema(schema Schema) string {
 	}
 	if len(schema.UnionElements) != 0 {
 		objectParts = append(objectParts, "union json.RawMessage")
+		objectParts = append(objectParts, "xunion RawMessage")
 	}
 	objectParts = append(objectParts, "}")
 	return strings.Join(objectParts, "\n")
@@ -927,4 +956,29 @@ func setSkipOptionalPointerForContainerType(outSchema *Schema) {
 	}
 
 	outSchema.SkipOptionalPointer = true
+}
+
+// Util function to read the XML properties from an openapiv3 schema. Currently
+// kin-openapi stores this an 'interface{}'. This can be removed if that
+// ever changes
+func readXmlProps(v *openapi3.XML) *XmlProps {
+	if v == nil {
+		return nil
+	}
+
+	return &XmlProps{
+		Name:      v.Name,
+		Attribute: v.Attribute,
+	}
+}
+
+// Used when constructing a 'struct' type - adds a 'XMLName` field to control
+// the document name if required by the schema. If not required, appends
+// nothing.
+func appendXMLNameField(objectParts []string, schema Schema) []string {
+	if schema.XmlProps == nil || schema.XmlProps.Name == "" {
+		return objectParts
+	}
+	xmlNameField := fmt.Sprintf("XMLName xml.Name `json:\"-\" xml:\"%s\"`", schema.XmlProps.Name)
+	return append(objectParts, xmlNameField)
 }
