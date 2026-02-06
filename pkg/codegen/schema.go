@@ -236,6 +236,11 @@ func (d *Discriminator) XMLTag() string {
 	return fmt.Sprintf("`xml:\"%s\"`", d.Property)
 }
 
+// CombinedTag returns a single Go struct tag with both JSON and XML tags.
+func (d *Discriminator) CombinedTag() string {
+	return fmt.Sprintf("`json:\"%s\" xml:\"%s\"`", d.Property, d.Property)
+}
+
 func (d *Discriminator) PropertyName() string {
 	return SchemaNameToTypeName(d.Property)
 }
