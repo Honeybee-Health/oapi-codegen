@@ -1,0 +1,218 @@
+openapi: "3.0.0"
+info:
+  version: 1.0.0
+  title: XML Marshal Test
+  description: Test spec for XML marshaling and unmarshaling support
+paths: {}
+components:
+  schemas:
+    # Simple object with basic properties
+    SimpleObject:
+      type: object
+      required:
+        - name
+        - id
+      properties:
+        name:
+          type: string
+        id:
+          type: integer
+        email:
+          type: string
+
+    # Object with XML-specific properties
+    XmlNamedObject:
+      type: object
+      xml:
+        name: named_object
+      required:
+        - title
+      properties:
+        title:
+          type: string
+          xml:
+            name: obj_title
+        count:
+          type: integer
+          xml:
+            name: obj_count
+
+    # Object with additional properties of type string
+    AdditionalPropsString:
+      type: object
+      required:
+        - name
+      properties:
+        name:
+          type: string
+      additionalProperties:
+        type: string
+
+    # Object with additional properties of type integer
+    AdditionalPropsInt:
+      type: object
+      required:
+        - id
+      properties:
+        id:
+          type: integer
+        label:
+          type: string
+      additionalProperties:
+        type: integer
+
+    # OneOf union - variant A is an object, variant B is an object
+    OneOfVariantA:
+      type: object
+      required:
+        - variantA
+      properties:
+        variantA:
+          type: string
+        valueA:
+          type: integer
+
+    OneOfVariantB:
+      type: object
+      required:
+        - variantB
+      properties:
+        variantB:
+          type: string
+        valueB:
+          type: boolean
+
+    # Simple oneOf union
+    SimpleUnion:
+      oneOf:
+        - $ref: '#/components/schemas/OneOfVariantA'
+        - $ref: '#/components/schemas/OneOfVariantB'
+
+    # OneOf with discriminator
+    DiscriminatorVariant1:
+      type: object
+      required:
+        - kind
+        - name
+      properties:
+        kind:
+          type: string
+        name:
+          type: string
+
+    DiscriminatorVariant2:
+      type: object
+      required:
+        - kind
+        - count
+      properties:
+        kind:
+          type: string
+        count:
+          type: integer
+
+    UnionWithDiscriminator:
+      oneOf:
+        - $ref: '#/components/schemas/DiscriminatorVariant1'
+        - $ref: '#/components/schemas/DiscriminatorVariant2'
+      discriminator:
+        propertyName: kind
+        mapping:
+          variant1: '#/components/schemas/DiscriminatorVariant1'
+          variant2: '#/components/schemas/DiscriminatorVariant2'
+
+    # OneOf with fixed properties
+    UnionWithFixedProps:
+      type: object
+      required:
+        - type
+      properties:
+        type:
+          type: string
+      oneOf:
+        - $ref: '#/components/schemas/OneOfVariantA'
+        - $ref: '#/components/schemas/OneOfVariantB'
+      discriminator:
+        propertyName: type
+        mapping:
+          a: '#/components/schemas/OneOfVariantA'
+          b: '#/components/schemas/OneOfVariantB'
+
+    # AnyOf union
+    AnyOfUnion:
+      anyOf:
+        - $ref: '#/components/schemas/OneOfVariantA'
+        - $ref: '#/components/schemas/OneOfVariantB'
+
+    # AllOf merged type
+    BaseObject:
+      type: object
+      required:
+        - id
+      properties:
+        id:
+          type: integer
+
+    ExtendedObject:
+      allOf:
+        - $ref: '#/components/schemas/BaseObject'
+        - type: object
+          required:
+            - name
+          properties:
+            name:
+              type: string
+            description:
+              type: string
+
+    # Union with additional properties
+    UnionWithAdditionalProps:
+      type: object
+      required:
+        - type
+      properties:
+        type:
+          type: string
+      oneOf:
+        - $ref: '#/components/schemas/OneOfVariantA'
+        - $ref: '#/components/schemas/OneOfVariantB'
+      discriminator:
+        propertyName: type
+        mapping:
+          a: '#/components/schemas/OneOfVariantA'
+          b: '#/components/schemas/OneOfVariantB'
+      additionalProperties:
+        type: string
+
+    # Object with optional fields
+    ObjectWithOptionalFields:
+      type: object
+      required:
+        - required_field
+      properties:
+        required_field:
+          type: string
+        optional_string:
+          type: string
+        optional_int:
+          type: integer
+
+    # Nested object
+    InnerObject:
+      type: object
+      required:
+        - value
+      properties:
+        value:
+          type: string
+
+    OuterObject:
+      type: object
+      required:
+        - inner
+        - label
+      properties:
+        label:
+          type: string
+        inner:
+          $ref: '#/components/schemas/InnerObject'

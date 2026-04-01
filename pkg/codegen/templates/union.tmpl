@@ -7,8 +7,19 @@
         // As{{ .Method }} returns the union data inside the {{$typeName}} as a {{.}}
         func (t {{$typeName}}) As{{ .Method }}() ({{.}}, error) {
             var body {{.}}
-            err := json.Unmarshal(t.union, &body)
-            return body, err
+            if len(t.union) > 0 {
+                err := json.Unmarshal(t.union, &body)
+                if err != nil {
+                    return body, err
+                }
+            }
+            if len(t.xunion) > 0 {
+                err := xml.Unmarshal(t.xunion, &body)
+                if err != nil {
+                    return body, err
+                }
+            }
+            return body, nil
         }
 
         // From{{ .Method }} overwrites any union data inside the {{$typeName}} as the provided {{.}}
@@ -28,8 +39,17 @@
                 {{end -}}
             {{end -}}
             b, err := json.Marshal(v)
+             if err != nil {
+                return err
+            }
             t.union = b
-            return err
+            b, err = xml.Marshal(v)
+            if err != nil {
+                return err
+            }
+            t.xunion = b
+
+            return nil
         }
 
         // Merge{{ .Method }} performs a merge with any union data inside the {{$typeName}}, using the provided {{.}}
@@ -53,8 +73,16 @@
               return err
             }
 
-            merged, err := runtime.JSONMerge(t.union, b)
+            merged, err := runtime.JSONMerge(b, t.union)
             t.union = merged
+
+            // For XML, re-marshal the merged result
+            bx, errx := xml.Marshal(v)
+            if errx != nil {
+                return errx
+            }
+            t.xunion = bx
+
             return err
         }
     {{end}}
@@ -62,10 +90,23 @@
     {{if $discriminator}}
         func (t {{.TypeName}}) Discriminator() (string, error) {
             var discriminator struct {
-                Discriminator string {{$discriminator.JSONTag}}
+                Discriminator string {{$discriminator.CombinedTag}}
             }
-            err := json.Unmarshal(t.union, &discriminator)
-            return discriminator.Discriminator, err
+            if len(t.union) > 0 {
+                err := json.Unmarshal(t.union, &discriminator)
+                if err != nil {
+                    return "", err
+                }
+                return discriminator.Discriminator, nil
+            }
+            if len(t.xunion) > 0 {
+                err := xml.Unmarshal(t.xunion, &discriminator)
+                if err != nil {
+                    return "", err
+                }
+                return discriminator.Discriminator, nil
+            }
+            return "", nil
         }
 
         {{if ne 0 (len $discriminator.Mapping)}}
@@ -135,6 +176,88 @@
             {{end}}
         {{end -}}
         return err
+    }
+
+    func (t {{$typeName}}) MarshalXML(e *xml.Encoder, start xml.StartElement) error {
+        {{if ne 0 (len .Schema.Properties) -}}
+            // Marshal with fixed properties merged into the union content
+            if err := e.EncodeToken(start); err != nil {
+                return err
+            }
+
+            // Write union inner content first
+            if len(t.xunion) > 0 {
+                d := xml.NewDecoder(bytes.NewReader([]byte(t.xunion)))
+                // Skip the original start element
+                if _, err := d.Token(); err != nil {
+                    return err
+                }
+                depth := 1
+                for depth > 0 {
+                    tok, err := d.Token()
+                    if err != nil {
+                        return err
+                    }
+                    switch tok.(type) {
+                    case xml.StartElement:
+                        depth++
+                    case xml.EndElement:
+                        depth--
+                    }
+                    if depth > 0 {
+                        if err := e.EncodeToken(xml.CopyToken(tok)); err != nil {
+                            return err
+                        }
+                    }
+                }
+            }
+
+            // Write fixed properties (ensures they are present even if not in xunion)
+            {{range .Schema.Properties}}
+            {{if .HasOptionalPointer}}if t.{{.GoFieldName}} != nil { {{end}}
+            if err := e.EncodeElement(t.{{.GoFieldName}}, xml.StartElement{Name: xml.Name{Local: "{{xmlFieldName .}}"}}); err != nil {
+                return fmt.Errorf("error marshaling '{{xmlFieldName .}}': %w", err)
+            }
+            {{if .HasOptionalPointer}} }{{end}}
+            {{end -}}
+
+            return e.EncodeToken(start.End())
+        {{else -}}
+            if len(t.xunion) > 0 {
+                return t.xunion.MarshalXML(e, start)
+            }
+            if err := e.EncodeToken(start); err != nil {
+                return err
+            }
+            return e.EncodeToken(start.End())
+        {{end -}}
+    }
+
+    func (t *{{$typeName}}) UnmarshalXML(d *xml.Decoder, start xml.StartElement) error {
+        var err error
+
+        t.xunion, err = CaptureXMLElement(d, start)
+        if err != nil {
+            return err
+        }
+
+        {{if ne 0 (len .Schema.Properties) -}}
+            // Extract fixed properties from the captured XML
+            type xmlProps struct {
+                {{range .Schema.Properties -}}
+                {{.GoFieldName}} {{.GoTypeDef}} `xml:"{{xmlFieldName .}}"`
+                {{end -}}
+            }
+            var props xmlProps
+            if err := xml.Unmarshal(t.xunion, &props); err != nil {
+                return err
+            }
+            {{range .Schema.Properties -}}
+            t.{{.GoFieldName}} = props.{{.GoFieldName}}
+            {{end -}}
+        {{end -}}
+
+        return nil
     }
     {{end}}
 {{end}}
