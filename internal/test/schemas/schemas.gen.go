@@ -51,24 +51,24 @@ type CustomStringType = string
 // DeprecatedProperty defines model for DeprecatedProperty.
 type DeprecatedProperty struct {
 	// NewProp Use this now!
-	NewProp string `json:"newProp"`
+	NewProp string `json:"newProp" xml:"newProp"`
 	// Deprecated: this property has been marked as deprecated upstream, but no `x-deprecated-reason` was set
-	OldProp1 *string `json:"oldProp1,omitempty"`
+	OldProp1 *string `json:"oldProp1,omitempty" xml:"oldProp1"`
 
 	// OldProp2 It used to do this and that
 	// Deprecated: this property has been marked as deprecated upstream, but no `x-deprecated-reason` was set
-	OldProp2 *string `json:"oldProp2,omitempty"`
+	OldProp2 *string `json:"oldProp2,omitempty" xml:"oldProp2"`
 	// Deprecated: Use NewProp instead!
-	OldProp3 *string `json:"oldProp3,omitempty"`
+	OldProp3 *string `json:"oldProp3,omitempty" xml:"oldProp3"`
 
 	// OldProp4 It used to do this and that
 	// Deprecated: Use NewProp instead!
-	OldProp4 *string `json:"oldProp4,omitempty"`
+	OldProp4 *string `json:"oldProp4,omitempty" xml:"oldProp4"`
 }
 
 // EnumInObjInArray defines model for EnumInObjInArray.
 type EnumInObjInArray = []struct {
-	Val *EnumInObjInArrayVal `json:"val,omitempty"`
+	Val *EnumInObjInArrayVal `json:"val,omitempty" xml:"val"`
 }
 
 // EnumInObjInArrayVal defines model for EnumInObjInArray.Val.
@@ -79,32 +79,127 @@ type GenericObject = map[string]interface{}
 
 // NullableProperties defines model for NullableProperties.
 type NullableProperties struct {
-	Optional            *string `json:"optional,omitempty"`
-	OptionalAndNullable *string `json:"optionalAndNullable"`
-	Required            string  `json:"required"`
-	RequiredAndNullable *string `json:"requiredAndNullable"`
+	Optional            *string `json:"optional,omitempty" xml:"optional"`
+	OptionalAndNullable *string `json:"optionalAndNullable" xml:"optionalAndNullable"`
+	Required            string  `json:"required" xml:"required"`
+	RequiredAndNullable *string `json:"requiredAndNullable" xml:"requiredAndNullable"`
 }
 
 // OuterTypeWithAnonymousInner defines model for OuterTypeWithAnonymousInner.
 type OuterTypeWithAnonymousInner struct {
-	Inner InnerRenamedAnonymousObject `json:"inner"`
-	Name  string                      `json:"name"`
+	Inner InnerRenamedAnonymousObject `json:"inner" xml:"inner"`
+	Name  string                      `json:"name" xml:"name"`
 }
 
 // InnerRenamedAnonymousObject defines model for .
 type InnerRenamedAnonymousObject struct {
-	Id int `json:"id"`
+	Id int `json:"id" xml:"id"`
 }
 
 // StringInPath defines model for StringInPath.
 type StringInPath = string
+
+type RawMessage []byte
+
+// MarshalJSON returns the raw bytes as JSON.
+func (r RawMessage) MarshalJSON() ([]byte, error) {
+	if r == nil {
+		return []byte("null"), nil
+	}
+	return r, nil
+}
+
+// UnmarshalJSON sets the raw bytes from JSON input.
+func (r *RawMessage) UnmarshalJSON(data []byte) error {
+	*r = append((*r)[0:0], data...)
+	return nil
+}
+
+// MarshalXML encodes the raw XML message into the encoder, re-wrapping
+// it within the provided start element.
+func (r RawMessage) MarshalXML(e *xml.Encoder, start xml.StartElement) error {
+	if len(r) == 0 {
+		return nil
+	}
+
+	d := xml.NewDecoder(bytes.NewReader(r))
+	// Skip the original start element from the stored raw XML
+	_, err := d.Token()
+	if err != nil {
+		return err
+	}
+
+	// Write the caller-provided start element
+	if err := e.EncodeToken(start); err != nil {
+		return err
+	}
+
+	// Copy all inner tokens until we reach the matching end element
+	depth := 1
+	for {
+		tok, err := d.Token()
+		if err != nil {
+			return err
+		}
+		switch tok.(type) {
+		case xml.StartElement:
+			depth++
+		case xml.EndElement:
+			depth--
+			if depth == 0 {
+				return e.EncodeToken(start.End())
+			}
+		}
+		if err := e.EncodeToken(xml.CopyToken(tok)); err != nil {
+			return err
+		}
+	}
+}
+
+// UnmarshalXML captures a full XML element (including children) into raw bytes.
+func (r *RawMessage) UnmarshalXML(d *xml.Decoder, start xml.StartElement) error {
+	data, err := CaptureXMLElement(d, start)
+	if err != nil {
+		return err
+	}
+	*r = data
+	return nil
+}
+
+// CaptureXMLElement reads an entire XML element from the decoder and returns it as bytes.
+func CaptureXMLElement(d *xml.Decoder, start xml.StartElement) ([]byte, error) {
+	buf := new(bytes.Buffer)
+	encoder := xml.NewEncoder(buf)
+
+	if err := encoder.EncodeToken(start); err != nil {
+		return nil, err
+	}
+
+	for {
+		tok, err := d.Token()
+		if err != nil {
+			return nil, err
+		}
+
+		if err = encoder.EncodeToken(tok); err != nil {
+			return nil, err
+		}
+
+		if end, ok := tok.(xml.EndElement); ok && end.Name == start.Name {
+			encoder.Flush()
+			break
+		}
+	}
+
+	return buf.Bytes(), nil
+}
 
 // Issue9JSONBody defines parameters for Issue9.
 type Issue9JSONBody = interface{}
 
 // Issue9Params defines parameters for Issue9.
 type Issue9Params struct {
-	Foo string `form:"foo" json:"foo"`
+	Foo string `form:"foo" json:"foo" xml:"foo"`
 }
 
 // Issue185JSONRequestBody defines body for Issue185 for application/json ContentType.
@@ -782,13 +877,13 @@ type EnsureEverythingIsReferencedResponse struct {
 	Body         []byte
 	HTTPResponse *http.Response
 	JSON200      *struct {
-		AnyType1 *AnyType1 `json:"anyType1,omitempty"`
+		AnyType1 *AnyType1 `json:"anyType1,omitempty" xml:"anyType1"`
 
 		// AnyType2 AnyType2 represents any type.
 		//
 		// This should be an interface{}
-		AnyType2         *AnyType2         `json:"anyType2,omitempty"`
-		CustomStringType *CustomStringType `foo:"bar" json:"customStringType,omitempty"`
+		AnyType2         *AnyType2         `json:"anyType2,omitempty" xml:"anyType2"`
+		CustomStringType *CustomStringType `foo:"bar" json:"customStringType,omitempty" xml:"customStringType"`
 	}
 }
 
@@ -1127,13 +1222,13 @@ func ParseEnsureEverythingIsReferencedResponse(rsp *http.Response) (*EnsureEvery
 	switch {
 	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
 		var dest struct {
-			AnyType1 *AnyType1 `json:"anyType1,omitempty"`
+			AnyType1 *AnyType1 `json:"anyType1,omitempty" xml:"anyType1"`
 
 			// AnyType2 AnyType2 represents any type.
 			//
 			// This should be an interface{}
-			AnyType2         *AnyType2         `json:"anyType2,omitempty"`
-			CustomStringType *CustomStringType `foo:"bar" json:"customStringType,omitempty"`
+			AnyType2         *AnyType2         `json:"anyType2,omitempty" xml:"anyType2"`
+			CustomStringType *CustomStringType `foo:"bar" json:"customStringType,omitempty" xml:"customStringType"`
 		}
 		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
 			return nil, err

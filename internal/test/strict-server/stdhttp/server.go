@@ -138,9 +138,9 @@ func (s StrictServer) UnionExample(ctx context.Context, request UnionExampleRequ
 		return nil, err
 	}
 
-	return UnionExample200JSONResponse{
-		Body: struct{ union json.RawMessage }{
-			union: union,
-		},
-	}, nil
+	// Assign the field rather than restating the anonymous struct type, so
+	// that adding fields to the generated union does not break this file.
+	var response UnionExample200JSONResponse
+	response.Body.union = union
+	return response, nil
 }

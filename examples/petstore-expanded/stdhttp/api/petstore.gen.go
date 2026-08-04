@@ -9,6 +9,7 @@ import (
 	"bytes"
 	"compress/gzip"
 	"encoding/base64"
+	"encoding/xml"
 	"fmt"
 	"net/http"
 	"net/url"
@@ -22,40 +23,135 @@ import (
 // Error defines model for Error.
 type Error struct {
 	// Code Error code
-	Code int32 `json:"code"`
+	Code int32 `json:"code" xml:"code"`
 
 	// Message Error message
-	Message string `json:"message"`
+	Message string `json:"message" xml:"message"`
 }
 
 // NewPet defines model for NewPet.
 type NewPet struct {
 	// Name Name of the pet
-	Name string `json:"name"`
+	Name string `json:"name" xml:"name"`
 
 	// Tag Type of the pet
-	Tag *string `json:"tag,omitempty"`
+	Tag *string `json:"tag,omitempty" xml:"tag"`
 }
 
 // Pet defines model for Pet.
 type Pet struct {
 	// Id Unique id of the pet
-	Id int64 `json:"id"`
+	Id int64 `json:"id" xml:"id"`
 
 	// Name Name of the pet
-	Name string `json:"name"`
+	Name string `json:"name" xml:"name"`
 
 	// Tag Type of the pet
-	Tag *string `json:"tag,omitempty"`
+	Tag *string `json:"tag,omitempty" xml:"tag"`
+}
+
+type RawMessage []byte
+
+// MarshalJSON returns the raw bytes as JSON.
+func (r RawMessage) MarshalJSON() ([]byte, error) {
+	if r == nil {
+		return []byte("null"), nil
+	}
+	return r, nil
+}
+
+// UnmarshalJSON sets the raw bytes from JSON input.
+func (r *RawMessage) UnmarshalJSON(data []byte) error {
+	*r = append((*r)[0:0], data...)
+	return nil
+}
+
+// MarshalXML encodes the raw XML message into the encoder, re-wrapping
+// it within the provided start element.
+func (r RawMessage) MarshalXML(e *xml.Encoder, start xml.StartElement) error {
+	if len(r) == 0 {
+		return nil
+	}
+
+	d := xml.NewDecoder(bytes.NewReader(r))
+	// Skip the original start element from the stored raw XML
+	_, err := d.Token()
+	if err != nil {
+		return err
+	}
+
+	// Write the caller-provided start element
+	if err := e.EncodeToken(start); err != nil {
+		return err
+	}
+
+	// Copy all inner tokens until we reach the matching end element
+	depth := 1
+	for {
+		tok, err := d.Token()
+		if err != nil {
+			return err
+		}
+		switch tok.(type) {
+		case xml.StartElement:
+			depth++
+		case xml.EndElement:
+			depth--
+			if depth == 0 {
+				return e.EncodeToken(start.End())
+			}
+		}
+		if err := e.EncodeToken(xml.CopyToken(tok)); err != nil {
+			return err
+		}
+	}
+}
+
+// UnmarshalXML captures a full XML element (including children) into raw bytes.
+func (r *RawMessage) UnmarshalXML(d *xml.Decoder, start xml.StartElement) error {
+	data, err := CaptureXMLElement(d, start)
+	if err != nil {
+		return err
+	}
+	*r = data
+	return nil
+}
+
+// CaptureXMLElement reads an entire XML element from the decoder and returns it as bytes.
+func CaptureXMLElement(d *xml.Decoder, start xml.StartElement) ([]byte, error) {
+	buf := new(bytes.Buffer)
+	encoder := xml.NewEncoder(buf)
+
+	if err := encoder.EncodeToken(start); err != nil {
+		return nil, err
+	}
+
+	for {
+		tok, err := d.Token()
+		if err != nil {
+			return nil, err
+		}
+
+		if err = encoder.EncodeToken(tok); err != nil {
+			return nil, err
+		}
+
+		if end, ok := tok.(xml.EndElement); ok && end.Name == start.Name {
+			encoder.Flush()
+			break
+		}
+	}
+
+	return buf.Bytes(), nil
 }
 
 // FindPetsParams defines parameters for FindPets.
 type FindPetsParams struct {
 	// Tags tags to filter by
-	Tags *[]string `form:"tags,omitempty" json:"tags,omitempty"`
+	Tags *[]string `form:"tags,omitempty" json:"tags,omitempty" xml:"tags"`
 
 	// Limit maximum number of results to return
-	Limit *int32 `form:"limit,omitempty" json:"limit,omitempty"`
+	Limit *int32 `form:"limit,omitempty" json:"limit,omitempty" xml:"limit"`
 }
 
 // AddPetJSONRequestBody defines body for AddPet for application/json ContentType.

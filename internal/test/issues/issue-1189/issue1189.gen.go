@@ -9,6 +9,7 @@ import (
 	"context"
 	"encoding/base64"
 	"encoding/json"
+	"encoding/xml"
 	"fmt"
 	"io"
 	"net/http"
@@ -41,9 +42,9 @@ const (
 
 // Test defines model for test.
 type Test struct {
-	FieldA *Test_FieldA `json:"fieldA,omitempty"`
-	FieldB *TestFieldB  `json:"fieldB,omitempty"`
-	FieldC *Test_FieldC `json:"fieldC,omitempty"`
+	FieldA *Test_FieldA `json:"fieldA,omitempty" xml:"fieldA"`
+	FieldB *TestFieldB  `json:"fieldB,omitempty" xml:"fieldB"`
+	FieldC *Test_FieldC `json:"fieldC,omitempty" xml:"fieldC"`
 }
 
 // TestFieldA0 defines model for .
@@ -54,7 +55,8 @@ type TestFieldA1 string
 
 // Test_FieldA defines model for Test.FieldA.
 type Test_FieldA struct {
-	union json.RawMessage
+	union  json.RawMessage
+	xunion RawMessage
 }
 
 // TestFieldB defines model for Test.FieldB.
@@ -68,21 +70,137 @@ type TestFieldC1 string
 
 // Test_FieldC defines model for Test.FieldC.
 type Test_FieldC struct {
-	union json.RawMessage
+	union  json.RawMessage
+	xunion RawMessage
+}
+
+type RawMessage []byte
+
+// MarshalJSON returns the raw bytes as JSON.
+func (r RawMessage) MarshalJSON() ([]byte, error) {
+	if r == nil {
+		return []byte("null"), nil
+	}
+	return r, nil
+}
+
+// UnmarshalJSON sets the raw bytes from JSON input.
+func (r *RawMessage) UnmarshalJSON(data []byte) error {
+	*r = append((*r)[0:0], data...)
+	return nil
+}
+
+// MarshalXML encodes the raw XML message into the encoder, re-wrapping
+// it within the provided start element.
+func (r RawMessage) MarshalXML(e *xml.Encoder, start xml.StartElement) error {
+	if len(r) == 0 {
+		return nil
+	}
+
+	d := xml.NewDecoder(bytes.NewReader(r))
+	// Skip the original start element from the stored raw XML
+	_, err := d.Token()
+	if err != nil {
+		return err
+	}
+
+	// Write the caller-provided start element
+	if err := e.EncodeToken(start); err != nil {
+		return err
+	}
+
+	// Copy all inner tokens until we reach the matching end element
+	depth := 1
+	for {
+		tok, err := d.Token()
+		if err != nil {
+			return err
+		}
+		switch tok.(type) {
+		case xml.StartElement:
+			depth++
+		case xml.EndElement:
+			depth--
+			if depth == 0 {
+				return e.EncodeToken(start.End())
+			}
+		}
+		if err := e.EncodeToken(xml.CopyToken(tok)); err != nil {
+			return err
+		}
+	}
+}
+
+// UnmarshalXML captures a full XML element (including children) into raw bytes.
+func (r *RawMessage) UnmarshalXML(d *xml.Decoder, start xml.StartElement) error {
+	data, err := CaptureXMLElement(d, start)
+	if err != nil {
+		return err
+	}
+	*r = data
+	return nil
+}
+
+// CaptureXMLElement reads an entire XML element from the decoder and returns it as bytes.
+func CaptureXMLElement(d *xml.Decoder, start xml.StartElement) ([]byte, error) {
+	buf := new(bytes.Buffer)
+	encoder := xml.NewEncoder(buf)
+
+	if err := encoder.EncodeToken(start); err != nil {
+		return nil, err
+	}
+
+	for {
+		tok, err := d.Token()
+		if err != nil {
+			return nil, err
+		}
+
+		if err = encoder.EncodeToken(tok); err != nil {
+			return nil, err
+		}
+
+		if end, ok := tok.(xml.EndElement); ok && end.Name == start.Name {
+			encoder.Flush()
+			break
+		}
+	}
+
+	return buf.Bytes(), nil
 }
 
 // AsTestFieldA0 returns the union data inside the Test_FieldA as a TestFieldA0
 func (t Test_FieldA) AsTestFieldA0() (TestFieldA0, error) {
 	var body TestFieldA0
-	err := json.Unmarshal(t.union, &body)
-	return body, err
+	if len(t.union) > 0 {
+		err := json.Unmarshal(t.union, &body)
+		if err != nil {
+			return body, err
+		}
+	}
+	if len(t.xunion) > 0 {
+		err := xml.Unmarshal(t.xunion, &body)
+		if err != nil {
+			return body, err
+		}
+	}
+	return body, nil
 }
 
 // FromTestFieldA0 overwrites any union data inside the Test_FieldA as the provided TestFieldA0
 func (t *Test_FieldA) FromTestFieldA0(v TestFieldA0) error {
 	b, err := json.Marshal(v)
+	if err != nil {
+		return err
+	}
 	t.union = b
-	return err
+	b, err = xml.Marshal(v)
+	if err != nil {
+		return err
+	}
+	t.xunion = b
+
+	return nil
 }
 
 // MergeTestFieldA0 performs a merge with any union data inside the Test_FieldA, using the provided TestFieldA0
@@ -92,23 +210,51 @@ func (t *Test_FieldA) MergeTestFieldA0(v TestFieldA0) error {
 		return err
 	}
 
-	merged, err := runtime.JSONMerge(t.union, b)
+	merged, err := runtime.JSONMerge(b, t.union)
 	t.union = merged
+
+	// For XML, re-marshal the merged result
+	bx, errx := xml.Marshal(v)
+	if errx != nil {
+		return errx
+	}
+	t.xunion = bx
+
 	return err
 }
 
 // AsTestFieldA1 returns the union data inside the Test_FieldA as a TestFieldA1
 func (t Test_FieldA) AsTestFieldA1() (TestFieldA1, error) {
 	var body TestFieldA1
-	err := json.Unmarshal(t.union, &body)
-	return body, err
+	if len(t.union) > 0 {
+		err := json.Unmarshal(t.union, &body)
+		if err != nil {
+			return body, err
+		}
+	}
+	if len(t.xunion) > 0 {
+		err := xml.Unmarshal(t.xunion, &body)
+		if err != nil {
+			return body, err
+		}
+	}
+	return body, nil
 }
 
 // FromTestFieldA1 overwrites any union data inside the Test_FieldA as the provided TestFieldA1
 func (t *Test_FieldA) FromTestFieldA1(v TestFieldA1) error {
 	b, err := json.Marshal(v)
+	if err != nil {
+		return err
+	}
 	t.union = b
-	return err
+	b, err = xml.Marshal(v)
+	if err != nil {
+		return err
+	}
+	t.xunion = b
+
+	return nil
 }
 
 // MergeTestFieldA1 performs a merge with any union data inside the Test_FieldA, using the provided TestFieldA1
@@ -118,8 +264,16 @@ func (t *Test_FieldA) MergeTestFieldA1(v TestFieldA1) error {
 		return err
 	}
 
-	merged, err := runtime.JSONMerge(t.union, b)
+	merged, err := runtime.JSONMerge(b, t.union)
 	t.union = merged
+
+	// For XML, re-marshal the merged result
+	bx, errx := xml.Marshal(v)
+	if errx != nil {
+		return errx
+	}
+	t.xunion = bx
+
 	return err
 }
 
@@ -133,18 +287,59 @@ func (t *Test_FieldA) UnmarshalJSON(b []byte) error {
 	return err
 }
 
+func (t Test_FieldA) MarshalXML(e *xml.Encoder, start xml.StartElement) error {
+	if len(t.xunion) > 0 {
+		return t.xunion.MarshalXML(e, start)
+	}
+	if err := e.EncodeToken(start); err != nil {
+		return err
+	}
+	return e.EncodeToken(start.End())
+}
+
+func (t *Test_FieldA) UnmarshalXML(d *xml.Decoder, start xml.StartElement) error {
+	var err error
+
+	t.xunion, err = CaptureXMLElement(d, start)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
 // AsTestFieldC0 returns the union data inside the Test_FieldC as a TestFieldC0
 func (t Test_FieldC) AsTestFieldC0() (TestFieldC0, error) {
 	var body TestFieldC0
-	err := json.Unmarshal(t.union, &body)
-	return body, err
+	if len(t.union) > 0 {
+		err := json.Unmarshal(t.union, &body)
+		if err != nil {
+			return body, err
+		}
+	}
+	if len(t.xunion) > 0 {
+		err := xml.Unmarshal(t.xunion, &body)
+		if err != nil {
+			return body, err
+		}
+	}
+	return body, nil
 }
 
 // FromTestFieldC0 overwrites any union data inside the Test_FieldC as the provided TestFieldC0
 func (t *Test_FieldC) FromTestFieldC0(v TestFieldC0) error {
 	b, err := json.Marshal(v)
+	if err != nil {
+		return err
+	}
 	t.union = b
-	return err
+	b, err = xml.Marshal(v)
+	if err != nil {
+		return err
+	}
+	t.xunion = b
+
+	return nil
 }
 
 // MergeTestFieldC0 performs a merge with any union data inside the Test_FieldC, using the provided TestFieldC0
@@ -154,23 +349,51 @@ func (t *Test_FieldC) MergeTestFieldC0(v TestFieldC0) error {
 		return err
 	}
 
-	merged, err := runtime.JSONMerge(t.union, b)
+	merged, err := runtime.JSONMerge(b, t.union)
 	t.union = merged
+
+	// For XML, re-marshal the merged result
+	bx, errx := xml.Marshal(v)
+	if errx != nil {
+		return errx
+	}
+	t.xunion = bx
+
 	return err
 }
 
 // AsTestFieldC1 returns the union data inside the Test_FieldC as a TestFieldC1
 func (t Test_FieldC) AsTestFieldC1() (TestFieldC1, error) {
 	var body TestFieldC1
-	err := json.Unmarshal(t.union, &body)
-	return body, err
+	if len(t.union) > 0 {
+		err := json.Unmarshal(t.union, &body)
+		if err != nil {
+			return body, err
+		}
+	}
+	if len(t.xunion) > 0 {
+		err := xml.Unmarshal(t.xunion, &body)
+		if err != nil {
+			return body, err
+		}
+	}
+	return body, nil
 }
 
 // FromTestFieldC1 overwrites any union data inside the Test_FieldC as the provided TestFieldC1
 func (t *Test_FieldC) FromTestFieldC1(v TestFieldC1) error {
 	b, err := json.Marshal(v)
+	if err != nil {
+		return err
+	}
 	t.union = b
-	return err
+	b, err = xml.Marshal(v)
+	if err != nil {
+		return err
+	}
+	t.xunion = b
+
+	return nil
 }
 
 // MergeTestFieldC1 performs a merge with any union data inside the Test_FieldC, using the provided TestFieldC1
@@ -180,8 +403,16 @@ func (t *Test_FieldC) MergeTestFieldC1(v TestFieldC1) error {
 		return err
 	}
 
-	merged, err := runtime.JSONMerge(t.union, b)
+	merged, err := runtime.JSONMerge(b, t.union)
 	t.union = merged
+
+	// For XML, re-marshal the merged result
+	bx, errx := xml.Marshal(v)
+	if errx != nil {
+		return errx
+	}
+	t.xunion = bx
+
 	return err
 }
 
@@ -193,6 +424,27 @@ func (t Test_FieldC) MarshalJSON() ([]byte, error) {
 func (t *Test_FieldC) UnmarshalJSON(b []byte) error {
 	err := t.union.UnmarshalJSON(b)
 	return err
+}
+
+func (t Test_FieldC) MarshalXML(e *xml.Encoder, start xml.StartElement) error {
+	if len(t.xunion) > 0 {
+		return t.xunion.MarshalXML(e, start)
+	}
+	if err := e.EncodeToken(start); err != nil {
+		return err
+	}
+	return e.EncodeToken(start.End())
+}
+
+func (t *Test_FieldC) UnmarshalXML(d *xml.Decoder, start xml.StartElement) error {
+	var err error
+
+	t.xunion, err = CaptureXMLElement(d, start)
+	if err != nil {
+		return err
+	}
+
+	return nil
 }
 
 // RequestEditorFn  is the function signature for the RequestEditor callback function

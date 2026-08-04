@@ -9,6 +9,7 @@ import (
 	"context"
 	"encoding/base64"
 	"encoding/json"
+	"encoding/xml"
 	"fmt"
 	"io"
 	"net/http"
@@ -34,23 +35,118 @@ type TestField1 string
 
 // MyTestRequestNestedField A nested object with allocated name
 type MyTestRequestNestedField struct {
-	Field1 bool   `json:"field1"`
-	Field2 string `json:"field2"`
+	Field1 bool   `json:"field1" xml:"field1"`
+	Field2 string `json:"field2" xml:"field2"`
 }
 
 // MyTestRequest defines model for .
 type MyTestRequest struct {
 	// Field1 A array of enum values
-	Field1 *[]TestField1 `json:"field1,omitempty"`
+	Field1 *[]TestField1 `json:"field1,omitempty" xml:"field1"`
 
 	// Field2 A nested object with allocated name
-	Field2 *MyTestRequestNestedField `json:"field2,omitempty"`
+	Field2 *MyTestRequestNestedField `json:"field2,omitempty" xml:"field2"`
 
 	// Field3 A nested object without allocated name
 	Field3 *struct {
-		Field1 bool   `json:"field1"`
-		Field2 string `json:"field2"`
-	} `json:"field3,omitempty"`
+		Field1 bool   `json:"field1" xml:"field1"`
+		Field2 string `json:"field2" xml:"field2"`
+	} `json:"field3,omitempty" xml:"field3"`
+}
+
+type RawMessage []byte
+
+// MarshalJSON returns the raw bytes as JSON.
+func (r RawMessage) MarshalJSON() ([]byte, error) {
+	if r == nil {
+		return []byte("null"), nil
+	}
+	return r, nil
+}
+
+// UnmarshalJSON sets the raw bytes from JSON input.
+func (r *RawMessage) UnmarshalJSON(data []byte) error {
+	*r = append((*r)[0:0], data...)
+	return nil
+}
+
+// MarshalXML encodes the raw XML message into the encoder, re-wrapping
+// it within the provided start element.
+func (r RawMessage) MarshalXML(e *xml.Encoder, start xml.StartElement) error {
+	if len(r) == 0 {
+		return nil
+	}
+
+	d := xml.NewDecoder(bytes.NewReader(r))
+	// Skip the original start element from the stored raw XML
+	_, err := d.Token()
+	if err != nil {
+		return err
+	}
+
+	// Write the caller-provided start element
+	if err := e.EncodeToken(start); err != nil {
+		return err
+	}
+
+	// Copy all inner tokens until we reach the matching end element
+	depth := 1
+	for {
+		tok, err := d.Token()
+		if err != nil {
+			return err
+		}
+		switch tok.(type) {
+		case xml.StartElement:
+			depth++
+		case xml.EndElement:
+			depth--
+			if depth == 0 {
+				return e.EncodeToken(start.End())
+			}
+		}
+		if err := e.EncodeToken(xml.CopyToken(tok)); err != nil {
+			return err
+		}
+	}
+}
+
+// UnmarshalXML captures a full XML element (including children) into raw bytes.
+func (r *RawMessage) UnmarshalXML(d *xml.Decoder, start xml.StartElement) error {
+	data, err := CaptureXMLElement(d, start)
+	if err != nil {
+		return err
+	}
+	*r = data
+	return nil
+}
+
+// CaptureXMLElement reads an entire XML element from the decoder and returns it as bytes.
+func CaptureXMLElement(d *xml.Decoder, start xml.StartElement) ([]byte, error) {
+	buf := new(bytes.Buffer)
+	encoder := xml.NewEncoder(buf)
+
+	if err := encoder.EncodeToken(start); err != nil {
+		return nil, err
+	}
+
+	for {
+		tok, err := d.Token()
+		if err != nil {
+			return nil, err
+		}
+
+		if err = encoder.EncodeToken(tok); err != nil {
+			return nil, err
+		}
+
+		if end, ok := tok.(xml.EndElement); ok && end.Name == start.Name {
+			encoder.Flush()
+			break
+		}
+	}
+
+	return buf.Bytes(), nil
 }
 
 // TestApplicationTestPlusJSONRequestBody defines body for Test for application/test+json ContentType.

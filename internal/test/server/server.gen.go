@@ -4,6 +4,9 @@
 package server
 
 import (
+	"bytes"
+	"encoding/json"
+	"encoding/xml"
 	"fmt"
 	"net/http"
 	"time"
@@ -21,63 +24,63 @@ const (
 
 // EveryTypeOptional defines model for EveryTypeOptional.
 type EveryTypeOptional struct {
-	ArrayInlineField     *[]int              `json:"array_inline_field,omitempty"`
-	ArrayReferencedField *[]SomeObject       `json:"array_referenced_field,omitempty"`
-	BoolField            *bool               `json:"bool_field,omitempty"`
-	ByteField            *[]byte             `json:"byte_field,omitempty"`
-	DateField            *openapi_types.Date `json:"date_field,omitempty"`
-	DateTimeField        *time.Time          `json:"date_time_field,omitempty"`
-	DoubleField          *float64            `json:"double_field,omitempty"`
-	FloatField           *float32            `json:"float_field,omitempty"`
+	ArrayInlineField     *[]int        `json:"array_inline_field,omitempty" xml:"array_inline_field"`
+	ArrayReferencedField *[]SomeObject `json:"array_referenced_field,omitempty" xml:"array_referenced_field"`
+	BoolField            *bool         `json:"bool_field,omitempty" xml:"bool_field"`
+	ByteField            *[]byte       `json:"byte_field,omitempty" xml:"byte_field"`
+	DateField            *XMLDate      `json:"date_field,omitempty" xml:"date_field"`
+	DateTimeField        *time.Time    `json:"date_time_field,omitempty" xml:"date_time_field"`
+	DoubleField          *float64      `json:"double_field,omitempty" xml:"double_field"`
+	FloatField           *float32      `json:"float_field,omitempty" xml:"float_field"`
 	InlineObjectField    *struct {
-		Name   string `json:"name"`
-		Number int    `json:"number"`
-	} `json:"inline_object_field,omitempty"`
-	Int32Field      *int32      `json:"int32_field,omitempty"`
-	Int64Field      *int64      `json:"int64_field,omitempty"`
-	IntField        *int        `json:"int_field,omitempty"`
-	NumberField     *float32    `json:"number_field,omitempty"`
-	ReferencedField *SomeObject `json:"referenced_field,omitempty"`
-	StringField     *string     `json:"string_field,omitempty"`
+		Name   string `json:"name" xml:"name"`
+		Number int    `json:"number" xml:"number"`
+	} `json:"inline_object_field,omitempty" xml:"inline_object_field"`
+	Int32Field      *int32      `json:"int32_field,omitempty" xml:"int32_field"`
+	Int64Field      *int64      `json:"int64_field,omitempty" xml:"int64_field"`
+	IntField        *int        `json:"int_field,omitempty" xml:"int_field"`
+	NumberField     *float32    `json:"number_field,omitempty" xml:"number_field"`
+	ReferencedField *SomeObject `json:"referenced_field,omitempty" xml:"referenced_field"`
+	StringField     *string     `json:"string_field,omitempty" xml:"string_field"`
 }
 
 // EveryTypeRequired defines model for EveryTypeRequired.
 type EveryTypeRequired struct {
-	ArrayInlineField     []int                `json:"array_inline_field"`
-	ArrayReferencedField []SomeObject         `json:"array_referenced_field"`
-	BoolField            bool                 `json:"bool_field"`
-	ByteField            []byte               `json:"byte_field"`
-	DateField            openapi_types.Date   `json:"date_field"`
-	DateTimeField        time.Time            `json:"date_time_field"`
-	DoubleField          float64              `json:"double_field"`
-	EmailField           *openapi_types.Email `json:"email_field,omitempty"`
-	FloatField           float32              `json:"float_field"`
+	ArrayInlineField     []int                `json:"array_inline_field" xml:"array_inline_field"`
+	ArrayReferencedField []SomeObject         `json:"array_referenced_field" xml:"array_referenced_field"`
+	BoolField            bool                 `json:"bool_field" xml:"bool_field"`
+	ByteField            []byte               `json:"byte_field" xml:"byte_field"`
+	DateField            XMLDate              `json:"date_field" xml:"date_field"`
+	DateTimeField        time.Time            `json:"date_time_field" xml:"date_time_field"`
+	DoubleField          float64              `json:"double_field" xml:"double_field"`
+	EmailField           *openapi_types.Email `json:"email_field,omitempty" xml:"email_field"`
+	FloatField           float32              `json:"float_field" xml:"float_field"`
 	InlineObjectField    struct {
-		Name   string `json:"name"`
-		Number int    `json:"number"`
-	} `json:"inline_object_field"`
-	Int32Field      int32      `json:"int32_field"`
-	Int64Field      int64      `json:"int64_field"`
-	IntField        int        `json:"int_field"`
-	NumberField     float32    `json:"number_field"`
-	ReferencedField SomeObject `json:"referenced_field"`
-	StringField     string     `json:"string_field"`
+		Name   string `json:"name" xml:"name"`
+		Number int    `json:"number" xml:"number"`
+	} `json:"inline_object_field" xml:"inline_object_field"`
+	Int32Field      int32      `json:"int32_field" xml:"int32_field"`
+	Int64Field      int64      `json:"int64_field" xml:"int64_field"`
+	IntField        int        `json:"int_field" xml:"int_field"`
+	NumberField     float32    `json:"number_field" xml:"number_field"`
+	ReferencedField SomeObject `json:"referenced_field" xml:"referenced_field"`
+	StringField     string     `json:"string_field" xml:"string_field"`
 }
 
 // ReservedKeyword defines model for ReservedKeyword.
 type ReservedKeyword struct {
-	Channel *string `json:"channel,omitempty"`
+	Channel *string `json:"channel,omitempty" xml:"channel"`
 }
 
 // Resource defines model for Resource.
 type Resource struct {
-	Name  string  `json:"name"`
-	Value float32 `json:"value"`
+	Name  string  `json:"name" xml:"name"`
+	Value float32 `json:"value" xml:"value"`
 }
 
 // SomeObject defines model for some_object.
 type SomeObject struct {
-	Name string `json:"name"`
+	Name string `json:"name" xml:"name"`
 }
 
 // Argument defines model for argument.
@@ -88,19 +91,114 @@ type ResponseWithReference = SomeObject
 
 // SimpleResponse defines model for SimpleResponse.
 type SimpleResponse struct {
-	Name string `json:"name"`
+	Name string `json:"name" xml:"name"`
+}
+
+type RawMessage []byte
+
+// MarshalJSON returns the raw bytes as JSON.
+func (r RawMessage) MarshalJSON() ([]byte, error) {
+	if r == nil {
+		return []byte("null"), nil
+	}
+	return r, nil
+}
+
+// UnmarshalJSON sets the raw bytes from JSON input.
+func (r *RawMessage) UnmarshalJSON(data []byte) error {
+	*r = append((*r)[0:0], data...)
+	return nil
+}
+
+// MarshalXML encodes the raw XML message into the encoder, re-wrapping
+// it within the provided start element.
+func (r RawMessage) MarshalXML(e *xml.Encoder, start xml.StartElement) error {
+	if len(r) == 0 {
+		return nil
+	}
+
+	d := xml.NewDecoder(bytes.NewReader(r))
+	// Skip the original start element from the stored raw XML
+	_, err := d.Token()
+	if err != nil {
+		return err
+	}
+
+	// Write the caller-provided start element
+	if err := e.EncodeToken(start); err != nil {
+		return err
+	}
+
+	// Copy all inner tokens until we reach the matching end element
+	depth := 1
+	for {
+		tok, err := d.Token()
+		if err != nil {
+			return err
+		}
+		switch tok.(type) {
+		case xml.StartElement:
+			depth++
+		case xml.EndElement:
+			depth--
+			if depth == 0 {
+				return e.EncodeToken(start.End())
+			}
+		}
+		if err := e.EncodeToken(xml.CopyToken(tok)); err != nil {
+			return err
+		}
+	}
+}
+
+// UnmarshalXML captures a full XML element (including children) into raw bytes.
+func (r *RawMessage) UnmarshalXML(d *xml.Decoder, start xml.StartElement) error {
+	data, err := CaptureXMLElement(d, start)
+	if err != nil {
+		return err
+	}
+	*r = data
+	return nil
+}
+
+// CaptureXMLElement reads an entire XML element from the decoder and returns it as bytes.
+func CaptureXMLElement(d *xml.Decoder, start xml.StartElement) ([]byte, error) {
+	buf := new(bytes.Buffer)
+	encoder := xml.NewEncoder(buf)
+
+	if err := encoder.EncodeToken(start); err != nil {
+		return nil, err
+	}
+
+	for {
+		tok, err := d.Token()
+		if err != nil {
+			return nil, err
+		}
+
+		if err = encoder.EncodeToken(tok); err != nil {
+			return nil, err
+		}
+
+		if end, ok := tok.(xml.EndElement); ok && end.Name == start.Name {
+			encoder.Flush()
+			break
+		}
+	}
+
+	return buf.Bytes(), nil
 }
 
 // GetWithArgsParams defines parameters for GetWithArgs.
 type GetWithArgsParams struct {
 	// OptionalArgument An optional query argument
-	OptionalArgument *int64 `form:"optional_argument,omitempty" json:"optional_argument,omitempty"`
+	OptionalArgument *int64 `form:"optional_argument,omitempty" json:"optional_argument,omitempty" xml:"optional_argument"`
 
 	// RequiredArgument An optional query argument
-	RequiredArgument int64 `form:"required_argument" json:"required_argument"`
+	RequiredArgument int64 `form:"required_argument" json:"required_argument" xml:"required_argument"`
 
 	// HeaderArgument An optional query argument
-	HeaderArgument *int32 `json:"header_argument,omitempty"`
+	HeaderArgument *int32 `json:"header_argument,omitempty" xml:"header_argument"`
 }
 
 // GetWithContentTypeParamsContentType defines parameters for GetWithContentType.
@@ -109,13 +207,13 @@ type GetWithContentTypeParamsContentType string
 // CreateResource2Params defines parameters for CreateResource2.
 type CreateResource2Params struct {
 	// InlineQueryArgument Some query argument
-	InlineQueryArgument *int `form:"inline_query_argument,omitempty" json:"inline_query_argument,omitempty"`
+	InlineQueryArgument *int `form:"inline_query_argument,omitempty" json:"inline_query_argument,omitempty" xml:"inline_query_argument"`
 }
 
 // UpdateResource3JSONBody defines parameters for UpdateResource3.
 type UpdateResource3JSONBody struct {
-	Id   *int    `json:"id,omitempty"`
-	Name *string `json:"name,omitempty"`
+	Id   *int    `json:"id,omitempty" xml:"id"`
+	Name *string `json:"name,omitempty" xml:"name"`
 }
 
 // CreateResourceJSONRequestBody defines body for CreateResource for application/json ContentType.
@@ -645,4 +743,60 @@ func HandlerWithOptions(si ServerInterface, options ChiServerOptions) http.Handl
 	})
 
 	return r
+}
+
+// XMLDate is the Go type for OpenAPI `format: date` values. It renders as a
+// plain CCYY-MM-DD date in both JSON and XML, including when used as an XML
+// attribute.
+//
+// It deliberately has the same underlying type as
+// github.com/oapi-codegen/runtime/types.Date (a struct embedding time.Time)
+// rather than embedding that type, so it stays convertible to it. The runtime's
+// parameter binding detects dates with reflect ConvertibleTo checks against
+// types.Date; a type that merely embedded types.Date would fail those checks
+// and silently bind the zero date in deepObject parameters.
+type XMLDate struct {
+	time.Time
+}
+
+// MarshalText renders the date as CCYY-MM-DD.
+//
+// This is the method types.Date is missing. Without it, encoding/xml finds the
+// MarshalText promoted from the embedded time.Time and emits a full RFC3339
+// timestamp, which is invalid for an xsd:date element.
+func (d XMLDate) MarshalText() ([]byte, error) {
+	return []byte(d.Time.Format("2006-01-02")), nil
+}
+
+// UnmarshalText parses a CCYY-MM-DD date.
+func (d *XMLDate) UnmarshalText(data []byte) error {
+	parsed, err := time.Parse("2006-01-02", string(data))
+	if err != nil {
+		return err
+	}
+	d.Time = parsed
+	return nil
+}
+
+// MarshalJSON renders the date as a CCYY-MM-DD JSON string.
+func (d XMLDate) MarshalJSON() ([]byte, error) {
+	return json.Marshal(d.Time.Format("2006-01-02"))
+}
+
+// UnmarshalJSON parses a CCYY-MM-DD JSON string.
+func (d *XMLDate) UnmarshalJSON(data []byte) error {
+	var dateStr string
+	if err := json.Unmarshal(data, &dateStr); err != nil {
+		return err
+	}
+	parsed, err := time.Parse("2006-01-02", dateStr)
+	if err != nil {
+		return err
+	}
+	d.Time = parsed
+	return nil
+}
+
+func (d XMLDate) String() string {
+	return d.Time.Format("2006-01-02")
 }

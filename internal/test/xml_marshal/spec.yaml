@@ -216,3 +216,60 @@ components:
           type: string
         inner:
           $ref: '#/components/schemas/InnerObject'
+
+    # Mirrors the NCPDP shape: a wrapper object named Date holding a
+    # `format: date` field, alongside its date-time counterpart.
+    DateWrapper:
+      type: object
+      xml:
+        name: Date
+      required:
+        - Date
+      properties:
+        Date:
+          type: string
+          format: date
+
+    DateTimeWrapper:
+      type: object
+      xml:
+        name: DateTime
+      required:
+        - DateTime
+      properties:
+        DateTime:
+          type: string
+          format: date-time
+
+    # Dates in every position that matters: required, optional pointer, slice,
+    # XML attribute, and next to a date-time that must stay RFC3339.
+    DateHolder:
+      type: object
+      required:
+        - required_date
+        - stamp
+      properties:
+        required_date:
+          type: string
+          format: date
+        optional_date:
+          type: string
+          format: date
+        date_list:
+          type: array
+          items:
+            type: string
+            format: date
+        attr_date:
+          type: string
+          format: date
+          xml:
+            attribute: true
+        stamp:
+          type: string
+          format: date-time
+
+    # Bare `format: date` schema, exercising the DefineViaAlias path.
+    BirthDate:
+      type: string
+      format: date

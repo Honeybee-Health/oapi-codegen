@@ -4,187 +4,284 @@
 package issue1219
 
 import (
+	"bytes"
 	"encoding/json"
+	"encoding/xml"
 	"fmt"
 )
 
 // DefaultAdditional1 defines model for DefaultAdditional1.
 type DefaultAdditional1 struct {
-	Field1 *int    `json:"field1,omitempty"`
-	Field2 *string `json:"field2,omitempty"`
+	Field1 *int    `json:"field1,omitempty" xml:"field1"`
+	Field2 *string `json:"field2,omitempty" xml:"field2"`
 }
 
 // DefaultAdditional2 defines model for DefaultAdditional2.
 type DefaultAdditional2 struct {
-	FieldA *int    `json:"fieldA,omitempty"`
-	FieldB *string `json:"fieldB,omitempty"`
+	FieldA *int    `json:"fieldA,omitempty" xml:"fieldA"`
+	FieldB *string `json:"fieldB,omitempty" xml:"fieldB"`
 }
 
 // MergeDefaultDefault defines model for MergeDefaultDefault.
 type MergeDefaultDefault struct {
-	Field1 *int    `json:"field1,omitempty"`
-	Field2 *string `json:"field2,omitempty"`
-	FieldA *int    `json:"fieldA,omitempty"`
-	FieldB *string `json:"fieldB,omitempty"`
+	Field1 *int    `json:"field1,omitempty" xml:"field1"`
+	Field2 *string `json:"field2,omitempty" xml:"field2"`
+	FieldA *int    `json:"fieldA,omitempty" xml:"fieldA"`
+	FieldB *string `json:"fieldB,omitempty" xml:"fieldB"`
 }
 
 // MergeDefaultWithAny defines model for MergeDefaultWithAny.
 type MergeDefaultWithAny struct {
-	Field1               *int                   `json:"field1,omitempty"`
-	Field2               *string                `json:"field2,omitempty"`
-	FieldA               *int                   `json:"fieldA,omitempty"`
-	FieldB               *string                `json:"fieldB,omitempty"`
+	Field1               *int                   `json:"field1,omitempty" xml:"field1"`
+	Field2               *string                `json:"field2,omitempty" xml:"field2"`
+	FieldA               *int                   `json:"fieldA,omitempty" xml:"fieldA"`
+	FieldB               *string                `json:"fieldB,omitempty" xml:"fieldB"`
 	AdditionalProperties map[string]interface{} `json:"-"`
 }
 
 // MergeDefaultWithString defines model for MergeDefaultWithString.
 type MergeDefaultWithString struct {
-	Field1               *int              `json:"field1,omitempty"`
-	Field2               *string           `json:"field2,omitempty"`
-	FieldA               *int              `json:"fieldA,omitempty"`
-	FieldB               *string           `json:"fieldB,omitempty"`
+	Field1               *int              `json:"field1,omitempty" xml:"field1"`
+	Field2               *string           `json:"field2,omitempty" xml:"field2"`
+	FieldA               *int              `json:"fieldA,omitempty" xml:"fieldA"`
+	FieldB               *string           `json:"fieldB,omitempty" xml:"fieldB"`
 	AdditionalProperties map[string]string `json:"-"`
 }
 
 // MergeDefaultWithout defines model for MergeDefaultWithout.
 type MergeDefaultWithout struct {
-	Field1 *int    `json:"field1,omitempty"`
-	Field2 *string `json:"field2,omitempty"`
-	FieldA *int    `json:"fieldA,omitempty"`
-	FieldB *string `json:"fieldB,omitempty"`
+	Field1 *int    `json:"field1,omitempty" xml:"field1"`
+	Field2 *string `json:"field2,omitempty" xml:"field2"`
+	FieldA *int    `json:"fieldA,omitempty" xml:"fieldA"`
+	FieldB *string `json:"fieldB,omitempty" xml:"fieldB"`
 }
 
 // MergeWithAnyDefault defines model for MergeWithAnyDefault.
 type MergeWithAnyDefault struct {
-	Field1               *int                   `json:"field1,omitempty"`
-	Field2               *string                `json:"field2,omitempty"`
-	FieldA               *int                   `json:"fieldA,omitempty"`
-	FieldB               *string                `json:"fieldB,omitempty"`
+	Field1               *int                   `json:"field1,omitempty" xml:"field1"`
+	Field2               *string                `json:"field2,omitempty" xml:"field2"`
+	FieldA               *int                   `json:"fieldA,omitempty" xml:"fieldA"`
+	FieldB               *string                `json:"fieldB,omitempty" xml:"fieldB"`
 	AdditionalProperties map[string]interface{} `json:"-"`
 }
 
 // MergeWithAnyWithAny defines model for MergeWithAnyWithAny.
 type MergeWithAnyWithAny struct {
-	Field1               *int                   `json:"field1,omitempty"`
-	Field2               *string                `json:"field2,omitempty"`
-	FieldA               *int                   `json:"fieldA,omitempty"`
-	FieldB               *string                `json:"fieldB,omitempty"`
+	Field1               *int                   `json:"field1,omitempty" xml:"field1"`
+	Field2               *string                `json:"field2,omitempty" xml:"field2"`
+	FieldA               *int                   `json:"fieldA,omitempty" xml:"fieldA"`
+	FieldB               *string                `json:"fieldB,omitempty" xml:"fieldB"`
 	AdditionalProperties map[string]interface{} `json:"-"`
 }
 
 // MergeWithAnyWithString defines model for MergeWithAnyWithString.
 type MergeWithAnyWithString struct {
-	Field1               *int              `json:"field1,omitempty"`
-	Field2               *string           `json:"field2,omitempty"`
-	FieldA               *int              `json:"fieldA,omitempty"`
-	FieldB               *string           `json:"fieldB,omitempty"`
+	Field1               *int              `json:"field1,omitempty" xml:"field1"`
+	Field2               *string           `json:"field2,omitempty" xml:"field2"`
+	FieldA               *int              `json:"fieldA,omitempty" xml:"fieldA"`
+	FieldB               *string           `json:"fieldB,omitempty" xml:"fieldB"`
 	AdditionalProperties map[string]string `json:"-"`
 }
 
 // MergeWithAnyWithout defines model for MergeWithAnyWithout.
 type MergeWithAnyWithout struct {
-	Field1 *int    `json:"field1,omitempty"`
-	Field2 *string `json:"field2,omitempty"`
-	FieldA *int    `json:"fieldA,omitempty"`
-	FieldB *string `json:"fieldB,omitempty"`
+	Field1 *int    `json:"field1,omitempty" xml:"field1"`
+	Field2 *string `json:"field2,omitempty" xml:"field2"`
+	FieldA *int    `json:"fieldA,omitempty" xml:"fieldA"`
+	FieldB *string `json:"fieldB,omitempty" xml:"fieldB"`
 }
 
 // MergeWithStringDefault defines model for MergeWithStringDefault.
 type MergeWithStringDefault struct {
-	Field1               *int              `json:"field1,omitempty"`
-	Field2               *string           `json:"field2,omitempty"`
-	FieldA               *int              `json:"fieldA,omitempty"`
-	FieldB               *string           `json:"fieldB,omitempty"`
+	Field1               *int              `json:"field1,omitempty" xml:"field1"`
+	Field2               *string           `json:"field2,omitempty" xml:"field2"`
+	FieldA               *int              `json:"fieldA,omitempty" xml:"fieldA"`
+	FieldB               *string           `json:"fieldB,omitempty" xml:"fieldB"`
 	AdditionalProperties map[string]string `json:"-"`
 }
 
 // MergeWithStringWithAny defines model for MergeWithStringWithAny.
 type MergeWithStringWithAny struct {
-	Field1               *int              `json:"field1,omitempty"`
-	Field2               *string           `json:"field2,omitempty"`
-	FieldA               *int              `json:"fieldA,omitempty"`
-	FieldB               *string           `json:"fieldB,omitempty"`
+	Field1               *int              `json:"field1,omitempty" xml:"field1"`
+	Field2               *string           `json:"field2,omitempty" xml:"field2"`
+	FieldA               *int              `json:"fieldA,omitempty" xml:"fieldA"`
+	FieldB               *string           `json:"fieldB,omitempty" xml:"fieldB"`
 	AdditionalProperties map[string]string `json:"-"`
 }
 
 // MergeWithStringWithout defines model for MergeWithStringWithout.
 type MergeWithStringWithout struct {
-	Field1 *int    `json:"field1,omitempty"`
-	Field2 *string `json:"field2,omitempty"`
-	FieldA *int    `json:"fieldA,omitempty"`
-	FieldB *string `json:"fieldB,omitempty"`
+	Field1 *int    `json:"field1,omitempty" xml:"field1"`
+	Field2 *string `json:"field2,omitempty" xml:"field2"`
+	FieldA *int    `json:"fieldA,omitempty" xml:"fieldA"`
+	FieldB *string `json:"fieldB,omitempty" xml:"fieldB"`
 }
 
 // MergeWithoutDefault defines model for MergeWithoutDefault.
 type MergeWithoutDefault struct {
-	Field1 *int    `json:"field1,omitempty"`
-	Field2 *string `json:"field2,omitempty"`
-	FieldA *int    `json:"fieldA,omitempty"`
-	FieldB *string `json:"fieldB,omitempty"`
+	Field1 *int    `json:"field1,omitempty" xml:"field1"`
+	Field2 *string `json:"field2,omitempty" xml:"field2"`
+	FieldA *int    `json:"fieldA,omitempty" xml:"fieldA"`
+	FieldB *string `json:"fieldB,omitempty" xml:"fieldB"`
 }
 
 // MergeWithoutWithAny defines model for MergeWithoutWithAny.
 type MergeWithoutWithAny struct {
-	Field1 *int    `json:"field1,omitempty"`
-	Field2 *string `json:"field2,omitempty"`
-	FieldA *int    `json:"fieldA,omitempty"`
-	FieldB *string `json:"fieldB,omitempty"`
+	Field1 *int    `json:"field1,omitempty" xml:"field1"`
+	Field2 *string `json:"field2,omitempty" xml:"field2"`
+	FieldA *int    `json:"fieldA,omitempty" xml:"fieldA"`
+	FieldB *string `json:"fieldB,omitempty" xml:"fieldB"`
 }
 
 // MergeWithoutWithString defines model for MergeWithoutWithString.
 type MergeWithoutWithString struct {
-	Field1 *int    `json:"field1,omitempty"`
-	Field2 *string `json:"field2,omitempty"`
-	FieldA *int    `json:"fieldA,omitempty"`
-	FieldB *string `json:"fieldB,omitempty"`
+	Field1 *int    `json:"field1,omitempty" xml:"field1"`
+	Field2 *string `json:"field2,omitempty" xml:"field2"`
+	FieldA *int    `json:"fieldA,omitempty" xml:"fieldA"`
+	FieldB *string `json:"fieldB,omitempty" xml:"fieldB"`
 }
 
 // MergeWithoutWithout defines model for MergeWithoutWithout.
 type MergeWithoutWithout struct {
-	Field1 *int    `json:"field1,omitempty"`
-	Field2 *string `json:"field2,omitempty"`
-	FieldA *int    `json:"fieldA,omitempty"`
-	FieldB *string `json:"fieldB,omitempty"`
+	Field1 *int    `json:"field1,omitempty" xml:"field1"`
+	Field2 *string `json:"field2,omitempty" xml:"field2"`
+	FieldA *int    `json:"fieldA,omitempty" xml:"fieldA"`
+	FieldB *string `json:"fieldB,omitempty" xml:"fieldB"`
 }
 
 // WithAnyAdditional1 defines model for WithAnyAdditional1.
 type WithAnyAdditional1 struct {
-	Field1               *int                   `json:"field1,omitempty"`
-	Field2               *string                `json:"field2,omitempty"`
+	Field1               *int                   `json:"field1,omitempty" xml:"field1"`
+	Field2               *string                `json:"field2,omitempty" xml:"field2"`
 	AdditionalProperties map[string]interface{} `json:"-"`
 }
 
 // WithAnyAdditional2 defines model for WithAnyAdditional2.
 type WithAnyAdditional2 struct {
-	FieldA               *int                   `json:"fieldA,omitempty"`
-	FieldB               *string                `json:"fieldB,omitempty"`
+	FieldA               *int                   `json:"fieldA,omitempty" xml:"fieldA"`
+	FieldB               *string                `json:"fieldB,omitempty" xml:"fieldB"`
 	AdditionalProperties map[string]interface{} `json:"-"`
 }
 
 // WithStringAdditional1 defines model for WithStringAdditional1.
 type WithStringAdditional1 struct {
-	Field1               *int              `json:"field1,omitempty"`
-	Field2               *string           `json:"field2,omitempty"`
+	Field1               *int              `json:"field1,omitempty" xml:"field1"`
+	Field2               *string           `json:"field2,omitempty" xml:"field2"`
 	AdditionalProperties map[string]string `json:"-"`
 }
 
 // WithStringAdditional2 defines model for WithStringAdditional2.
 type WithStringAdditional2 struct {
-	FieldA               *int              `json:"fieldA,omitempty"`
-	FieldB               *string           `json:"fieldB,omitempty"`
+	FieldA               *int              `json:"fieldA,omitempty" xml:"fieldA"`
+	FieldB               *string           `json:"fieldB,omitempty" xml:"fieldB"`
 	AdditionalProperties map[string]string `json:"-"`
 }
 
 // WithoutAdditional1 defines model for WithoutAdditional1.
 type WithoutAdditional1 struct {
-	Field1 *int    `json:"field1,omitempty"`
-	Field2 *string `json:"field2,omitempty"`
+	Field1 *int    `json:"field1,omitempty" xml:"field1"`
+	Field2 *string `json:"field2,omitempty" xml:"field2"`
 }
 
 // WithoutAdditional2 defines model for WithoutAdditional2.
 type WithoutAdditional2 struct {
-	FieldA *int    `json:"fieldA,omitempty"`
-	FieldB *string `json:"fieldB,omitempty"`
+	FieldA *int    `json:"fieldA,omitempty" xml:"fieldA"`
+	FieldB *string `json:"fieldB,omitempty" xml:"fieldB"`
+}
+
+type RawMessage []byte
+
+// MarshalJSON returns the raw bytes as JSON.
+func (r RawMessage) MarshalJSON() ([]byte, error) {
+	if r == nil {
+		return []byte("null"), nil
+	}
+	return r, nil
+}
+
+// UnmarshalJSON sets the raw bytes from JSON input.
+func (r *RawMessage) UnmarshalJSON(data []byte) error {
+	*r = append((*r)[0:0], data...)
+	return nil
+}
+
+// MarshalXML encodes the raw XML message into the encoder, re-wrapping
+// it within the provided start element.
+func (r RawMessage) MarshalXML(e *xml.Encoder, start xml.StartElement) error {
+	if len(r) == 0 {
+		return nil
+	}
+
+	d := xml.NewDecoder(bytes.NewReader(r))
+	// Skip the original start element from the stored raw XML
+	_, err := d.Token()
+	if err != nil {
+		return err
+	}
+
+	// Write the caller-provided start element
+	if err := e.EncodeToken(start); err != nil {
+		return err
+	}
+
+	// Copy all inner tokens until we reach the matching end element
+	depth := 1
+	for {
+		tok, err := d.Token()
+		if err != nil {
+			return err
+		}
+		switch tok.(type) {
+		case xml.StartElement:
+			depth++
+		case xml.EndElement:
+			depth--
+			if depth == 0 {
+				return e.EncodeToken(start.End())
+			}
+		}
+		if err := e.EncodeToken(xml.CopyToken(tok)); err != nil {
+			return err
+		}
+	}
+}
+
+// UnmarshalXML captures a full XML element (including children) into raw bytes.
+func (r *RawMessage) UnmarshalXML(d *xml.Decoder, start xml.StartElement) error {
+	data, err := CaptureXMLElement(d, start)
+	if err != nil {
+		return err
+	}
+	*r = data
+	return nil
+}
+
+// CaptureXMLElement reads an entire XML element from the decoder and returns it as bytes.
+func CaptureXMLElement(d *xml.Decoder, start xml.StartElement) ([]byte, error) {
+	buf := new(bytes.Buffer)
+	encoder := xml.NewEncoder(buf)
+
+	if err := encoder.EncodeToken(start); err != nil {
+		return nil, err
+	}
+
+	for {
+		tok, err := d.Token()
+		if err != nil {
+			return nil, err
+		}
+
+		if err = encoder.EncodeToken(tok); err != nil {
+			return nil, err
+		}
+
+		if end, ok := tok.(xml.EndElement); ok && end.Name == start.Name {
+			encoder.Flush()
+			break
+		}
+	}
+
+	return buf.Bytes(), nil
 }
 
 // Getter for additional properties for MergeDefaultWithAny. Returns the specified
@@ -300,6 +397,99 @@ func (a MergeDefaultWithAny) MarshalJSON() ([]byte, error) {
 	return json.Marshal(object)
 }
 
+// Override default XML handling for MergeDefaultWithAny to handle AdditionalProperties
+func (a *MergeDefaultWithAny) UnmarshalXML(d *xml.Decoder, start xml.StartElement) error {
+	knownFields := map[string]bool{
+		"field1": true,
+		"field2": true,
+		"fieldA": true,
+		"fieldB": true,
+	}
+
+	for {
+		tok, err := d.Token()
+		if err != nil {
+			return err
+		}
+		switch t := tok.(type) {
+		case xml.StartElement:
+			switch t.Name.Local {
+			case "field1":
+				if err := d.DecodeElement(&a.Field1, &t); err != nil {
+					return fmt.Errorf("error reading 'field1': %w", err)
+				}
+			case "field2":
+				if err := d.DecodeElement(&a.Field2, &t); err != nil {
+					return fmt.Errorf("error reading 'field2': %w", err)
+				}
+			case "fieldA":
+				if err := d.DecodeElement(&a.FieldA, &t); err != nil {
+					return fmt.Errorf("error reading 'fieldA': %w", err)
+				}
+			case "fieldB":
+				if err := d.DecodeElement(&a.FieldB, &t); err != nil {
+					return fmt.Errorf("error reading 'fieldB': %w", err)
+				}
+			default:
+				if !knownFields[t.Name.Local] {
+					if a.AdditionalProperties == nil {
+						a.AdditionalProperties = make(map[string]interface{})
+					}
+					var val interface{}
+					if err := d.DecodeElement(&val, &t); err != nil {
+						return fmt.Errorf("error unmarshaling field %s: %w", t.Name.Local, err)
+					}
+					a.AdditionalProperties[t.Name.Local] = val
+				} else {
+					if err := d.Skip(); err != nil {
+						return err
+					}
+				}
+			}
+		case xml.EndElement:
+			return nil
+		}
+	}
+}
+
+// Override default XML handling for MergeDefaultWithAny to handle AdditionalProperties
+func (a MergeDefaultWithAny) MarshalXML(e *xml.Encoder, start xml.StartElement) error {
+	if err := e.EncodeToken(start); err != nil {
+		return err
+	}
+
+	if a.Field1 != nil {
+		if err := e.EncodeElement(a.Field1, xml.StartElement{Name: xml.Name{Local: "field1"}}); err != nil {
+			return fmt.Errorf("error marshaling 'field1': %w", err)
+		}
+	}
+
+	if a.Field2 != nil {
+		if err := e.EncodeElement(a.Field2, xml.StartElement{Name: xml.Name{Local: "field2"}}); err != nil {
+			return fmt.Errorf("error marshaling 'field2': %w", err)
+		}
+	}
+
+	if a.FieldA != nil {
+		if err := e.EncodeElement(a.FieldA, xml.StartElement{Name: xml.Name{Local: "fieldA"}}); err != nil {
+			return fmt.Errorf("error marshaling 'fieldA': %w", err)
+		}
+	}
+
+	if a.FieldB != nil {
+		if err := e.EncodeElement(a.FieldB, xml.StartElement{Name: xml.Name{Local: "fieldB"}}); err != nil {
+			return fmt.Errorf("error marshaling 'fieldB': %w", err)
+		}
+	}
+
+	for fieldName, field := range a.AdditionalProperties {
+		if err := e.EncodeElement(field, xml.StartElement{Name: xml.Name{Local: fieldName}}); err != nil {
+			return fmt.Errorf("error marshaling '%s': %w", fieldName, err)
+		}
+	}
+	return e.EncodeToken(start.End())
+}
+
 // Getter for additional properties for MergeDefaultWithString. Returns the specified
 // element and whether it was found
 func (a MergeDefaultWithString) Get(fieldName string) (value string, found bool) {
@@ -411,6 +601,99 @@ func (a MergeDefaultWithString) MarshalJSON() ([]byte, error) {
 		}
 	}
 	return json.Marshal(object)
+}
+
+// Override default XML handling for MergeDefaultWithString to handle AdditionalProperties
+func (a *MergeDefaultWithString) UnmarshalXML(d *xml.Decoder, start xml.StartElement) error {
+	knownFields := map[string]bool{
+		"field1": true,
+		"field2": true,
+		"fieldA": true,
+		"fieldB": true,
+	}
+
+	for {
+		tok, err := d.Token()
+		if err != nil {
+			return err
+		}
+		switch t := tok.(type) {
+		case xml.StartElement:
+			switch t.Name.Local {
+			case "field1":
+				if err := d.DecodeElement(&a.Field1, &t); err != nil {
+					return fmt.Errorf("error reading 'field1': %w", err)
+				}
+			case "field2":
+				if err := d.DecodeElement(&a.Field2, &t); err != nil {
+					return fmt.Errorf("error reading 'field2': %w", err)
+				}
+			case "fieldA":
+				if err := d.DecodeElement(&a.FieldA, &t); err != nil {
+					return fmt.Errorf("error reading 'fieldA': %w", err)
+				}
+			case "fieldB":
+				if err := d.DecodeElement(&a.FieldB, &t); err != nil {
+					return fmt.Errorf("error reading 'fieldB': %w", err)
+				}
+			default:
+				if !knownFields[t.Name.Local] {
+					if a.AdditionalProperties == nil {
+						a.AdditionalProperties = make(map[string]string)
+					}
+					var val string
+					if err := d.DecodeElement(&val, &t); err != nil {
+						return fmt.Errorf("error unmarshaling field %s: %w", t.Name.Local, err)
+					}
+					a.AdditionalProperties[t.Name.Local] = val
+				} else {
+					if err := d.Skip(); err != nil {
+						return err
+					}
+				}
+			}
+		case xml.EndElement:
+			return nil
+		}
+	}
+}
+
+// Override default XML handling for MergeDefaultWithString to handle AdditionalProperties
+func (a MergeDefaultWithString) MarshalXML(e *xml.Encoder, start xml.StartElement) error {
+	if err := e.EncodeToken(start); err != nil {
+		return err
+	}
+
+	if a.Field1 != nil {
+		if err := e.EncodeElement(a.Field1, xml.StartElement{Name: xml.Name{Local: "field1"}}); err != nil {
+			return fmt.Errorf("error marshaling 'field1': %w", err)
+		}
+	}
+
+	if a.Field2 != nil {
+		if err := e.EncodeElement(a.Field2, xml.StartElement{Name: xml.Name{Local: "field2"}}); err != nil {
+			return fmt.Errorf("error marshaling 'field2': %w", err)
+		}
+	}
+
+	if a.FieldA != nil {
+		if err := e.EncodeElement(a.FieldA, xml.StartElement{Name: xml.Name{Local: "fieldA"}}); err != nil {
+			return fmt.Errorf("error marshaling 'fieldA': %w", err)
+		}
+	}
+
+	if a.FieldB != nil {
+		if err := e.EncodeElement(a.FieldB, xml.StartElement{Name: xml.Name{Local: "fieldB"}}); err != nil {
+			return fmt.Errorf("error marshaling 'fieldB': %w", err)
+		}
+	}
+
+	for fieldName, field := range a.AdditionalProperties {
+		if err := e.EncodeElement(field, xml.StartElement{Name: xml.Name{Local: fieldName}}); err != nil {
+			return fmt.Errorf("error marshaling '%s': %w", fieldName, err)
+		}
+	}
+	return e.EncodeToken(start.End())
 }
 
 // Getter for additional properties for MergeWithAnyDefault. Returns the specified
@@ -526,6 +809,99 @@ func (a MergeWithAnyDefault) MarshalJSON() ([]byte, error) {
 	return json.Marshal(object)
 }
 
+// Override default XML handling for MergeWithAnyDefault to handle AdditionalProperties
+func (a *MergeWithAnyDefault) UnmarshalXML(d *xml.Decoder, start xml.StartElement) error {
+	knownFields := map[string]bool{
+		"field1": true,
+		"field2": true,
+		"fieldA": true,
+		"fieldB": true,
+	}
+
+	for {
+		tok, err := d.Token()
+		if err != nil {
+			return err
+		}
+		switch t := tok.(type) {
+		case xml.StartElement:
+			switch t.Name.Local {
+			case "field1":
+				if err := d.DecodeElement(&a.Field1, &t); err != nil {
+					return fmt.Errorf("error reading 'field1': %w", err)
+				}
+			case "field2":
+				if err := d.DecodeElement(&a.Field2, &t); err != nil {
+					return fmt.Errorf("error reading 'field2': %w", err)
+				}
+			case "fieldA":
+				if err := d.DecodeElement(&a.FieldA, &t); err != nil {
+					return fmt.Errorf("error reading 'fieldA': %w", err)
+				}
+			case "fieldB":
+				if err := d.DecodeElement(&a.FieldB, &t); err != nil {
+					return fmt.Errorf("error reading 'fieldB': %w", err)
+				}
+			default:
+				if !knownFields[t.Name.Local] {
+					if a.AdditionalProperties == nil {
+						a.AdditionalProperties = make(map[string]interface{})
+					}
+					var val interface{}
+					if err := d.DecodeElement(&val, &t); err != nil {
+						return fmt.Errorf("error unmarshaling field %s: %w", t.Name.Local, err)
+					}
+					a.AdditionalProperties[t.Name.Local] = val
+				} else {
+					if err := d.Skip(); err != nil {
+						return err
+					}
+				}
+			}
+		case xml.EndElement:
+			return nil
+		}
+	}
+}
+
+// Override default XML handling for MergeWithAnyDefault to handle AdditionalProperties
+func (a MergeWithAnyDefault) MarshalXML(e *xml.Encoder, start xml.StartElement) error {
+	if err := e.EncodeToken(start); err != nil {
+		return err
+	}
+
+	if a.Field1 != nil {
+		if err := e.EncodeElement(a.Field1, xml.StartElement{Name: xml.Name{Local: "field1"}}); err != nil {
+			return fmt.Errorf("error marshaling 'field1': %w", err)
+		}
+	}
+
+	if a.Field2 != nil {
+		if err := e.EncodeElement(a.Field2, xml.StartElement{Name: xml.Name{Local: "field2"}}); err != nil {
+			return fmt.Errorf("error marshaling 'field2': %w", err)
+		}
+	}
+
+	if a.FieldA != nil {
+		if err := e.EncodeElement(a.FieldA, xml.StartElement{Name: xml.Name{Local: "fieldA"}}); err != nil {
+			return fmt.Errorf("error marshaling 'fieldA': %w", err)
+		}
+	}
+
+	if a.FieldB != nil {
+		if err := e.EncodeElement(a.FieldB, xml.StartElement{Name: xml.Name{Local: "fieldB"}}); err != nil {
+			return fmt.Errorf("error marshaling 'fieldB': %w", err)
+		}
+	}
+
+	for fieldName, field := range a.AdditionalProperties {
+		if err := e.EncodeElement(field, xml.StartElement{Name: xml.Name{Local: fieldName}}); err != nil {
+			return fmt.Errorf("error marshaling '%s': %w", fieldName, err)
+		}
+	}
+	return e.EncodeToken(start.End())
+}
+
 // Getter for additional properties for MergeWithAnyWithAny. Returns the specified
 // element and whether it was found
 func (a MergeWithAnyWithAny) Get(fieldName string) (value interface{}, found bool) {
@@ -637,6 +1013,99 @@ func (a MergeWithAnyWithAny) MarshalJSON() ([]byte, error) {
 		}
 	}
 	return json.Marshal(object)
+}
+
+// Override default XML handling for MergeWithAnyWithAny to handle AdditionalProperties
+func (a *MergeWithAnyWithAny) UnmarshalXML(d *xml.Decoder, start xml.StartElement) error {
+	knownFields := map[string]bool{
+		"field1": true,
+		"field2": true,
+		"fieldA": true,
+		"fieldB": true,
+	}
+
+	for {
+		tok, err := d.Token()
+		if err != nil {
+			return err
+		}
+		switch t := tok.(type) {
+		case xml.StartElement:
+			switch t.Name.Local {
+			case "field1":
+				if err := d.DecodeElement(&a.Field1, &t); err != nil {
+					return fmt.Errorf("error reading 'field1': %w", err)
+				}
+			case "field2":
+				if err := d.DecodeElement(&a.Field2, &t); err != nil {
+					return fmt.Errorf("error reading 'field2': %w", err)
+				}
+			case "fieldA":
+				if err := d.DecodeElement(&a.FieldA, &t); err != nil {
+					return fmt.Errorf("error reading 'fieldA': %w", err)
+				}
+			case "fieldB":
+				if err := d.DecodeElement(&a.FieldB, &t); err != nil {
+					return fmt.Errorf("error reading 'fieldB': %w", err)
+				}
+			default:
+				if !knownFields[t.Name.Local] {
+					if a.AdditionalProperties == nil {
+						a.AdditionalProperties = make(map[string]interface{})
+					}
+					var val interface{}
+					if err := d.DecodeElement(&val, &t); err != nil {
+						return fmt.Errorf("error unmarshaling field %s: %w", t.Name.Local, err)
+					}
+					a.AdditionalProperties[t.Name.Local] = val
+				} else {
+					if err := d.Skip(); err != nil {
+						return err
+					}
+				}
+			}
+		case xml.EndElement:
+			return nil
+		}
+	}
+}
+
+// Override default XML handling for MergeWithAnyWithAny to handle AdditionalProperties
+func (a MergeWithAnyWithAny) MarshalXML(e *xml.Encoder, start xml.StartElement) error {
+	if err := e.EncodeToken(start); err != nil {
+		return err
+	}
+
+	if a.Field1 != nil {
+		if err := e.EncodeElement(a.Field1, xml.StartElement{Name: xml.Name{Local: "field1"}}); err != nil {
+			return fmt.Errorf("error marshaling 'field1': %w", err)
+		}
+	}
+
+	if a.Field2 != nil {
+		if err := e.EncodeElement(a.Field2, xml.StartElement{Name: xml.Name{Local: "field2"}}); err != nil {
+			return fmt.Errorf("error marshaling 'field2': %w", err)
+		}
+	}
+
+	if a.FieldA != nil {
+		if err := e.EncodeElement(a.FieldA, xml.StartElement{Name: xml.Name{Local: "fieldA"}}); err != nil {
+			return fmt.Errorf("error marshaling 'fieldA': %w", err)
+		}
+	}
+
+	if a.FieldB != nil {
+		if err := e.EncodeElement(a.FieldB, xml.StartElement{Name: xml.Name{Local: "fieldB"}}); err != nil {
+			return fmt.Errorf("error marshaling 'fieldB': %w", err)
+		}
+	}
+
+	for fieldName, field := range a.AdditionalProperties {
+		if err := e.EncodeElement(field, xml.StartElement{Name: xml.Name{Local: fieldName}}); err != nil {
+			return fmt.Errorf("error marshaling '%s': %w", fieldName, err)
+		}
+	}
+	return e.EncodeToken(start.End())
 }
 
 // Getter for additional properties for MergeWithAnyWithString. Returns the specified
@@ -752,6 +1221,99 @@ func (a MergeWithAnyWithString) MarshalJSON() ([]byte, error) {
 	return json.Marshal(object)
 }
 
+// Override default XML handling for MergeWithAnyWithString to handle AdditionalProperties
+func (a *MergeWithAnyWithString) UnmarshalXML(d *xml.Decoder, start xml.StartElement) error {
+	knownFields := map[string]bool{
+		"field1": true,
+		"field2": true,
+		"fieldA": true,
+		"fieldB": true,
+	}
+
+	for {
+		tok, err := d.Token()
+		if err != nil {
+			return err
+		}
+		switch t := tok.(type) {
+		case xml.StartElement:
+			switch t.Name.Local {
+			case "field1":
+				if err := d.DecodeElement(&a.Field1, &t); err != nil {
+					return fmt.Errorf("error reading 'field1': %w", err)
+				}
+			case "field2":
+				if err := d.DecodeElement(&a.Field2, &t); err != nil {
+					return fmt.Errorf("error reading 'field2': %w", err)
+				}
+			case "fieldA":
+				if err := d.DecodeElement(&a.FieldA, &t); err != nil {
+					return fmt.Errorf("error reading 'fieldA': %w", err)
+				}
+			case "fieldB":
+				if err := d.DecodeElement(&a.FieldB, &t); err != nil {
+					return fmt.Errorf("error reading 'fieldB': %w", err)
+				}
+			default:
+				if !knownFields[t.Name.Local] {
+					if a.AdditionalProperties == nil {
+						a.AdditionalProperties = make(map[string]string)
+					}
+					var val string
+					if err := d.DecodeElement(&val, &t); err != nil {
+						return fmt.Errorf("error unmarshaling field %s: %w", t.Name.Local, err)
+					}
+					a.AdditionalProperties[t.Name.Local] = val
+				} else {
+					if err := d.Skip(); err != nil {
+						return err
+					}
+				}
+			}
+		case xml.EndElement:
+			return nil
+		}
+	}
+}
+
+// Override default XML handling for MergeWithAnyWithString to handle AdditionalProperties
+func (a MergeWithAnyWithString) MarshalXML(e *xml.Encoder, start xml.StartElement) error {
+	if err := e.EncodeToken(start); err != nil {
+		return err
+	}
+
+	if a.Field1 != nil {
+		if err := e.EncodeElement(a.Field1, xml.StartElement{Name: xml.Name{Local: "field1"}}); err != nil {
+			return fmt.Errorf("error marshaling 'field1': %w", err)
+		}
+	}
+
+	if a.Field2 != nil {
+		if err := e.EncodeElement(a.Field2, xml.StartElement{Name: xml.Name{Local: "field2"}}); err != nil {
+			return fmt.Errorf("error marshaling 'field2': %w", err)
+		}
+	}
+
+	if a.FieldA != nil {
+		if err := e.EncodeElement(a.FieldA, xml.StartElement{Name: xml.Name{Local: "fieldA"}}); err != nil {
+			return fmt.Errorf("error marshaling 'fieldA': %w", err)
+		}
+	}
+
+	if a.FieldB != nil {
+		if err := e.EncodeElement(a.FieldB, xml.StartElement{Name: xml.Name{Local: "fieldB"}}); err != nil {
+			return fmt.Errorf("error marshaling 'fieldB': %w", err)
+		}
+	}
+
+	for fieldName, field := range a.AdditionalProperties {
+		if err := e.EncodeElement(field, xml.StartElement{Name: xml.Name{Local: fieldName}}); err != nil {
+			return fmt.Errorf("error marshaling '%s': %w", fieldName, err)
+		}
+	}
+	return e.EncodeToken(start.End())
+}
+
 // Getter for additional properties for MergeWithStringDefault. Returns the specified
 // element and whether it was found
 func (a MergeWithStringDefault) Get(fieldName string) (value string, found bool) {
@@ -863,6 +1425,99 @@ func (a MergeWithStringDefault) MarshalJSON() ([]byte, error) {
 		}
 	}
 	return json.Marshal(object)
+}
+
+// Override default XML handling for MergeWithStringDefault to handle AdditionalProperties
+func (a *MergeWithStringDefault) UnmarshalXML(d *xml.Decoder, start xml.StartElement) error {
+	knownFields := map[string]bool{
+		"field1": true,
+		"field2": true,
+		"fieldA": true,
+		"fieldB": true,
+	}
+
+	for {
+		tok, err := d.Token()
+		if err != nil {
+			return err
+		}
+		switch t := tok.(type) {
+		case xml.StartElement:
+			switch t.Name.Local {
+			case "field1":
+				if err := d.DecodeElement(&a.Field1, &t); err != nil {
+					return fmt.Errorf("error reading 'field1': %w", err)
+				}
+			case "field2":
+				if err := d.DecodeElement(&a.Field2, &t); err != nil {
+					return fmt.Errorf("error reading 'field2': %w", err)
+				}
+			case "fieldA":
+				if err := d.DecodeElement(&a.FieldA, &t); err != nil {
+					return fmt.Errorf("error reading 'fieldA': %w", err)
+				}
+			case "fieldB":
+				if err := d.DecodeElement(&a.FieldB, &t); err != nil {
+					return fmt.Errorf("error reading 'fieldB': %w", err)
+				}
+			default:
+				if !knownFields[t.Name.Local] {
+					if a.AdditionalProperties == nil {
+						a.AdditionalProperties = make(map[string]string)
+					}
+					var val string
+					if err := d.DecodeElement(&val, &t); err != nil {
+						return fmt.Errorf("error unmarshaling field %s: %w", t.Name.Local, err)
+					}
+					a.AdditionalProperties[t.Name.Local] = val
+				} else {
+					if err := d.Skip(); err != nil {
+						return err
+					}
+				}
+			}
+		case xml.EndElement:
+			return nil
+		}
+	}
+}
+
+// Override default XML handling for MergeWithStringDefault to handle AdditionalProperties
+func (a MergeWithStringDefault) MarshalXML(e *xml.Encoder, start xml.StartElement) error {
+	if err := e.EncodeToken(start); err != nil {
+		return err
+	}
+
+	if a.Field1 != nil {
+		if err := e.EncodeElement(a.Field1, xml.StartElement{Name: xml.Name{Local: "field1"}}); err != nil {
+			return fmt.Errorf("error marshaling 'field1': %w", err)
+		}
+	}
+
+	if a.Field2 != nil {
+		if err := e.EncodeElement(a.Field2, xml.StartElement{Name: xml.Name{Local: "field2"}}); err != nil {
+			return fmt.Errorf("error marshaling 'field2': %w", err)
+		}
+	}
+
+	if a.FieldA != nil {
+		if err := e.EncodeElement(a.FieldA, xml.StartElement{Name: xml.Name{Local: "fieldA"}}); err != nil {
+			return fmt.Errorf("error marshaling 'fieldA': %w", err)
+		}
+	}
+
+	if a.FieldB != nil {
+		if err := e.EncodeElement(a.FieldB, xml.StartElement{Name: xml.Name{Local: "fieldB"}}); err != nil {
+			return fmt.Errorf("error marshaling 'fieldB': %w", err)
+		}
+	}
+
+	for fieldName, field := range a.AdditionalProperties {
+		if err := e.EncodeElement(field, xml.StartElement{Name: xml.Name{Local: fieldName}}); err != nil {
+			return fmt.Errorf("error marshaling '%s': %w", fieldName, err)
+		}
+	}
+	return e.EncodeToken(start.End())
 }
 
 // Getter for additional properties for MergeWithStringWithAny. Returns the specified
@@ -978,6 +1633,99 @@ func (a MergeWithStringWithAny) MarshalJSON() ([]byte, error) {
 	return json.Marshal(object)
 }
 
+// Override default XML handling for MergeWithStringWithAny to handle AdditionalProperties
+func (a *MergeWithStringWithAny) UnmarshalXML(d *xml.Decoder, start xml.StartElement) error {
+	knownFields := map[string]bool{
+		"field1": true,
+		"field2": true,
+		"fieldA": true,
+		"fieldB": true,
+	}
+
+	for {
+		tok, err := d.Token()
+		if err != nil {
+			return err
+		}
+		switch t := tok.(type) {
+		case xml.StartElement:
+			switch t.Name.Local {
+			case "field1":
+				if err := d.DecodeElement(&a.Field1, &t); err != nil {
+					return fmt.Errorf("error reading 'field1': %w", err)
+				}
+			case "field2":
+				if err := d.DecodeElement(&a.Field2, &t); err != nil {
+					return fmt.Errorf("error reading 'field2': %w", err)
+				}
+			case "fieldA":
+				if err := d.DecodeElement(&a.FieldA, &t); err != nil {
+					return fmt.Errorf("error reading 'fieldA': %w", err)
+				}
+			case "fieldB":
+				if err := d.DecodeElement(&a.FieldB, &t); err != nil {
+					return fmt.Errorf("error reading 'fieldB': %w", err)
+				}
+			default:
+				if !knownFields[t.Name.Local] {
+					if a.AdditionalProperties == nil {
+						a.AdditionalProperties = make(map[string]string)
+					}
+					var val string
+					if err := d.DecodeElement(&val, &t); err != nil {
+						return fmt.Errorf("error unmarshaling field %s: %w", t.Name.Local, err)
+					}
+					a.AdditionalProperties[t.Name.Local] = val
+				} else {
+					if err := d.Skip(); err != nil {
+						return err
+					}
+				}
+			}
+		case xml.EndElement:
+			return nil
+		}
+	}
+}
+
+// Override default XML handling for MergeWithStringWithAny to handle AdditionalProperties
+func (a MergeWithStringWithAny) MarshalXML(e *xml.Encoder, start xml.StartElement) error {
+	if err := e.EncodeToken(start); err != nil {
+		return err
+	}
+
+	if a.Field1 != nil {
+		if err := e.EncodeElement(a.Field1, xml.StartElement{Name: xml.Name{Local: "field1"}}); err != nil {
+			return fmt.Errorf("error marshaling 'field1': %w", err)
+		}
+	}
+
+	if a.Field2 != nil {
+		if err := e.EncodeElement(a.Field2, xml.StartElement{Name: xml.Name{Local: "field2"}}); err != nil {
+			return fmt.Errorf("error marshaling 'field2': %w", err)
+		}
+	}
+
+	if a.FieldA != nil {
+		if err := e.EncodeElement(a.FieldA, xml.StartElement{Name: xml.Name{Local: "fieldA"}}); err != nil {
+			return fmt.Errorf("error marshaling 'fieldA': %w", err)
+		}
+	}
+
+	if a.FieldB != nil {
+		if err := e.EncodeElement(a.FieldB, xml.StartElement{Name: xml.Name{Local: "fieldB"}}); err != nil {
+			return fmt.Errorf("error marshaling 'fieldB': %w", err)
+		}
+	}
+
+	for fieldName, field := range a.AdditionalProperties {
+		if err := e.EncodeElement(field, xml.StartElement{Name: xml.Name{Local: fieldName}}); err != nil {
+			return fmt.Errorf("error marshaling '%s': %w", fieldName, err)
+		}
+	}
+	return e.EncodeToken(start.End())
+}
+
 // Getter for additional properties for WithAnyAdditional1. Returns the specified
 // element and whether it was found
 func (a WithAnyAdditional1) Get(fieldName string) (value interface{}, found bool) {
@@ -1059,6 +1807,77 @@ func (a WithAnyAdditional1) MarshalJSON() ([]byte, error) {
 		}
 	}
 	return json.Marshal(object)
+}
+
+// Override default XML handling for WithAnyAdditional1 to handle AdditionalProperties
+func (a *WithAnyAdditional1) UnmarshalXML(d *xml.Decoder, start xml.StartElement) error {
+	knownFields := map[string]bool{
+		"field1": true,
+		"field2": true,
+	}
+
+	for {
+		tok, err := d.Token()
+		if err != nil {
+			return err
+		}
+		switch t := tok.(type) {
+		case xml.StartElement:
+			switch t.Name.Local {
+			case "field1":
+				if err := d.DecodeElement(&a.Field1, &t); err != nil {
+					return fmt.Errorf("error reading 'field1': %w", err)
+				}
+			case "field2":
+				if err := d.DecodeElement(&a.Field2, &t); err != nil {
+					return fmt.Errorf("error reading 'field2': %w", err)
+				}
+			default:
+				if !knownFields[t.Name.Local] {
+					if a.AdditionalProperties == nil {
+						a.AdditionalProperties = make(map[string]interface{})
+					}
+					var val interface{}
+					if err := d.DecodeElement(&val, &t); err != nil {
+						return fmt.Errorf("error unmarshaling field %s: %w", t.Name.Local, err)
+					}
+					a.AdditionalProperties[t.Name.Local] = val
+				} else {
+					if err := d.Skip(); err != nil {
+						return err
+					}
+				}
+			}
+		case xml.EndElement:
+			return nil
+		}
+	}
+}
+
+// Override default XML handling for WithAnyAdditional1 to handle AdditionalProperties
+func (a WithAnyAdditional1) MarshalXML(e *xml.Encoder, start xml.StartElement) error {
+	if err := e.EncodeToken(start); err != nil {
+		return err
+	}
+
+	if a.Field1 != nil {
+		if err := e.EncodeElement(a.Field1, xml.StartElement{Name: xml.Name{Local: "field1"}}); err != nil {
+			return fmt.Errorf("error marshaling 'field1': %w", err)
+		}
+	}
+
+	if a.Field2 != nil {
+		if err := e.EncodeElement(a.Field2, xml.StartElement{Name: xml.Name{Local: "field2"}}); err != nil {
+			return fmt.Errorf("error marshaling 'field2': %w", err)
+		}
+	}
+
+	for fieldName, field := range a.AdditionalProperties {
+		if err := e.EncodeElement(field, xml.StartElement{Name: xml.Name{Local: fieldName}}); err != nil {
+			return fmt.Errorf("error marshaling '%s': %w", fieldName, err)
+		}
+	}
+	return e.EncodeToken(start.End())
 }
 
 // Getter for additional properties for WithAnyAdditional2. Returns the specified
@@ -1144,6 +1963,77 @@ func (a WithAnyAdditional2) MarshalJSON() ([]byte, error) {
 	return json.Marshal(object)
 }
 
+// Override default XML handling for WithAnyAdditional2 to handle AdditionalProperties
+func (a *WithAnyAdditional2) UnmarshalXML(d *xml.Decoder, start xml.StartElement) error {
+	knownFields := map[string]bool{
+		"fieldA": true,
+		"fieldB": true,
+	}
+
+	for {
+		tok, err := d.Token()
+		if err != nil {
+			return err
+		}
+		switch t := tok.(type) {
+		case xml.StartElement:
+			switch t.Name.Local {
+			case "fieldA":
+				if err := d.DecodeElement(&a.FieldA, &t); err != nil {
+					return fmt.Errorf("error reading 'fieldA': %w", err)
+				}
+			case "fieldB":
+				if err := d.DecodeElement(&a.FieldB, &t); err != nil {
+					return fmt.Errorf("error reading 'fieldB': %w", err)
+				}
+			default:
+				if !knownFields[t.Name.Local] {
+					if a.AdditionalProperties == nil {
+						a.AdditionalProperties = make(map[string]interface{})
+					}
+					var val interface{}
+					if err := d.DecodeElement(&val, &t); err != nil {
+						return fmt.Errorf("error unmarshaling field %s: %w", t.Name.Local, err)
+					}
+					a.AdditionalProperties[t.Name.Local] = val
+				} else {
+					if err := d.Skip(); err != nil {
+						return err
+					}
+				}
+			}
+		case xml.EndElement:
+			return nil
+		}
+	}
+}
+
+// Override default XML handling for WithAnyAdditional2 to handle AdditionalProperties
+func (a WithAnyAdditional2) MarshalXML(e *xml.Encoder, start xml.StartElement) error {
+	if err := e.EncodeToken(start); err != nil {
+		return err
+	}
+
+	if a.FieldA != nil {
+		if err := e.EncodeElement(a.FieldA, xml.StartElement{Name: xml.Name{Local: "fieldA"}}); err != nil {
+			return fmt.Errorf("error marshaling 'fieldA': %w", err)
+		}
+	}
+
+	if a.FieldB != nil {
+		if err := e.EncodeElement(a.FieldB, xml.StartElement{Name: xml.Name{Local: "fieldB"}}); err != nil {
+			return fmt.Errorf("error marshaling 'fieldB': %w", err)
+		}
+	}
+
+	for fieldName, field := range a.AdditionalProperties {
+		if err := e.EncodeElement(field, xml.StartElement{Name: xml.Name{Local: fieldName}}); err != nil {
+			return fmt.Errorf("error marshaling '%s': %w", fieldName, err)
+		}
+	}
+	return e.EncodeToken(start.End())
+}
+
 // Getter for additional properties for WithStringAdditional1. Returns the specified
 // element and whether it was found
 func (a WithStringAdditional1) Get(fieldName string) (value string, found bool) {
@@ -1227,6 +2117,77 @@ func (a WithStringAdditional1) MarshalJSON() ([]byte, error) {
 	return json.Marshal(object)
 }
 
+// Override default XML handling for WithStringAdditional1 to handle AdditionalProperties
+func (a *WithStringAdditional1) UnmarshalXML(d *xml.Decoder, start xml.StartElement) error {
+	knownFields := map[string]bool{
+		"field1": true,
+		"field2": true,
+	}
+
+	for {
+		tok, err := d.Token()
+		if err != nil {
+			return err
+		}
+		switch t := tok.(type) {
+		case xml.StartElement:
+			switch t.Name.Local {
+			case "field1":
+				if err := d.DecodeElement(&a.Field1, &t); err != nil {
+					return fmt.Errorf("error reading 'field1': %w", err)
+				}
+			case "field2":
+				if err := d.DecodeElement(&a.Field2, &t); err != nil {
+					return fmt.Errorf("error reading 'field2': %w", err)
+				}
+			default:
+				if !knownFields[t.Name.Local] {
+					if a.AdditionalProperties == nil {
+						a.AdditionalProperties = make(map[string]string)
+					}
+					var val string
+					if err := d.DecodeElement(&val, &t); err != nil {
+						return fmt.Errorf("error unmarshaling field %s: %w", t.Name.Local, err)
+					}
+					a.AdditionalProperties[t.Name.Local] = val
+				} else {
+					if err := d.Skip(); err != nil {
+						return err
+					}
+				}
+			}
+		case xml.EndElement:
+			return nil
+		}
+	}
+}
+
+// Override default XML handling for WithStringAdditional1 to handle AdditionalProperties
+func (a WithStringAdditional1) MarshalXML(e *xml.Encoder, start xml.StartElement) error {
+	if err := e.EncodeToken(start); err != nil {
+		return err
+	}
+
+	if a.Field1 != nil {
+		if err := e.EncodeElement(a.Field1, xml.StartElement{Name: xml.Name{Local: "field1"}}); err != nil {
+			return fmt.Errorf("error marshaling 'field1': %w", err)
+		}
+	}
+
+	if a.Field2 != nil {
+		if err := e.EncodeElement(a.Field2, xml.StartElement{Name: xml.Name{Local: "field2"}}); err != nil {
+			return fmt.Errorf("error marshaling 'field2': %w", err)
+		}
+	}
+
+	for fieldName, field := range a.AdditionalProperties {
+		if err := e.EncodeElement(field, xml.StartElement{Name: xml.Name{Local: fieldName}}); err != nil {
+			return fmt.Errorf("error marshaling '%s': %w", fieldName, err)
+		}
+	}
+	return e.EncodeToken(start.End())
+}
+
 // Getter for additional properties for WithStringAdditional2. Returns the specified
 // element and whether it was found
 func (a WithStringAdditional2) Get(fieldName string) (value string, found bool) {
@@ -1308,4 +2269,75 @@ func (a WithStringAdditional2) MarshalJSON() ([]byte, error) {
 		}
 	}
 	return json.Marshal(object)
+}
+
+// Override default XML handling for WithStringAdditional2 to handle AdditionalProperties
+func (a *WithStringAdditional2) UnmarshalXML(d *xml.Decoder, start xml.StartElement) error {
+	knownFields := map[string]bool{
+		"fieldA": true,
+		"fieldB": true,
+	}
+
+	for {
+		tok, err := d.Token()
+		if err != nil {
+			return err
+		}
+		switch t := tok.(type) {
+		case xml.StartElement:
+			switch t.Name.Local {
+			case "fieldA":
+				if err := d.DecodeElement(&a.FieldA, &t); err != nil {
+					return fmt.Errorf("error reading 'fieldA': %w", err)
+				}
+			case "fieldB":
+				if err := d.DecodeElement(&a.FieldB, &t); err != nil {
+					return fmt.Errorf("error reading 'fieldB': %w", err)
+				}
+			default:
+				if !knownFields[t.Name.Local] {
+					if a.AdditionalProperties == nil {
+						a.AdditionalProperties = make(map[string]string)
+					}
+					var val string
+					if err := d.DecodeElement(&val, &t); err != nil {
+						return fmt.Errorf("error unmarshaling field %s: %w", t.Name.Local, err)
+					}
+					a.AdditionalProperties[t.Name.Local] = val
+				} else {
+					if err := d.Skip(); err != nil {
+						return err
+					}
+				}
+			}
+		case xml.EndElement:
+			return nil
+		}
+	}
+}
+
+// Override default XML handling for WithStringAdditional2 to handle AdditionalProperties
+func (a WithStringAdditional2) MarshalXML(e *xml.Encoder, start xml.StartElement) error {
+	if err := e.EncodeToken(start); err != nil {
+		return err
+	}
+
+	if a.FieldA != nil {
+		if err := e.EncodeElement(a.FieldA, xml.StartElement{Name: xml.Name{Local: "fieldA"}}); err != nil {
+			return fmt.Errorf("error marshaling 'fieldA': %w", err)
+		}
+	}
+
+	if a.FieldB != nil {
+		if err := e.EncodeElement(a.FieldB, xml.StartElement{Name: xml.Name{Local: "fieldB"}}); err != nil {
+			return fmt.Errorf("error marshaling 'fieldB': %w", err)
+		}
+	}
+
+	for fieldName, field := range a.AdditionalProperties {
+		if err := e.EncodeElement(field, xml.StartElement{Name: xml.Name{Local: fieldName}}); err != nil {
+			return fmt.Errorf("error marshaling '%s': %w", fieldName, err)
+		}
+	}
+	return e.EncodeToken(start.End())
 }

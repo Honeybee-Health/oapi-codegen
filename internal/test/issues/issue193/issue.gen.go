@@ -4,16 +4,113 @@
 package issue52
 
 import (
+	"bytes"
 	"encoding/json"
+	"encoding/xml"
 	"fmt"
 )
 
 // Person defines model for Person.
 type Person struct {
-	Age                  *float32               `json:"age,omitempty"`
-	Metadata             string                 `json:"metadata"`
-	Name                 *string                `json:"name,omitempty"`
+	Age                  *float32               `json:"age,omitempty" xml:"age"`
+	Metadata             string                 `json:"metadata" xml:"metadata"`
+	Name                 *string                `json:"name,omitempty" xml:"name"`
 	AdditionalProperties map[string]interface{} `json:"-"`
+}
+
+type RawMessage []byte
+
+// MarshalJSON returns the raw bytes as JSON.
+func (r RawMessage) MarshalJSON() ([]byte, error) {
+	if r == nil {
+		return []byte("null"), nil
+	}
+	return r, nil
+}
+
+// UnmarshalJSON sets the raw bytes from JSON input.
+func (r *RawMessage) UnmarshalJSON(data []byte) error {
+	*r = append((*r)[0:0], data...)
+	return nil
+}
+
+// MarshalXML encodes the raw XML message into the encoder, re-wrapping
+// it within the provided start element.
+func (r RawMessage) MarshalXML(e *xml.Encoder, start xml.StartElement) error {
+	if len(r) == 0 {
+		return nil
+	}
+
+	d := xml.NewDecoder(bytes.NewReader(r))
+	// Skip the original start element from the stored raw XML
+	_, err := d.Token()
+	if err != nil {
+		return err
+	}
+
+	// Write the caller-provided start element
+	if err := e.EncodeToken(start); err != nil {
+		return err
+	}
+
+	// Copy all inner tokens until we reach the matching end element
+	depth := 1
+	for {
+		tok, err := d.Token()
+		if err != nil {
+			return err
+		}
+		switch tok.(type) {
+		case xml.StartElement:
+			depth++
+		case xml.EndElement:
+			depth--
+			if depth == 0 {
+				return e.EncodeToken(start.End())
+			}
+		}
+		if err := e.EncodeToken(xml.CopyToken(tok)); err != nil {
+			return err
+		}
+	}
+}
+
+// UnmarshalXML captures a full XML element (including children) into raw bytes.
+func (r *RawMessage) UnmarshalXML(d *xml.Decoder, start xml.StartElement) error {
+	data, err := CaptureXMLElement(d, start)
+	if err != nil {
+		return err
+	}
+	*r = data
+	return nil
+}
+
+// CaptureXMLElement reads an entire XML element from the decoder and returns it as bytes.
+func CaptureXMLElement(d *xml.Decoder, start xml.StartElement) ([]byte, error) {
+	buf := new(bytes.Buffer)
+	encoder := xml.NewEncoder(buf)
+
+	if err := encoder.EncodeToken(start); err != nil {
+		return nil, err
+	}
+
+	for {
+		tok, err := d.Token()
+		if err != nil {
+			return nil, err
+		}
+
+		if err = encoder.EncodeToken(tok); err != nil {
+			return nil, err
+		}
+
+		if end, ok := tok.(xml.EndElement); ok && end.Name == start.Name {
+			encoder.Flush()
+			break
+		}
+	}
+
+	return buf.Bytes(), nil
 }
 
 // Getter for additional properties for Person. Returns the specified
@@ -110,4 +207,84 @@ func (a Person) MarshalJSON() ([]byte, error) {
 		}
 	}
 	return json.Marshal(object)
+}
+
+// Override default XML handling for Person to handle AdditionalProperties
+func (a *Person) UnmarshalXML(d *xml.Decoder, start xml.StartElement) error {
+	knownFields := map[string]bool{
+		"age":      true,
+		"metadata": true,
+		"name":     true,
+	}
+
+	for {
+		tok, err := d.Token()
+		if err != nil {
+			return err
+		}
+		switch t := tok.(type) {
+		case xml.StartElement:
+			switch t.Name.Local {
+			case "age":
+				if err := d.DecodeElement(&a.Age, &t); err != nil {
+					return fmt.Errorf("error reading 'age': %w", err)
+				}
+			case "metadata":
+				if err := d.DecodeElement(&a.Metadata, &t); err != nil {
+					return fmt.Errorf("error reading 'metadata': %w", err)
+				}
+			case "name":
+				if err := d.DecodeElement(&a.Name, &t); err != nil {
+					return fmt.Errorf("error reading 'name': %w", err)
+				}
+			default:
+				if !knownFields[t.Name.Local] {
+					if a.AdditionalProperties == nil {
+						a.AdditionalProperties = make(map[string]interface{})
+					}
+					var val interface{}
+					if err := d.DecodeElement(&val, &t); err != nil {
+						return fmt.Errorf("error unmarshaling field %s: %w", t.Name.Local, err)
+					}
+					a.AdditionalProperties[t.Name.Local] = val
+				} else {
+					if err := d.Skip(); err != nil {
+						return err
+					}
+				}
+			}
+		case xml.EndElement:
+			return nil
+		}
+	}
+}
+
+// Override default XML handling for Person to handle AdditionalProperties
+func (a Person) MarshalXML(e *xml.Encoder, start xml.StartElement) error {
+	if err := e.EncodeToken(start); err != nil {
+		return err
+	}
+
+	if a.Age != nil {
+		if err := e.EncodeElement(a.Age, xml.StartElement{Name: xml.Name{Local: "age"}}); err != nil {
+			return fmt.Errorf("error marshaling 'age': %w", err)
+		}
+	}
+
+	if err := e.EncodeElement(a.Metadata, xml.StartElement{Name: xml.Name{Local: "metadata"}}); err != nil {
+		return fmt.Errorf("error marshaling 'metadata': %w", err)
+	}
+
+	if a.Name != nil {
+		if err := e.EncodeElement(a.Name, xml.StartElement{Name: xml.Name{Local: "name"}}); err != nil {
+			return fmt.Errorf("error marshaling 'name': %w", err)
+		}
+	}
+
+	for fieldName, field := range a.AdditionalProperties {
+		if err := e.EncodeElement(field, xml.StartElement{Name: xml.Name{Local: fieldName}}); err != nil {
+			return fmt.Errorf("error marshaling '%s': %w", fieldName, err)
+		}
+	}
+	return e.EncodeToken(start.End())
 }

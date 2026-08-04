@@ -658,7 +658,11 @@ func oapiSchemaToGoType(schema *openapi3.Schema, path []string, outSchema *Schem
 		case "email":
 			outSchema.GoType = "openapi_types.Email"
 		case "date":
-			outSchema.GoType = "openapi_types.Date"
+			// Not openapi_types.Date: that type has no MarshalText of its own,
+			// so XML marshaling falls through to the embedded time.Time and
+			// emits RFC3339. XMLDate is generated into the output package with
+			// a MarshalText that renders CCYY-MM-DD.
+			outSchema.GoType = "XMLDate"
 		case "date-time":
 			outSchema.GoType = "time.Time"
 		case "json":

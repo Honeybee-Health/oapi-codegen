@@ -23,6 +23,7 @@ import (
 	"io"
 	"io/fs"
 	"net/http"
+	"regexp"
 	"os"
 	"runtime/debug"
 	"sort"
@@ -427,6 +428,15 @@ func Generate(spec *openapi3.T, opts Configuration) (string, error) {
 	// remove any byte-order-marks which break Go-Code
 	goCode := SanitizeCode(buf.String())
 
+	// Emit the XMLDate definition only if the spec actually produced a date.
+	// Nothing configures this: `format: date` resolves to XMLDate in
+	// oapiSchemaToGoType, and we simply look for the resulting references
+	// rather than dropping an unused type into every generated package.
+	goCode, err = appendXMLDateIfUsed(t, goCode)
+	if err != nil {
+		return "", err
+	}
+
 	// The generation code produces unindented horrors. Use the Go Imports
 	// to make it all pretty.
 	if opts.OutputOptions.SkipFmt {
@@ -438,6 +448,27 @@ func Generate(spec *openapi3.T, opts Configuration) (string, error) {
 		return "", fmt.Errorf("error formatting Go code %s: %w", goCode, err)
 	}
 	return string(outBytes), nil
+}
+
+// xmlDateRef matches a reference to the generated XMLDate type. Qualified
+// references (externalRef0.XMLDate) belong to another package, which emits its
+// own definition, so they must not count here.
+var xmlDateRef = regexp.MustCompile(`(^|[^\w.])XMLDate\b`)
+
+// appendXMLDateIfUsed appends the XMLDate definition to goCode when the
+// generated code references it. Go allows the definition to trail its uses, so
+// appending is safe, and it keeps the check to a single pass over the finished
+// output rather than threading a flag through every schema walk.
+func appendXMLDateIfUsed(t *template.Template, goCode string) (string, error) {
+	if !xmlDateRef.MatchString(goCode) {
+		return goCode, nil
+	}
+
+	xmlDateOut, err := GenerateTemplates([]string{"xml-date.tmpl"}, t, nil)
+	if err != nil {
+		return "", fmt.Errorf("error generating XMLDate definition: %w", err)
+	}
+	return goCode + xmlDateOut, nil
 }
 
 func GenerateTypeDefinitions(t *template.Template, swagger *openapi3.T, ops []OperationDefinition, excludeSchemas []string) (string, error) {
