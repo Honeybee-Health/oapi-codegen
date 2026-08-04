@@ -9,6 +9,7 @@ import (
 	"context"
 	"encoding/base64"
 	"encoding/json"
+	"encoding/xml"
 	"fmt"
 	"io"
 	"net/http"
@@ -29,48 +30,143 @@ const (
 
 // ComplexObject defines model for ComplexObject.
 type ComplexObject struct {
-	Id      int    `json:"Id"`
-	IsAdmin bool   `json:"IsAdmin"`
-	Object  Object `json:"Object"`
+	Id      int    `json:"Id" xml:"Id"`
+	IsAdmin bool   `json:"IsAdmin" xml:"IsAdmin"`
+	Object  Object `json:"Object" xml:"Object"`
 }
 
 // Object defines model for Object.
 type Object struct {
-	FirstName string `json:"firstName"`
-	Role      string `json:"role"`
+	FirstName string `json:"firstName" xml:"firstName"`
+	Role      string `json:"role" xml:"role"`
+}
+
+type RawMessage []byte
+
+// MarshalJSON returns the raw bytes as JSON.
+func (r RawMessage) MarshalJSON() ([]byte, error) {
+	if r == nil {
+		return []byte("null"), nil
+	}
+	return r, nil
+}
+
+// UnmarshalJSON sets the raw bytes from JSON input.
+func (r *RawMessage) UnmarshalJSON(data []byte) error {
+	*r = append((*r)[0:0], data...)
+	return nil
+}
+
+// MarshalXML encodes the raw XML message into the encoder, re-wrapping
+// it within the provided start element.
+func (r RawMessage) MarshalXML(e *xml.Encoder, start xml.StartElement) error {
+	if len(r) == 0 {
+		return nil
+	}
+
+	d := xml.NewDecoder(bytes.NewReader(r))
+	// Skip the original start element from the stored raw XML
+	_, err := d.Token()
+	if err != nil {
+		return err
+	}
+
+	// Write the caller-provided start element
+	if err := e.EncodeToken(start); err != nil {
+		return err
+	}
+
+	// Copy all inner tokens until we reach the matching end element
+	depth := 1
+	for {
+		tok, err := d.Token()
+		if err != nil {
+			return err
+		}
+		switch tok.(type) {
+		case xml.StartElement:
+			depth++
+		case xml.EndElement:
+			depth--
+			if depth == 0 {
+				return e.EncodeToken(start.End())
+			}
+		}
+		if err := e.EncodeToken(xml.CopyToken(tok)); err != nil {
+			return err
+		}
+	}
+}
+
+// UnmarshalXML captures a full XML element (including children) into raw bytes.
+func (r *RawMessage) UnmarshalXML(d *xml.Decoder, start xml.StartElement) error {
+	data, err := CaptureXMLElement(d, start)
+	if err != nil {
+		return err
+	}
+	*r = data
+	return nil
+}
+
+// CaptureXMLElement reads an entire XML element from the decoder and returns it as bytes.
+func CaptureXMLElement(d *xml.Decoder, start xml.StartElement) ([]byte, error) {
+	buf := new(bytes.Buffer)
+	encoder := xml.NewEncoder(buf)
+
+	if err := encoder.EncodeToken(start); err != nil {
+		return nil, err
+	}
+
+	for {
+		tok, err := d.Token()
+		if err != nil {
+			return nil, err
+		}
+
+		if err = encoder.EncodeToken(tok); err != nil {
+			return nil, err
+		}
+
+		if end, ok := tok.(xml.EndElement); ok && end.Name == start.Name {
+			encoder.Flush()
+			break
+		}
+	}
+
+	return buf.Bytes(), nil
 }
 
 // GetCookieParams defines parameters for GetCookie.
 type GetCookieParams struct {
 	// P primitive
-	P *int32 `form:"p,omitempty" json:"p,omitempty"`
+	P *int32 `form:"p,omitempty" json:"p,omitempty" xml:"p"`
 
 	// Ep primitive
-	Ep *int32 `form:"ep,omitempty" json:"ep,omitempty"`
+	Ep *int32 `form:"ep,omitempty" json:"ep,omitempty" xml:"ep"`
 
 	// Ea exploded array
-	Ea *[]int32 `form:"ea,omitempty" json:"ea,omitempty"`
+	Ea *[]int32 `form:"ea,omitempty" json:"ea,omitempty" xml:"ea"`
 
 	// A array
-	A *[]int32 `form:"a,omitempty" json:"a,omitempty"`
+	A *[]int32 `form:"a,omitempty" json:"a,omitempty" xml:"a"`
 
 	// Eo exploded object
-	Eo *Object `form:"eo,omitempty" json:"eo,omitempty"`
+	Eo *Object `form:"eo,omitempty" json:"eo,omitempty" xml:"eo"`
 
 	// O object
-	O *Object `form:"o,omitempty" json:"o,omitempty"`
+	O *Object `form:"o,omitempty" json:"o,omitempty" xml:"o"`
 
 	// Co complex object
-	Co *ComplexObject `form:"co,omitempty" json:"co,omitempty"`
+	Co *ComplexObject `form:"co,omitempty" json:"co,omitempty" xml:"co"`
 
 	// N1s name starting with number
-	N1s *string `form:"1s,omitempty" json:"1s,omitempty"`
+	N1s *string `form:"1s,omitempty" json:"1s,omitempty" xml:"1s"`
 }
 
 // EnumParamsParams defines parameters for EnumParams.
 type EnumParamsParams struct {
 	// EnumPathParam Parameter with enum values
-	EnumPathParam *EnumParamsParamsEnumPathParam `form:"enumPathParam,omitempty" json:"enumPathParam,omitempty"`
+	EnumPathParam *EnumParamsParamsEnumPathParam `form:"enumPathParam,omitempty" json:"enumPathParam,omitempty" xml:"enumPathParam"`
 }
 
 // EnumParamsParamsEnumPathParam defines parameters for EnumParams.
@@ -79,64 +175,64 @@ type EnumParamsParamsEnumPathParam int32
 // GetHeaderParams defines parameters for GetHeader.
 type GetHeaderParams struct {
 	// XPrimitive primitive
-	XPrimitive *int32 `json:"X-Primitive,omitempty"`
+	XPrimitive *int32 `json:"X-Primitive,omitempty" xml:"X-Primitive"`
 
 	// XPrimitiveExploded primitive
-	XPrimitiveExploded *int32 `json:"X-Primitive-Exploded,omitempty"`
+	XPrimitiveExploded *int32 `json:"X-Primitive-Exploded,omitempty" xml:"X-Primitive-Exploded"`
 
 	// XArrayExploded exploded array
-	XArrayExploded *[]int32 `json:"X-Array-Exploded,omitempty"`
+	XArrayExploded *[]int32 `json:"X-Array-Exploded,omitempty" xml:"X-Array-Exploded"`
 
 	// XArray array
-	XArray *[]int32 `json:"X-Array,omitempty"`
+	XArray *[]int32 `json:"X-Array,omitempty" xml:"X-Array"`
 
 	// XObjectExploded exploded object
-	XObjectExploded *Object `json:"X-Object-Exploded,omitempty"`
+	XObjectExploded *Object `json:"X-Object-Exploded,omitempty" xml:"X-Object-Exploded"`
 
 	// XObject object
-	XObject *Object `json:"X-Object,omitempty"`
+	XObject *Object `json:"X-Object,omitempty" xml:"X-Object"`
 
 	// XComplexObject complex object
-	XComplexObject *ComplexObject `json:"X-Complex-Object,omitempty"`
+	XComplexObject *ComplexObject `json:"X-Complex-Object,omitempty" xml:"X-Complex-Object"`
 
 	// N1StartingWithNumber name starting with number
-	N1StartingWithNumber *string `json:"1-Starting-With-Number,omitempty"`
+	N1StartingWithNumber *string `json:"1-Starting-With-Number,omitempty" xml:"1-Starting-With-Number"`
 }
 
 // GetDeepObjectParams defines parameters for GetDeepObject.
 type GetDeepObjectParams struct {
 	// DeepObj deep object
-	DeepObj ComplexObject `json:"deepObj"`
+	DeepObj ComplexObject `json:"deepObj" xml:"deepObj"`
 }
 
 // GetQueryFormParams defines parameters for GetQueryForm.
 type GetQueryFormParams struct {
 	// Ea exploded array
-	Ea *[]int32 `form:"ea,omitempty" json:"ea,omitempty"`
+	Ea *[]int32 `form:"ea,omitempty" json:"ea,omitempty" xml:"ea"`
 
 	// A array
-	A *[]int32 `form:"a,omitempty" json:"a,omitempty"`
+	A *[]int32 `form:"a,omitempty" json:"a,omitempty" xml:"a"`
 
 	// Eo exploded object
-	Eo *Object `form:"eo,omitempty" json:"eo,omitempty"`
+	Eo *Object `form:"eo,omitempty" json:"eo,omitempty" xml:"eo"`
 
 	// O object
-	O *Object `form:"o,omitempty" json:"o,omitempty"`
+	O *Object `form:"o,omitempty" json:"o,omitempty" xml:"o"`
 
 	// Ep exploded primitive
-	Ep *int32 `form:"ep,omitempty" json:"ep,omitempty"`
+	Ep *int32 `form:"ep,omitempty" json:"ep,omitempty" xml:"ep"`
 
 	// P primitive
-	P *int32 `form:"p,omitempty" json:"p,omitempty"`
+	P *int32 `form:"p,omitempty" json:"p,omitempty" xml:"p"`
 
 	// Ps primitive string
-	Ps *string `form:"ps,omitempty" json:"ps,omitempty"`
+	Ps *string `form:"ps,omitempty" json:"ps,omitempty" xml:"ps"`
 
 	// Co complex object
-	Co *ComplexObject `form:"co,omitempty" json:"co,omitempty"`
+	Co *ComplexObject `form:"co,omitempty" json:"co,omitempty" xml:"co"`
 
 	// N1s name starting with number
-	N1s *string `form:"1s,omitempty" json:"1s,omitempty"`
+	N1s *string `form:"1s,omitempty" json:"1s,omitempty" xml:"1s"`
 }
 
 // RequestEditorFn  is the function signature for the RequestEditor callback function

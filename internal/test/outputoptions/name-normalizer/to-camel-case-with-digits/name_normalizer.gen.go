@@ -9,6 +9,7 @@ import (
 	"context"
 	"encoding/base64"
 	"encoding/json"
+	"encoding/xml"
 	"fmt"
 	"io"
 	"net/http"
@@ -25,48 +26,164 @@ import (
 // Error defines model for Error.
 type Error struct {
 	// Code Error code
-	Code int32 `json:"code"`
+	Code int32 `json:"code" xml:"code"`
 
 	// Message Error message
-	Message string `json:"message"`
+	Message string `json:"message" xml:"message"`
 }
 
 // OneOf2Things Notice that the `things` is not capitalised
 type OneOf2Things struct {
-	union json.RawMessage
+	union  json.RawMessage
+	xunion RawMessage
 }
 
 // OneOf2Things0 defines model for .
 type OneOf2Things0 struct {
-	Id int `json:"id"`
+	Id int `json:"id" xml:"id"`
 }
 
 // OneOf2Things1 defines model for .
 type OneOf2Things1 struct {
-	Id openapi_types.UUID `json:"id"`
+	Id openapi_types.UUID `json:"id" xml:"id"`
 }
 
 // Pet defines model for Pet.
 type Pet struct {
 	// Name The name of the pet.
-	Name string `json:"name"`
+	Name string `json:"name" xml:"name"`
 
 	// Uuid The pet uuid.
-	Uuid string `json:"uuid"`
+	Uuid string `json:"uuid" xml:"uuid"`
+}
+
+type RawMessage []byte
+
+// MarshalJSON returns the raw bytes as JSON.
+func (r RawMessage) MarshalJSON() ([]byte, error) {
+	if r == nil {
+		return []byte("null"), nil
+	}
+	return r, nil
+}
+
+// UnmarshalJSON sets the raw bytes from JSON input.
+func (r *RawMessage) UnmarshalJSON(data []byte) error {
+	*r = append((*r)[0:0], data...)
+	return nil
+}
+
+// MarshalXML encodes the raw XML message into the encoder, re-wrapping
+// it within the provided start element.
+func (r RawMessage) MarshalXML(e *xml.Encoder, start xml.StartElement) error {
+	if len(r) == 0 {
+		return nil
+	}
+
+	d := xml.NewDecoder(bytes.NewReader(r))
+	// Skip the original start element from the stored raw XML
+	_, err := d.Token()
+	if err != nil {
+		return err
+	}
+
+	// Write the caller-provided start element
+	if err := e.EncodeToken(start); err != nil {
+		return err
+	}
+
+	// Copy all inner tokens until we reach the matching end element
+	depth := 1
+	for {
+		tok, err := d.Token()
+		if err != nil {
+			return err
+		}
+		switch tok.(type) {
+		case xml.StartElement:
+			depth++
+		case xml.EndElement:
+			depth--
+			if depth == 0 {
+				return e.EncodeToken(start.End())
+			}
+		}
+		if err := e.EncodeToken(xml.CopyToken(tok)); err != nil {
+			return err
+		}
+	}
+}
+
+// UnmarshalXML captures a full XML element (including children) into raw bytes.
+func (r *RawMessage) UnmarshalXML(d *xml.Decoder, start xml.StartElement) error {
+	data, err := CaptureXMLElement(d, start)
+	if err != nil {
+		return err
+	}
+	*r = data
+	return nil
+}
+
+// CaptureXMLElement reads an entire XML element from the decoder and returns it as bytes.
+func CaptureXMLElement(d *xml.Decoder, start xml.StartElement) ([]byte, error) {
+	buf := new(bytes.Buffer)
+	encoder := xml.NewEncoder(buf)
+
+	if err := encoder.EncodeToken(start); err != nil {
+		return nil, err
+	}
+
+	for {
+		tok, err := d.Token()
+		if err != nil {
+			return nil, err
+		}
+
+		if err = encoder.EncodeToken(tok); err != nil {
+			return nil, err
+		}
+
+		if end, ok := tok.(xml.EndElement); ok && end.Name == start.Name {
+			encoder.Flush()
+			break
+		}
+	}
+
+	return buf.Bytes(), nil
 }
 
 // AsOneOf2Things0 returns the union data inside the OneOf2Things as a OneOf2Things0
 func (t OneOf2Things) AsOneOf2Things0() (OneOf2Things0, error) {
 	var body OneOf2Things0
-	err := json.Unmarshal(t.union, &body)
-	return body, err
+	if len(t.union) > 0 {
+		err := json.Unmarshal(t.union, &body)
+		if err != nil {
+			return body, err
+		}
+	}
+	if len(t.xunion) > 0 {
+		err := xml.Unmarshal(t.xunion, &body)
+		if err != nil {
+			return body, err
+		}
+	}
+	return body, nil
 }
 
 // FromOneOf2Things0 overwrites any union data inside the OneOf2Things as the provided OneOf2Things0
 func (t *OneOf2Things) FromOneOf2Things0(v OneOf2Things0) error {
 	b, err := json.Marshal(v)
+	if err != nil {
+		return err
+	}
 	t.union = b
-	return err
+	b, err = xml.Marshal(v)
+	if err != nil {
+		return err
+	}
+	t.xunion = b
+
+	return nil
 }
 
 // MergeOneOf2Things0 performs a merge with any union data inside the OneOf2Things, using the provided OneOf2Things0
@@ -76,23 +193,51 @@ func (t *OneOf2Things) MergeOneOf2Things0(v OneOf2Things0) error {
 		return err
 	}
 
-	merged, err := runtime.JSONMerge(t.union, b)
+	merged, err := runtime.JSONMerge(b, t.union)
 	t.union = merged
+
+	// For XML, re-marshal the merged result
+	bx, errx := xml.Marshal(v)
+	if errx != nil {
+		return errx
+	}
+	t.xunion = bx
+
 	return err
 }
 
 // AsOneOf2Things1 returns the union data inside the OneOf2Things as a OneOf2Things1
 func (t OneOf2Things) AsOneOf2Things1() (OneOf2Things1, error) {
 	var body OneOf2Things1
-	err := json.Unmarshal(t.union, &body)
-	return body, err
+	if len(t.union) > 0 {
+		err := json.Unmarshal(t.union, &body)
+		if err != nil {
+			return body, err
+		}
+	}
+	if len(t.xunion) > 0 {
+		err := xml.Unmarshal(t.xunion, &body)
+		if err != nil {
+			return body, err
+		}
+	}
+	return body, nil
 }
 
 // FromOneOf2Things1 overwrites any union data inside the OneOf2Things as the provided OneOf2Things1
 func (t *OneOf2Things) FromOneOf2Things1(v OneOf2Things1) error {
 	b, err := json.Marshal(v)
+	if err != nil {
+		return err
+	}
 	t.union = b
-	return err
+	b, err = xml.Marshal(v)
+	if err != nil {
+		return err
+	}
+	t.xunion = b
+
+	return nil
 }
 
 // MergeOneOf2Things1 performs a merge with any union data inside the OneOf2Things, using the provided OneOf2Things1
@@ -102,8 +247,16 @@ func (t *OneOf2Things) MergeOneOf2Things1(v OneOf2Things1) error {
 		return err
 	}
 
-	merged, err := runtime.JSONMerge(t.union, b)
+	merged, err := runtime.JSONMerge(b, t.union)
 	t.union = merged
+
+	// For XML, re-marshal the merged result
+	bx, errx := xml.Marshal(v)
+	if errx != nil {
+		return errx
+	}
+	t.xunion = bx
+
 	return err
 }
 
@@ -115,6 +268,27 @@ func (t OneOf2Things) MarshalJSON() ([]byte, error) {
 func (t *OneOf2Things) UnmarshalJSON(b []byte) error {
 	err := t.union.UnmarshalJSON(b)
 	return err
+}
+
+func (t OneOf2Things) MarshalXML(e *xml.Encoder, start xml.StartElement) error {
+	if len(t.xunion) > 0 {
+		return t.xunion.MarshalXML(e, start)
+	}
+	if err := e.EncodeToken(start); err != nil {
+		return err
+	}
+	return e.EncodeToken(start.End())
+}
+
+func (t *OneOf2Things) UnmarshalXML(d *xml.Decoder, start xml.StartElement) error {
+	var err error
+
+	t.xunion, err = CaptureXMLElement(d, start)
+	if err != nil {
+		return err
+	}
+
+	return nil
 }
 
 // RequestEditorFn  is the function signature for the RequestEditor callback function

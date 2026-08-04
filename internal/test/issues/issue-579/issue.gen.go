@@ -4,14 +4,168 @@
 package issue579
 
 import (
-	openapi_types "github.com/oapi-codegen/runtime/types"
+	"bytes"
+	"encoding/json"
+	"encoding/xml"
+	"time"
 )
 
 // AliasedDate defines model for AliasedDate.
-type AliasedDate = openapi_types.Date
+type AliasedDate = XMLDate
 
 // Pet defines model for Pet.
 type Pet struct {
-	Born   *AliasedDate        `json:"born,omitempty"`
-	BornAt *openapi_types.Date `json:"born_at,omitempty"`
+	Born   *AliasedDate `json:"born,omitempty" xml:"born"`
+	BornAt *XMLDate     `json:"born_at,omitempty" xml:"born_at"`
+}
+
+type RawMessage []byte
+
+// MarshalJSON returns the raw bytes as JSON.
+func (r RawMessage) MarshalJSON() ([]byte, error) {
+	if r == nil {
+		return []byte("null"), nil
+	}
+	return r, nil
+}
+
+// UnmarshalJSON sets the raw bytes from JSON input.
+func (r *RawMessage) UnmarshalJSON(data []byte) error {
+	*r = append((*r)[0:0], data...)
+	return nil
+}
+
+// MarshalXML encodes the raw XML message into the encoder, re-wrapping
+// it within the provided start element.
+func (r RawMessage) MarshalXML(e *xml.Encoder, start xml.StartElement) error {
+	if len(r) == 0 {
+		return nil
+	}
+
+	d := xml.NewDecoder(bytes.NewReader(r))
+	// Skip the original start element from the stored raw XML
+	_, err := d.Token()
+	if err != nil {
+		return err
+	}
+
+	// Write the caller-provided start element
+	if err := e.EncodeToken(start); err != nil {
+		return err
+	}
+
+	// Copy all inner tokens until we reach the matching end element
+	depth := 1
+	for {
+		tok, err := d.Token()
+		if err != nil {
+			return err
+		}
+		switch tok.(type) {
+		case xml.StartElement:
+			depth++
+		case xml.EndElement:
+			depth--
+			if depth == 0 {
+				return e.EncodeToken(start.End())
+			}
+		}
+		if err := e.EncodeToken(xml.CopyToken(tok)); err != nil {
+			return err
+		}
+	}
+}
+
+// UnmarshalXML captures a full XML element (including children) into raw bytes.
+func (r *RawMessage) UnmarshalXML(d *xml.Decoder, start xml.StartElement) error {
+	data, err := CaptureXMLElement(d, start)
+	if err != nil {
+		return err
+	}
+	*r = data
+	return nil
+}
+
+// CaptureXMLElement reads an entire XML element from the decoder and returns it as bytes.
+func CaptureXMLElement(d *xml.Decoder, start xml.StartElement) ([]byte, error) {
+	buf := new(bytes.Buffer)
+	encoder := xml.NewEncoder(buf)
+
+	if err := encoder.EncodeToken(start); err != nil {
+		return nil, err
+	}
+
+	for {
+		tok, err := d.Token()
+		if err != nil {
+			return nil, err
+		}
+
+		if err = encoder.EncodeToken(tok); err != nil {
+			return nil, err
+		}
+
+		if end, ok := tok.(xml.EndElement); ok && end.Name == start.Name {
+			encoder.Flush()
+			break
+		}
+	}
+
+	return buf.Bytes(), nil
+}
+
+// XMLDate is the Go type for OpenAPI `format: date` values. It renders as a
+// plain CCYY-MM-DD date in both JSON and XML, including when used as an XML
+// attribute.
+//
+// It deliberately has the same underlying type as
+// github.com/oapi-codegen/runtime/types.Date (a struct embedding time.Time)
+// rather than embedding that type, so it stays convertible to it. The runtime's
+// parameter binding detects dates with reflect ConvertibleTo checks against
+// types.Date; a type that merely embedded types.Date would fail those checks
+// and silently bind the zero date in deepObject parameters.
+type XMLDate struct {
+	time.Time
+}
+
+// MarshalText renders the date as CCYY-MM-DD.
+//
+// This is the method types.Date is missing. Without it, encoding/xml finds the
+// MarshalText promoted from the embedded time.Time and emits a full RFC3339
+// timestamp, which is invalid for an xsd:date element.
+func (d XMLDate) MarshalText() ([]byte, error) {
+	return []byte(d.Time.Format("2006-01-02")), nil
+}
+
+// UnmarshalText parses a CCYY-MM-DD date.
+func (d *XMLDate) UnmarshalText(data []byte) error {
+	parsed, err := time.Parse("2006-01-02", string(data))
+	if err != nil {
+		return err
+	}
+	d.Time = parsed
+	return nil
+}
+
+// MarshalJSON renders the date as a CCYY-MM-DD JSON string.
+func (d XMLDate) MarshalJSON() ([]byte, error) {
+	return json.Marshal(d.Time.Format("2006-01-02"))
+}
+
+// UnmarshalJSON parses a CCYY-MM-DD JSON string.
+func (d *XMLDate) UnmarshalJSON(data []byte) error {
+	var dateStr string
+	if err := json.Unmarshal(data, &dateStr); err != nil {
+		return err
+	}
+	parsed, err := time.Parse("2006-01-02", dateStr)
+	if err != nil {
+		return err
+	}
+	d.Time = parsed
+	return nil
+}
+
+func (d XMLDate) String() string {
+	return d.Time.Format("2006-01-02")
 }

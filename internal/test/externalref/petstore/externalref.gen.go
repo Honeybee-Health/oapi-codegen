@@ -7,6 +7,7 @@ import (
 	"bytes"
 	"compress/gzip"
 	"encoding/base64"
+	"encoding/xml"
 	"fmt"
 	"net/url"
 	"path"
@@ -45,42 +46,42 @@ const (
 
 // Address defines model for Address.
 type Address struct {
-	City   *string `json:"city,omitempty"`
-	State  *string `json:"state,omitempty"`
-	Street *string `json:"street,omitempty"`
-	Zip    *string `json:"zip,omitempty"`
+	City   *string `json:"city,omitempty" xml:"city"`
+	State  *string `json:"state,omitempty" xml:"state"`
+	Street *string `json:"street,omitempty" xml:"street"`
+	Zip    *string `json:"zip,omitempty" xml:"zip"`
 }
 
 // ApiResponse defines model for ApiResponse.
 type ApiResponse struct {
-	Code    *int32  `json:"code,omitempty"`
-	Message *string `json:"message,omitempty"`
-	Type    *string `json:"type,omitempty"`
+	Code    *int32  `json:"code,omitempty" xml:"code"`
+	Message *string `json:"message,omitempty" xml:"message"`
+	Type    *string `json:"type,omitempty" xml:"type"`
 }
 
 // Category defines model for Category.
 type Category struct {
-	Id   *int64  `json:"id,omitempty"`
-	Name *string `json:"name,omitempty"`
+	Id   *int64  `json:"id,omitempty" xml:"id"`
+	Name *string `json:"name,omitempty" xml:"name"`
 }
 
 // Customer defines model for Customer.
 type Customer struct {
-	Address  *[]Address `json:"address,omitempty"`
-	Id       *int64     `json:"id,omitempty"`
-	Username *string    `json:"username,omitempty"`
+	Address  *[]Address `json:"address,omitempty" xml:"addresses"`
+	Id       *int64     `json:"id,omitempty" xml:"id"`
+	Username *string    `json:"username,omitempty" xml:"username"`
 }
 
 // Order defines model for Order.
 type Order struct {
-	Complete *bool      `json:"complete,omitempty"`
-	Id       *int64     `json:"id,omitempty"`
-	PetId    *int64     `json:"petId,omitempty"`
-	Quantity *int32     `json:"quantity,omitempty"`
-	ShipDate *time.Time `json:"shipDate,omitempty"`
+	Complete *bool      `json:"complete,omitempty" xml:"complete"`
+	Id       *int64     `json:"id,omitempty" xml:"id"`
+	PetId    *int64     `json:"petId,omitempty" xml:"petId"`
+	Quantity *int32     `json:"quantity,omitempty" xml:"quantity"`
+	ShipDate *time.Time `json:"shipDate,omitempty" xml:"shipDate"`
 
 	// Status Order Status
-	Status *OrderStatus `json:"status,omitempty"`
+	Status *OrderStatus `json:"status,omitempty" xml:"status"`
 }
 
 // OrderStatus Order Status
@@ -88,14 +89,14 @@ type OrderStatus string
 
 // Pet defines model for Pet.
 type Pet struct {
-	Category  *Category `json:"category,omitempty"`
-	Id        *int64    `json:"id,omitempty"`
-	Name      string    `json:"name"`
-	PhotoUrls []string  `json:"photoUrls"`
+	Category  *Category `json:"category,omitempty" xml:"category"`
+	Id        *int64    `json:"id,omitempty" xml:"id"`
+	Name      string    `json:"name" xml:"name"`
+	PhotoUrls []string  `json:"photoUrls" xml:"photoUrls"`
 
 	// Status pet status in the store
-	Status *PetStatus `json:"status,omitempty"`
-	Tags   *[]Tag     `json:"tags,omitempty"`
+	Status *PetStatus `json:"status,omitempty" xml:"status"`
+	Tags   *[]Tag     `json:"tags,omitempty" xml:"tags"`
 }
 
 // PetStatus pet status in the store
@@ -103,31 +104,126 @@ type PetStatus string
 
 // Tag defines model for Tag.
 type Tag struct {
-	Id   *int64  `json:"id,omitempty"`
-	Name *string `json:"name,omitempty"`
+	Id   *int64  `json:"id,omitempty" xml:"id"`
+	Name *string `json:"name,omitempty" xml:"name"`
 }
 
 // User defines model for User.
 type User struct {
-	Email     *string `json:"email,omitempty"`
-	FirstName *string `json:"firstName,omitempty"`
-	Id        *int64  `json:"id,omitempty"`
-	LastName  *string `json:"lastName,omitempty"`
-	Password  *string `json:"password,omitempty"`
-	Phone     *string `json:"phone,omitempty"`
+	Email     *string `json:"email,omitempty" xml:"email"`
+	FirstName *string `json:"firstName,omitempty" xml:"firstName"`
+	Id        *int64  `json:"id,omitempty" xml:"id"`
+	LastName  *string `json:"lastName,omitempty" xml:"lastName"`
+	Password  *string `json:"password,omitempty" xml:"password"`
+	Phone     *string `json:"phone,omitempty" xml:"phone"`
 
 	// UserStatus User Status
-	UserStatus *int32  `json:"userStatus,omitempty"`
-	Username   *string `json:"username,omitempty"`
+	UserStatus *int32  `json:"userStatus,omitempty" xml:"userStatus"`
+	Username   *string `json:"username,omitempty" xml:"username"`
 }
 
 // UserArray defines model for UserArray.
 type UserArray = []User
 
+type RawMessage []byte
+
+// MarshalJSON returns the raw bytes as JSON.
+func (r RawMessage) MarshalJSON() ([]byte, error) {
+	if r == nil {
+		return []byte("null"), nil
+	}
+	return r, nil
+}
+
+// UnmarshalJSON sets the raw bytes from JSON input.
+func (r *RawMessage) UnmarshalJSON(data []byte) error {
+	*r = append((*r)[0:0], data...)
+	return nil
+}
+
+// MarshalXML encodes the raw XML message into the encoder, re-wrapping
+// it within the provided start element.
+func (r RawMessage) MarshalXML(e *xml.Encoder, start xml.StartElement) error {
+	if len(r) == 0 {
+		return nil
+	}
+
+	d := xml.NewDecoder(bytes.NewReader(r))
+	// Skip the original start element from the stored raw XML
+	_, err := d.Token()
+	if err != nil {
+		return err
+	}
+
+	// Write the caller-provided start element
+	if err := e.EncodeToken(start); err != nil {
+		return err
+	}
+
+	// Copy all inner tokens until we reach the matching end element
+	depth := 1
+	for {
+		tok, err := d.Token()
+		if err != nil {
+			return err
+		}
+		switch tok.(type) {
+		case xml.StartElement:
+			depth++
+		case xml.EndElement:
+			depth--
+			if depth == 0 {
+				return e.EncodeToken(start.End())
+			}
+		}
+		if err := e.EncodeToken(xml.CopyToken(tok)); err != nil {
+			return err
+		}
+	}
+}
+
+// UnmarshalXML captures a full XML element (including children) into raw bytes.
+func (r *RawMessage) UnmarshalXML(d *xml.Decoder, start xml.StartElement) error {
+	data, err := CaptureXMLElement(d, start)
+	if err != nil {
+		return err
+	}
+	*r = data
+	return nil
+}
+
+// CaptureXMLElement reads an entire XML element from the decoder and returns it as bytes.
+func CaptureXMLElement(d *xml.Decoder, start xml.StartElement) ([]byte, error) {
+	buf := new(bytes.Buffer)
+	encoder := xml.NewEncoder(buf)
+
+	if err := encoder.EncodeToken(start); err != nil {
+		return nil, err
+	}
+
+	for {
+		tok, err := d.Token()
+		if err != nil {
+			return nil, err
+		}
+
+		if err = encoder.EncodeToken(tok); err != nil {
+			return nil, err
+		}
+
+		if end, ok := tok.(xml.EndElement); ok && end.Name == start.Name {
+			encoder.Flush()
+			break
+		}
+	}
+
+	return buf.Bytes(), nil
+}
+
 // FindPetsByStatusParams defines parameters for FindPetsByStatus.
 type FindPetsByStatusParams struct {
 	// Status Status values that need to be considered for filter
-	Status *FindPetsByStatusParamsStatus `form:"status,omitempty" json:"status,omitempty"`
+	Status *FindPetsByStatusParamsStatus `form:"status,omitempty" json:"status,omitempty" xml:"status"`
 }
 
 // FindPetsByStatusParamsStatus defines parameters for FindPetsByStatus.
@@ -136,27 +232,27 @@ type FindPetsByStatusParamsStatus string
 // FindPetsByTagsParams defines parameters for FindPetsByTags.
 type FindPetsByTagsParams struct {
 	// Tags Tags to filter by
-	Tags *[]string `form:"tags,omitempty" json:"tags,omitempty"`
+	Tags *[]string `form:"tags,omitempty" json:"tags,omitempty" xml:"tags"`
 }
 
 // DeletePetParams defines parameters for DeletePet.
 type DeletePetParams struct {
-	ApiKey *string `json:"api_key,omitempty"`
+	ApiKey *string `json:"api_key,omitempty" xml:"api_key"`
 }
 
 // UpdatePetWithFormParams defines parameters for UpdatePetWithForm.
 type UpdatePetWithFormParams struct {
 	// Name Name of pet that needs to be updated
-	Name *string `form:"name,omitempty" json:"name,omitempty"`
+	Name *string `form:"name,omitempty" json:"name,omitempty" xml:"name"`
 
 	// Status Status of pet that needs to be updated
-	Status *string `form:"status,omitempty" json:"status,omitempty"`
+	Status *string `form:"status,omitempty" json:"status,omitempty" xml:"status"`
 }
 
 // UploadFileParams defines parameters for UploadFile.
 type UploadFileParams struct {
 	// AdditionalMetadata Additional Metadata
-	AdditionalMetadata *string `form:"additionalMetadata,omitempty" json:"additionalMetadata,omitempty"`
+	AdditionalMetadata *string `form:"additionalMetadata,omitempty" json:"additionalMetadata,omitempty" xml:"additionalMetadata"`
 }
 
 // CreateUsersWithListInputJSONBody defines parameters for CreateUsersWithListInput.
@@ -165,10 +261,10 @@ type CreateUsersWithListInputJSONBody = []User
 // LoginUserParams defines parameters for LoginUser.
 type LoginUserParams struct {
 	// Username The user name for login
-	Username *string `form:"username,omitempty" json:"username,omitempty"`
+	Username *string `form:"username,omitempty" json:"username,omitempty" xml:"username"`
 
 	// Password The password for login in clear text
-	Password *string `form:"password,omitempty" json:"password,omitempty"`
+	Password *string `form:"password,omitempty" json:"password,omitempty" xml:"password"`
 }
 
 // AddPetJSONRequestBody defines body for AddPet for application/json ContentType.
