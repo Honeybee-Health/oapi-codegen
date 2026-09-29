@@ -10,7 +10,7 @@ import (
 // Pong defines model for Pong.
 type Pong struct {
 	// Ping Example: pong
-	Ping string `json:"ping"`
+	Ping string `json:"ping" xml:"ping"`
 }
 
 // ServerInterface represents all server handlers.

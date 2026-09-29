@@ -16,8 +16,8 @@ import (
 
 // SchemaObject defines model for SchemaObject.
 type SchemaObject struct {
-	FirstName string `json:"firstName"`
-	Role      string `json:"role"`
+	FirstName string `json:"firstName" xml:"firstName"`
+	Role      string `json:"role" xml:"role"`
 }
 
 // PostVendorJsonApplicationVndAPIPlusJSONBody defines parameters for PostVendorJson.

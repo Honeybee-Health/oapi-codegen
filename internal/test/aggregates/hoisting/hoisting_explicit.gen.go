@@ -5,8 +5,8 @@ package aggregateshoisting
 
 // Role defines model for Role.
 type Role struct {
-	Id   int    `json:"id"`
-	Name string `json:"name"`
+	Id   int    `json:"id" xml:"id"`
+	Name string `json:"name" xml:"name"`
 }
 
 // Roles defines model for Roles.
@@ -14,28 +14,28 @@ type Roles = []Roles_Item
 
 // Roles_Item defines model for Roles.Item.
 type Roles_Item struct {
-	Id   int    `json:"id"`
-	Name string `json:"name"`
+	Id   int    `json:"id" xml:"id"`
+	Name string `json:"name" xml:"name"`
 }
 
 // SuccessfulResponse defines model for SuccessfulResponse.
 type SuccessfulResponse struct {
 	// Data If successful, response from api
-	Data map[string]interface{} `json:"data"`
+	Data map[string]interface{} `json:"data" xml:"data"`
 
 	// Ok Indicated whether the response is successful.
-	Ok bool `json:"ok"`
+	Ok bool `json:"ok" xml:"ok"`
 }
 
 // GetRolesId200JSONResponseBody_Data defines parameters for GetRolesId.
 type GetRolesId200JSONResponseBody_Data struct {
-	Role Role `json:"role"`
+	Role Role `json:"role" xml:"role"`
 }
 
 // GetRolesId200JSONResponseBody defines parameters for GetRolesId.
 type GetRolesId200JSONResponseBody struct {
-	Data GetRolesId200JSONResponseBody_Data `json:"data"`
+	Data GetRolesId200JSONResponseBody_Data `json:"data" xml:"data"`
 
 	// Ok Indicated whether the response is successful.
-	Ok bool `json:"ok"`
+	Ok bool `json:"ok" xml:"ok"`
 }

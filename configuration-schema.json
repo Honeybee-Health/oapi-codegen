@@ -159,6 +159,10 @@
           "type": "boolean",
           "description": "Whether to skip generation of the Valid() method on enum types"
         },
+        "skip-xml-helpers": {
+          "type": "boolean",
+          "description": "Whether to skip emitting the XML helper types (RawMessage, CaptureXMLElement, XMLDate, setXMLDiscriminator). Set on all but one file when several generated files share a Go package"
+        },
         "skip-enum-via-oneof": {
           "type": "boolean",
           "description": "Disables detection of the OpenAPI 3.1 enum-via-oneOf idiom: a schema with `type: string|integer` and `oneOf:` members that each carry `const` + `title` will normally be emitted as a Go enum with named constants. Set this to true to fall through to the standard union generator instead."

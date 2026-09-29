@@ -20,7 +20,7 @@ import (
 
 // ErrTracingIdNotSent defines model for ErrTracingIdNotSent.
 type ErrTracingIdNotSent struct {
-	Code string `json:"code"`
+	Code string `json:"code" xml:"code"`
 }
 
 // ServerInterface represents all server handlers.

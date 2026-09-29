@@ -17,14 +17,14 @@ import (
 
 // Error defines model for Error.
 type Error struct {
-	Code    int32  `json:"code"`
-	Message string `json:"message"`
+	Code    int32  `json:"code" xml:"code"`
+	Message string `json:"message" xml:"message"`
 }
 
 // Thing defines model for Thing.
 type Thing struct {
-	Id   string `json:"id"`
-	Name string `json:"name"`
+	Id   string `json:"id" xml:"id"`
+	Name string `json:"name" xml:"name"`
 }
 
 // RequestEditorFn is the function signature for the RequestEditor callback function

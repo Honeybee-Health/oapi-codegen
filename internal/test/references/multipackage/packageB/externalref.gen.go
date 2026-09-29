@@ -53,7 +53,7 @@ func (e StatusEnum) Valid() bool {
 
 // ObjectB defines model for ObjectB.
 type ObjectB struct {
-	Name *string `json:"name,omitempty"`
+	Name *string `json:"name,omitempty" xml:"name"`
 }
 
 // Role defines model for Role.
@@ -64,14 +64,14 @@ type StatusEnum string
 
 // StatusV1 defines model for StatusV1.
 type StatusV1 struct {
-	Status StatusEnum `json:"status"`
+	Status StatusEnum `json:"status" xml:"status"`
 }
 
 // User defines model for User.
 type User struct {
-	Id       string  `json:"id"`
-	Roles    *[]Role `json:"roles,omitempty"`
-	Username string  `json:"username"`
+	Id       string  `json:"id" xml:"id"`
+	Roles    *[]Role `json:"roles,omitempty" xml:"roles"`
+	Username string  `json:"username" xml:"username"`
 }
 
 // Base64 encoded, compressed with deflate, json marshaled OpenAPI spec.

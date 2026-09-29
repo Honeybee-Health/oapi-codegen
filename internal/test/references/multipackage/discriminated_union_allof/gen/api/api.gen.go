@@ -4,7 +4,9 @@
 package api
 
 import (
+	"bytes"
 	"encoding/json"
+	"encoding/xml"
 	"errors"
 	"fmt"
 
@@ -14,20 +16,32 @@ import (
 
 // PRFile defines model for PRFile.
 type PRFile struct {
-	Viewed *bool `json:"viewed,omitempty"`
+	Viewed *bool `json:"viewed,omitempty" xml:"viewed"`
 	union  json.RawMessage
+	xunion RawMessage
 }
 
 // ViewedStatus defines model for ViewedStatus.
 type ViewedStatus struct {
-	Viewed *bool `json:"viewed,omitempty"`
+	Viewed *bool `json:"viewed,omitempty" xml:"viewed"`
 }
 
 // AsExternalRef0GitDiffFile returns the union data inside the PRFile as a externalRef0.GitDiffFile
 func (t PRFile) AsExternalRef0GitDiffFile() (externalRef0.GitDiffFile, error) {
 	var body externalRef0.GitDiffFile
-	err := json.Unmarshal(t.union, &body)
-	return body, err
+	if len(t.union) > 0 {
+		err := json.Unmarshal(t.union, &body)
+		if err != nil {
+			return body, err
+		}
+	}
+	if len(t.xunion) > 0 {
+		err := xml.Unmarshal(t.xunion, &body)
+		if err != nil {
+			return body, err
+		}
+	}
+	return body, nil
 }
 
 // FromExternalRef0GitDiffFile overwrites any union data inside the PRFile as the provided externalRef0.GitDiffFile
@@ -37,8 +51,20 @@ func (t *PRFile) FromExternalRef0GitDiffFile(v externalRef0.GitDiffFile) error {
 		return err
 	}
 	b, err = runtime.JSONMerge(b, []byte(`{"diff_type":"GitDiffFile"}`))
+	if err != nil {
+		return err
+	}
 	t.union = b
-	return err
+	// The JSON stamp above never reaches v, so set the variant's own
+	// discriminator field for the XML copy.
+	v.DiffType = "GitDiffFile"
+	b, err = xml.Marshal(v)
+	if err != nil {
+		return err
+	}
+	t.xunion = b
+
+	return nil
 }
 
 // MergeExternalRef0GitDiffFile performs a merge with any union data inside the PRFile, using the provided externalRef0.GitDiffFile
@@ -54,14 +80,34 @@ func (t *PRFile) MergeExternalRef0GitDiffFile(v externalRef0.GitDiffFile) error 
 
 	merged, err := runtime.JSONMerge(t.union, b)
 	t.union = merged
+
+	// For XML, re-marshal the merged result
+	v.DiffType = "GitDiffFile"
+	bx, errx := xml.Marshal(v)
+	if errx != nil {
+		return errx
+	}
+	t.xunion = bx
+
 	return err
 }
 
 // AsExternalRef0AddedImageDiffFile returns the union data inside the PRFile as a externalRef0.AddedImageDiffFile
 func (t PRFile) AsExternalRef0AddedImageDiffFile() (externalRef0.AddedImageDiffFile, error) {
 	var body externalRef0.AddedImageDiffFile
-	err := json.Unmarshal(t.union, &body)
-	return body, err
+	if len(t.union) > 0 {
+		err := json.Unmarshal(t.union, &body)
+		if err != nil {
+			return body, err
+		}
+	}
+	if len(t.xunion) > 0 {
+		err := xml.Unmarshal(t.xunion, &body)
+		if err != nil {
+			return body, err
+		}
+	}
+	return body, nil
 }
 
 // FromExternalRef0AddedImageDiffFile overwrites any union data inside the PRFile as the provided externalRef0.AddedImageDiffFile
@@ -71,8 +117,20 @@ func (t *PRFile) FromExternalRef0AddedImageDiffFile(v externalRef0.AddedImageDif
 		return err
 	}
 	b, err = runtime.JSONMerge(b, []byte(`{"diff_type":"AddedImageDiffFile"}`))
+	if err != nil {
+		return err
+	}
 	t.union = b
-	return err
+	// The JSON stamp above never reaches v, so set the variant's own
+	// discriminator field for the XML copy.
+	v.DiffType = "AddedImageDiffFile"
+	b, err = xml.Marshal(v)
+	if err != nil {
+		return err
+	}
+	t.xunion = b
+
+	return nil
 }
 
 // MergeExternalRef0AddedImageDiffFile performs a merge with any union data inside the PRFile, using the provided externalRef0.AddedImageDiffFile
@@ -88,15 +146,37 @@ func (t *PRFile) MergeExternalRef0AddedImageDiffFile(v externalRef0.AddedImageDi
 
 	merged, err := runtime.JSONMerge(t.union, b)
 	t.union = merged
+
+	// For XML, re-marshal the merged result
+	v.DiffType = "AddedImageDiffFile"
+	bx, errx := xml.Marshal(v)
+	if errx != nil {
+		return errx
+	}
+	t.xunion = bx
+
 	return err
 }
 
 func (t PRFile) Discriminator() (string, error) {
 	var discriminator struct {
-		Discriminator string `json:"diff_type"`
+		Discriminator string `json:"diff_type" xml:"diff_type"`
 	}
-	err := json.Unmarshal(t.union, &discriminator)
-	return discriminator.Discriminator, err
+	if len(t.union) > 0 {
+		err := json.Unmarshal(t.union, &discriminator)
+		if err != nil {
+			return "", err
+		}
+		return discriminator.Discriminator, nil
+	}
+	if len(t.xunion) > 0 {
+		err := xml.Unmarshal(t.xunion, &discriminator)
+		if err != nil {
+			return "", err
+		}
+		return discriminator.Discriminator, nil
+	}
+	return "", nil
 }
 
 func (t PRFile) ValueByDiscriminator() (interface{}, error) {
@@ -156,4 +236,162 @@ func (t *PRFile) UnmarshalJSON(b []byte) error {
 	}
 
 	return err
+}
+
+func (t PRFile) MarshalXML(e *xml.Encoder, start xml.StartElement) error {
+	// Marshal with fixed properties merged into the union content
+	if err := e.EncodeToken(start); err != nil {
+		return err
+	}
+
+	// Write union inner content first
+	if len(t.xunion) > 0 {
+		d := xml.NewDecoder(bytes.NewReader([]byte(t.xunion)))
+		// Skip the original start element
+		if _, err := d.Token(); err != nil {
+			return err
+		}
+		depth := 1
+		for depth > 0 {
+			tok, err := d.Token()
+			if err != nil {
+				return err
+			}
+			switch tok.(type) {
+			case xml.StartElement:
+				depth++
+			case xml.EndElement:
+				depth--
+			}
+			if depth > 0 {
+				if err := e.EncodeToken(xml.CopyToken(tok)); err != nil {
+					return err
+				}
+			}
+		}
+	}
+
+	// Write fixed properties (ensures they are present even if not in xunion)
+
+	if t.Viewed != nil {
+		if err := e.EncodeElement(t.Viewed, xml.StartElement{Name: xml.Name{Local: "viewed"}}); err != nil {
+			return fmt.Errorf("error marshaling 'viewed': %w", err)
+		}
+	}
+	return e.EncodeToken(start.End())
+}
+
+func (t *PRFile) UnmarshalXML(d *xml.Decoder, start xml.StartElement) error {
+	var err error
+
+	t.xunion, err = CaptureXMLElement(d, start)
+	if err != nil {
+		return err
+	}
+
+	// Extract fixed properties from the captured XML
+	type xmlProps struct {
+		Viewed *bool `xml:"viewed"`
+	}
+	var props xmlProps
+	if err := xml.Unmarshal(t.xunion, &props); err != nil {
+		return err
+	}
+	t.Viewed = props.Viewed
+	return nil
+}
+
+type RawMessage []byte
+
+// MarshalJSON returns the raw bytes as JSON.
+func (r RawMessage) MarshalJSON() ([]byte, error) {
+	if r == nil {
+		return []byte("null"), nil
+	}
+	return r, nil
+}
+
+// UnmarshalJSON sets the raw bytes from JSON input.
+func (r *RawMessage) UnmarshalJSON(data []byte) error {
+	*r = append((*r)[0:0], data...)
+	return nil
+}
+
+// MarshalXML encodes the raw XML message into the encoder, re-wrapping
+// it within the provided start element.
+func (r RawMessage) MarshalXML(e *xml.Encoder, start xml.StartElement) error {
+	if len(r) == 0 {
+		return nil
+	}
+
+	d := xml.NewDecoder(bytes.NewReader(r))
+	// Skip the original start element from the stored raw XML
+	_, err := d.Token()
+	if err != nil {
+		return err
+	}
+
+	// Write the caller-provided start element
+	if err := e.EncodeToken(start); err != nil {
+		return err
+	}
+
+	// Copy all inner tokens until we reach the matching end element
+	depth := 1
+	for {
+		tok, err := d.Token()
+		if err != nil {
+			return err
+		}
+		switch tok.(type) {
+		case xml.StartElement:
+			depth++
+		case xml.EndElement:
+			depth--
+			if depth == 0 {
+				return e.EncodeToken(start.End())
+			}
+		}
+		if err := e.EncodeToken(xml.CopyToken(tok)); err != nil {
+			return err
+		}
+	}
+}
+
+// UnmarshalXML captures a full XML element (including children) into raw bytes.
+func (r *RawMessage) UnmarshalXML(d *xml.Decoder, start xml.StartElement) error {
+	data, err := CaptureXMLElement(d, start)
+	if err != nil {
+		return err
+	}
+	*r = data
+	return nil
+}
+
+// CaptureXMLElement reads an entire XML element from the decoder and returns it as bytes.
+func CaptureXMLElement(d *xml.Decoder, start xml.StartElement) ([]byte, error) {
+	buf := new(bytes.Buffer)
+	encoder := xml.NewEncoder(buf)
+
+	if err := encoder.EncodeToken(start); err != nil {
+		return nil, err
+	}
+
+	for {
+		tok, err := d.Token()
+		if err != nil {
+			return nil, err
+		}
+
+		if err = encoder.EncodeToken(tok); err != nil {
+			return nil, err
+		}
+
+		if end, ok := tok.(xml.EndElement); ok && end.Name == start.Name {
+			encoder.Flush()
+			break
+		}
+	}
+
+	return buf.Bytes(), nil
 }

@@ -5,5 +5,5 @@ package optionsskipprune
 
 // ClientTypeDefault defines model for ClientTypeDefault.
 type ClientTypeDefault struct {
-	Name string `json:"name"`
+	Name string `json:"name" xml:"name"`
 }

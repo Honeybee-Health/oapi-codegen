@@ -4,7 +4,9 @@
 package aggregatesoneof
 
 import (
+	"bytes"
 	"encoding/json"
+	"encoding/xml"
 	"errors"
 	"fmt"
 
@@ -43,42 +45,44 @@ func (e ResourceConflictErrorCode) Valid() bool {
 
 // ConfigHttp defines model for ConfigHttp.
 type ConfigHttp struct {
-	ConfigType string  `json:"config_type"`
-	Host       string  `json:"host"`
-	Password   *string `json:"password,omitempty"`
-	Port       int     `json:"port"`
-	User       *string `json:"user,omitempty"`
+	ConfigType string  `json:"config_type" xml:"config_type"`
+	Host       string  `json:"host" xml:"host"`
+	Password   *string `json:"password,omitempty" xml:"password"`
+	Port       int     `json:"port" xml:"port"`
+	User       *string `json:"user,omitempty" xml:"user"`
 }
 
 // ConfigSaveReq defines model for ConfigSaveReq.
 type ConfigSaveReq struct {
-	union json.RawMessage
+	union  json.RawMessage
+	xunion RawMessage
 }
 
 // ConfigSsh defines model for ConfigSsh.
 type ConfigSsh struct {
-	ConfigType string  `json:"config_type"`
-	Host       *string `json:"host,omitempty"`
-	Port       *int    `json:"port,omitempty"`
-	PrivateKey *string `json:"private_key,omitempty"`
-	User       *string `json:"user,omitempty"`
+	ConfigType string  `json:"config_type" xml:"config_type"`
+	Host       *string `json:"host,omitempty" xml:"host"`
+	Port       *int    `json:"port,omitempty" xml:"port"`
+	PrivateKey *string `json:"private_key,omitempty" xml:"private_key"`
+	User       *string `json:"user,omitempty" xml:"user"`
 }
 
 // ConflictError defines model for ConflictError.
 type ConflictError struct {
-	union json.RawMessage
+	union  json.RawMessage
+	xunion RawMessage
 }
 
 // ErrorBase defines model for ErrorBase.
 type ErrorBase struct {
-	Code  *string `json:"code,omitempty"`
-	Error string  `json:"error"`
+	Code  *string `json:"code,omitempty" xml:"code"`
+	Error string  `json:"error" xml:"error"`
 }
 
 // IdempotencyConflictError defines model for IdempotencyConflictError.
 type IdempotencyConflictError struct {
-	Code  *IdempotencyConflictErrorCode `json:"code,omitempty"`
-	Error string                        `json:"error"`
+	Code  *IdempotencyConflictErrorCode `json:"code,omitempty" xml:"code"`
+	Error string                        `json:"error" xml:"error"`
 }
 
 // IdempotencyConflictErrorCode defines model for IdempotencyConflictError.Code.
@@ -86,30 +90,32 @@ type IdempotencyConflictErrorCode string
 
 // KindCat defines model for KindCat.
 type KindCat struct {
-	Meow *string `json:"meow,omitempty"`
+	Meow *string `json:"meow,omitempty" xml:"meow"`
 }
 
 // KindDog defines model for KindDog.
 type KindDog struct {
-	Bark *string `json:"bark,omitempty"`
+	Bark *string `json:"bark,omitempty" xml:"bark"`
 }
 
 // PetByKind defines model for PetByKind.
 type PetByKind struct {
-	Kind  *string `json:"kind,omitempty"`
-	union json.RawMessage
+	Kind   *string `json:"kind,omitempty" xml:"kind"`
+	union  json.RawMessage
+	xunion RawMessage
 }
 
 // RenamedPetByKind defines model for RenamedPetByKind.
 type RenamedPetByKind struct {
-	Species *string `json:"kind,omitempty"`
+	Species *string `json:"kind,omitempty" xml:"kind"`
 	union   json.RawMessage
+	xunion  RawMessage
 }
 
 // ResourceConflictError defines model for ResourceConflictError.
 type ResourceConflictError struct {
-	Code  *ResourceConflictErrorCode `json:"code,omitempty"`
-	Error string                     `json:"error"`
+	Code  *ResourceConflictErrorCode `json:"code,omitempty" xml:"code"`
+	Error string                     `json:"error" xml:"error"`
 }
 
 // ResourceConflictErrorCode defines model for ResourceConflictError.Code.
@@ -127,15 +133,35 @@ type PostRenamedPetJSONRequestBody = RenamedPetByKind
 // AsConfigHttp returns the union data inside the ConfigSaveReq as a ConfigHttp
 func (t ConfigSaveReq) AsConfigHttp() (ConfigHttp, error) {
 	var body ConfigHttp
-	err := json.Unmarshal(t.union, &body)
-	return body, err
+	if len(t.union) > 0 {
+		err := json.Unmarshal(t.union, &body)
+		if err != nil {
+			return body, err
+		}
+	}
+	if len(t.xunion) > 0 {
+		err := xml.Unmarshal(t.xunion, &body)
+		if err != nil {
+			return body, err
+		}
+	}
+	return body, nil
 }
 
 // FromConfigHttp overwrites any union data inside the ConfigSaveReq as the provided ConfigHttp
 func (t *ConfigSaveReq) FromConfigHttp(v ConfigHttp) error {
 	b, err := json.Marshal(v)
+	if err != nil {
+		return err
+	}
 	t.union = b
-	return err
+	b, err = xml.Marshal(v)
+	if err != nil {
+		return err
+	}
+	t.xunion = b
+
+	return nil
 }
 
 // MergeConfigHttp performs a merge with any union data inside the ConfigSaveReq, using the provided ConfigHttp
@@ -147,21 +173,49 @@ func (t *ConfigSaveReq) MergeConfigHttp(v ConfigHttp) error {
 
 	merged, err := runtime.JSONMerge(t.union, b)
 	t.union = merged
+
+	// For XML, re-marshal the merged result
+	bx, errx := xml.Marshal(v)
+	if errx != nil {
+		return errx
+	}
+	t.xunion = bx
+
 	return err
 }
 
 // AsConfigSsh returns the union data inside the ConfigSaveReq as a ConfigSsh
 func (t ConfigSaveReq) AsConfigSsh() (ConfigSsh, error) {
 	var body ConfigSsh
-	err := json.Unmarshal(t.union, &body)
-	return body, err
+	if len(t.union) > 0 {
+		err := json.Unmarshal(t.union, &body)
+		if err != nil {
+			return body, err
+		}
+	}
+	if len(t.xunion) > 0 {
+		err := xml.Unmarshal(t.xunion, &body)
+		if err != nil {
+			return body, err
+		}
+	}
+	return body, nil
 }
 
 // FromConfigSsh overwrites any union data inside the ConfigSaveReq as the provided ConfigSsh
 func (t *ConfigSaveReq) FromConfigSsh(v ConfigSsh) error {
 	b, err := json.Marshal(v)
+	if err != nil {
+		return err
+	}
 	t.union = b
-	return err
+	b, err = xml.Marshal(v)
+	if err != nil {
+		return err
+	}
+	t.xunion = b
+
+	return nil
 }
 
 // MergeConfigSsh performs a merge with any union data inside the ConfigSaveReq, using the provided ConfigSsh
@@ -173,15 +227,36 @@ func (t *ConfigSaveReq) MergeConfigSsh(v ConfigSsh) error {
 
 	merged, err := runtime.JSONMerge(t.union, b)
 	t.union = merged
+
+	// For XML, re-marshal the merged result
+	bx, errx := xml.Marshal(v)
+	if errx != nil {
+		return errx
+	}
+	t.xunion = bx
+
 	return err
 }
 
 func (t ConfigSaveReq) Discriminator() (string, error) {
 	var discriminator struct {
-		Discriminator string `json:"config_type"`
+		Discriminator string `json:"config_type" xml:"config_type"`
 	}
-	err := json.Unmarshal(t.union, &discriminator)
-	return discriminator.Discriminator, err
+	if len(t.union) > 0 {
+		err := json.Unmarshal(t.union, &discriminator)
+		if err != nil {
+			return "", err
+		}
+		return discriminator.Discriminator, nil
+	}
+	if len(t.xunion) > 0 {
+		err := xml.Unmarshal(t.xunion, &discriminator)
+		if err != nil {
+			return "", err
+		}
+		return discriminator.Discriminator, nil
+	}
+	return "", nil
 }
 
 func (t ConfigSaveReq) ValueByDiscriminator() (interface{}, error) {
@@ -213,11 +288,43 @@ func (t *ConfigSaveReq) UnmarshalJSON(b []byte) error {
 	return err
 }
 
+func (t ConfigSaveReq) MarshalXML(e *xml.Encoder, start xml.StartElement) error {
+	if len(t.xunion) > 0 {
+		return t.xunion.MarshalXML(e, start)
+	}
+	if err := e.EncodeToken(start); err != nil {
+		return err
+	}
+	return e.EncodeToken(start.End())
+}
+
+func (t *ConfigSaveReq) UnmarshalXML(d *xml.Decoder, start xml.StartElement) error {
+	var err error
+
+	t.xunion, err = CaptureXMLElement(d, start)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
 // AsResourceConflictError returns the union data inside the ConflictError as a ResourceConflictError
 func (t ConflictError) AsResourceConflictError() (ResourceConflictError, error) {
 	var body ResourceConflictError
-	err := json.Unmarshal(t.union, &body)
-	return body, err
+	if len(t.union) > 0 {
+		err := json.Unmarshal(t.union, &body)
+		if err != nil {
+			return body, err
+		}
+	}
+	if len(t.xunion) > 0 {
+		err := xml.Unmarshal(t.xunion, &body)
+		if err != nil {
+			return body, err
+		}
+	}
+	return body, nil
 }
 
 // FromResourceConflictError overwrites any union data inside the ConflictError as the provided ResourceConflictError
@@ -227,8 +334,20 @@ func (t *ConflictError) FromResourceConflictError(v ResourceConflictError) error
 		return err
 	}
 	b, err = runtime.JSONMerge(b, []byte(`{"code":"resource_exists"}`))
+	if err != nil {
+		return err
+	}
 	t.union = b
-	return err
+	// The JSON stamp above never reaches v, so set the variant's own
+	// discriminator field for the XML copy.
+	setXMLDiscriminator(&v.Code, "resource_exists")
+	b, err = xml.Marshal(v)
+	if err != nil {
+		return err
+	}
+	t.xunion = b
+
+	return nil
 }
 
 // MergeResourceConflictError performs a merge with any union data inside the ConflictError, using the provided ResourceConflictError
@@ -244,14 +363,34 @@ func (t *ConflictError) MergeResourceConflictError(v ResourceConflictError) erro
 
 	merged, err := runtime.JSONMerge(t.union, b)
 	t.union = merged
+
+	// For XML, re-marshal the merged result
+	setXMLDiscriminator(&v.Code, "resource_exists")
+	bx, errx := xml.Marshal(v)
+	if errx != nil {
+		return errx
+	}
+	t.xunion = bx
+
 	return err
 }
 
 // AsIdempotencyConflictError returns the union data inside the ConflictError as a IdempotencyConflictError
 func (t ConflictError) AsIdempotencyConflictError() (IdempotencyConflictError, error) {
 	var body IdempotencyConflictError
-	err := json.Unmarshal(t.union, &body)
-	return body, err
+	if len(t.union) > 0 {
+		err := json.Unmarshal(t.union, &body)
+		if err != nil {
+			return body, err
+		}
+	}
+	if len(t.xunion) > 0 {
+		err := xml.Unmarshal(t.xunion, &body)
+		if err != nil {
+			return body, err
+		}
+	}
+	return body, nil
 }
 
 // FromIdempotencyConflictError overwrites any union data inside the ConflictError as the provided IdempotencyConflictError
@@ -261,8 +400,20 @@ func (t *ConflictError) FromIdempotencyConflictError(v IdempotencyConflictError)
 		return err
 	}
 	b, err = runtime.JSONMerge(b, []byte(`{"code":"idempotency_conflict"}`))
+	if err != nil {
+		return err
+	}
 	t.union = b
-	return err
+	// The JSON stamp above never reaches v, so set the variant's own
+	// discriminator field for the XML copy.
+	setXMLDiscriminator(&v.Code, "idempotency_conflict")
+	b, err = xml.Marshal(v)
+	if err != nil {
+		return err
+	}
+	t.xunion = b
+
+	return nil
 }
 
 // MergeIdempotencyConflictError performs a merge with any union data inside the ConflictError, using the provided IdempotencyConflictError
@@ -278,15 +429,37 @@ func (t *ConflictError) MergeIdempotencyConflictError(v IdempotencyConflictError
 
 	merged, err := runtime.JSONMerge(t.union, b)
 	t.union = merged
+
+	// For XML, re-marshal the merged result
+	setXMLDiscriminator(&v.Code, "idempotency_conflict")
+	bx, errx := xml.Marshal(v)
+	if errx != nil {
+		return errx
+	}
+	t.xunion = bx
+
 	return err
 }
 
 func (t ConflictError) Discriminator() (string, error) {
 	var discriminator struct {
-		Discriminator string `json:"code"`
+		Discriminator string `json:"code" xml:"code"`
 	}
-	err := json.Unmarshal(t.union, &discriminator)
-	return discriminator.Discriminator, err
+	if len(t.union) > 0 {
+		err := json.Unmarshal(t.union, &discriminator)
+		if err != nil {
+			return "", err
+		}
+		return discriminator.Discriminator, nil
+	}
+	if len(t.xunion) > 0 {
+		err := xml.Unmarshal(t.xunion, &discriminator)
+		if err != nil {
+			return "", err
+		}
+		return discriminator.Discriminator, nil
+	}
+	return "", nil
 }
 
 func (t ConflictError) ValueByDiscriminator() (interface{}, error) {
@@ -314,11 +487,43 @@ func (t *ConflictError) UnmarshalJSON(b []byte) error {
 	return err
 }
 
+func (t ConflictError) MarshalXML(e *xml.Encoder, start xml.StartElement) error {
+	if len(t.xunion) > 0 {
+		return t.xunion.MarshalXML(e, start)
+	}
+	if err := e.EncodeToken(start); err != nil {
+		return err
+	}
+	return e.EncodeToken(start.End())
+}
+
+func (t *ConflictError) UnmarshalXML(d *xml.Decoder, start xml.StartElement) error {
+	var err error
+
+	t.xunion, err = CaptureXMLElement(d, start)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
 // AsKindCat returns the union data inside the PetByKind as a KindCat
 func (t PetByKind) AsKindCat() (KindCat, error) {
 	var body KindCat
-	err := json.Unmarshal(t.union, &body)
-	return body, err
+	if len(t.union) > 0 {
+		err := json.Unmarshal(t.union, &body)
+		if err != nil {
+			return body, err
+		}
+	}
+	if len(t.xunion) > 0 {
+		err := xml.Unmarshal(t.xunion, &body)
+		if err != nil {
+			return body, err
+		}
+	}
+	return body, nil
 }
 
 // FromKindCat overwrites any union data inside the PetByKind as the provided KindCat
@@ -330,8 +535,17 @@ func (t *PetByKind) FromKindCat(v KindCat) error {
 		return err
 	}
 	b, err = runtime.JSONMerge(b, []byte(`{"kind":"cat"}`))
+	if err != nil {
+		return err
+	}
 	t.union = b
-	return err
+	b, err = xml.Marshal(v)
+	if err != nil {
+		return err
+	}
+	t.xunion = b
+
+	return nil
 }
 
 // MergeKindCat performs a merge with any union data inside the PetByKind, using the provided KindCat
@@ -349,14 +563,33 @@ func (t *PetByKind) MergeKindCat(v KindCat) error {
 
 	merged, err := runtime.JSONMerge(t.union, b)
 	t.union = merged
+
+	// For XML, re-marshal the merged result
+	bx, errx := xml.Marshal(v)
+	if errx != nil {
+		return errx
+	}
+	t.xunion = bx
+
 	return err
 }
 
 // AsKindDog returns the union data inside the PetByKind as a KindDog
 func (t PetByKind) AsKindDog() (KindDog, error) {
 	var body KindDog
-	err := json.Unmarshal(t.union, &body)
-	return body, err
+	if len(t.union) > 0 {
+		err := json.Unmarshal(t.union, &body)
+		if err != nil {
+			return body, err
+		}
+	}
+	if len(t.xunion) > 0 {
+		err := xml.Unmarshal(t.xunion, &body)
+		if err != nil {
+			return body, err
+		}
+	}
+	return body, nil
 }
 
 // FromKindDog overwrites any union data inside the PetByKind as the provided KindDog
@@ -368,8 +601,17 @@ func (t *PetByKind) FromKindDog(v KindDog) error {
 		return err
 	}
 	b, err = runtime.JSONMerge(b, []byte(`{"kind":"dog"}`))
+	if err != nil {
+		return err
+	}
 	t.union = b
-	return err
+	b, err = xml.Marshal(v)
+	if err != nil {
+		return err
+	}
+	t.xunion = b
+
+	return nil
 }
 
 // MergeKindDog performs a merge with any union data inside the PetByKind, using the provided KindDog
@@ -387,15 +629,36 @@ func (t *PetByKind) MergeKindDog(v KindDog) error {
 
 	merged, err := runtime.JSONMerge(t.union, b)
 	t.union = merged
+
+	// For XML, re-marshal the merged result
+	bx, errx := xml.Marshal(v)
+	if errx != nil {
+		return errx
+	}
+	t.xunion = bx
+
 	return err
 }
 
 func (t PetByKind) Discriminator() (string, error) {
 	var discriminator struct {
-		Discriminator string `json:"kind"`
+		Discriminator string `json:"kind" xml:"kind"`
 	}
-	err := json.Unmarshal(t.union, &discriminator)
-	return discriminator.Discriminator, err
+	if len(t.union) > 0 {
+		err := json.Unmarshal(t.union, &discriminator)
+		if err != nil {
+			return "", err
+		}
+		return discriminator.Discriminator, nil
+	}
+	if len(t.xunion) > 0 {
+		err := xml.Unmarshal(t.xunion, &discriminator)
+		if err != nil {
+			return "", err
+		}
+		return discriminator.Discriminator, nil
+	}
+	return "", nil
 }
 
 func (t PetByKind) ValueByDiscriminator() (interface{}, error) {
@@ -457,11 +720,85 @@ func (t *PetByKind) UnmarshalJSON(b []byte) error {
 	return err
 }
 
+func (t PetByKind) MarshalXML(e *xml.Encoder, start xml.StartElement) error {
+	// Marshal with fixed properties merged into the union content
+	if err := e.EncodeToken(start); err != nil {
+		return err
+	}
+
+	// Write union inner content first
+	if len(t.xunion) > 0 {
+		d := xml.NewDecoder(bytes.NewReader([]byte(t.xunion)))
+		// Skip the original start element
+		if _, err := d.Token(); err != nil {
+			return err
+		}
+		depth := 1
+		for depth > 0 {
+			tok, err := d.Token()
+			if err != nil {
+				return err
+			}
+			switch tok.(type) {
+			case xml.StartElement:
+				depth++
+			case xml.EndElement:
+				depth--
+			}
+			if depth > 0 {
+				if err := e.EncodeToken(xml.CopyToken(tok)); err != nil {
+					return err
+				}
+			}
+		}
+	}
+
+	// Write fixed properties (ensures they are present even if not in xunion)
+
+	if t.Kind != nil {
+		if err := e.EncodeElement(t.Kind, xml.StartElement{Name: xml.Name{Local: "kind"}}); err != nil {
+			return fmt.Errorf("error marshaling 'kind': %w", err)
+		}
+	}
+	return e.EncodeToken(start.End())
+}
+
+func (t *PetByKind) UnmarshalXML(d *xml.Decoder, start xml.StartElement) error {
+	var err error
+
+	t.xunion, err = CaptureXMLElement(d, start)
+	if err != nil {
+		return err
+	}
+
+	// Extract fixed properties from the captured XML
+	type xmlProps struct {
+		Kind *string `xml:"kind"`
+	}
+	var props xmlProps
+	if err := xml.Unmarshal(t.xunion, &props); err != nil {
+		return err
+	}
+	t.Kind = props.Kind
+	return nil
+}
+
 // AsKindCat returns the union data inside the RenamedPetByKind as a KindCat
 func (t RenamedPetByKind) AsKindCat() (KindCat, error) {
 	var body KindCat
-	err := json.Unmarshal(t.union, &body)
-	return body, err
+	if len(t.union) > 0 {
+		err := json.Unmarshal(t.union, &body)
+		if err != nil {
+			return body, err
+		}
+	}
+	if len(t.xunion) > 0 {
+		err := xml.Unmarshal(t.xunion, &body)
+		if err != nil {
+			return body, err
+		}
+	}
+	return body, nil
 }
 
 // FromKindCat overwrites any union data inside the RenamedPetByKind as the provided KindCat
@@ -473,8 +810,17 @@ func (t *RenamedPetByKind) FromKindCat(v KindCat) error {
 		return err
 	}
 	b, err = runtime.JSONMerge(b, []byte(`{"kind":"cat"}`))
+	if err != nil {
+		return err
+	}
 	t.union = b
-	return err
+	b, err = xml.Marshal(v)
+	if err != nil {
+		return err
+	}
+	t.xunion = b
+
+	return nil
 }
 
 // MergeKindCat performs a merge with any union data inside the RenamedPetByKind, using the provided KindCat
@@ -492,14 +838,33 @@ func (t *RenamedPetByKind) MergeKindCat(v KindCat) error {
 
 	merged, err := runtime.JSONMerge(t.union, b)
 	t.union = merged
+
+	// For XML, re-marshal the merged result
+	bx, errx := xml.Marshal(v)
+	if errx != nil {
+		return errx
+	}
+	t.xunion = bx
+
 	return err
 }
 
 // AsKindDog returns the union data inside the RenamedPetByKind as a KindDog
 func (t RenamedPetByKind) AsKindDog() (KindDog, error) {
 	var body KindDog
-	err := json.Unmarshal(t.union, &body)
-	return body, err
+	if len(t.union) > 0 {
+		err := json.Unmarshal(t.union, &body)
+		if err != nil {
+			return body, err
+		}
+	}
+	if len(t.xunion) > 0 {
+		err := xml.Unmarshal(t.xunion, &body)
+		if err != nil {
+			return body, err
+		}
+	}
+	return body, nil
 }
 
 // FromKindDog overwrites any union data inside the RenamedPetByKind as the provided KindDog
@@ -511,8 +876,17 @@ func (t *RenamedPetByKind) FromKindDog(v KindDog) error {
 		return err
 	}
 	b, err = runtime.JSONMerge(b, []byte(`{"kind":"dog"}`))
+	if err != nil {
+		return err
+	}
 	t.union = b
-	return err
+	b, err = xml.Marshal(v)
+	if err != nil {
+		return err
+	}
+	t.xunion = b
+
+	return nil
 }
 
 // MergeKindDog performs a merge with any union data inside the RenamedPetByKind, using the provided KindDog
@@ -530,15 +904,36 @@ func (t *RenamedPetByKind) MergeKindDog(v KindDog) error {
 
 	merged, err := runtime.JSONMerge(t.union, b)
 	t.union = merged
+
+	// For XML, re-marshal the merged result
+	bx, errx := xml.Marshal(v)
+	if errx != nil {
+		return errx
+	}
+	t.xunion = bx
+
 	return err
 }
 
 func (t RenamedPetByKind) Discriminator() (string, error) {
 	var discriminator struct {
-		Discriminator string `json:"kind"`
+		Discriminator string `json:"kind" xml:"kind"`
 	}
-	err := json.Unmarshal(t.union, &discriminator)
-	return discriminator.Discriminator, err
+	if len(t.union) > 0 {
+		err := json.Unmarshal(t.union, &discriminator)
+		if err != nil {
+			return "", err
+		}
+		return discriminator.Discriminator, nil
+	}
+	if len(t.xunion) > 0 {
+		err := xml.Unmarshal(t.xunion, &discriminator)
+		if err != nil {
+			return "", err
+		}
+		return discriminator.Discriminator, nil
+	}
+	return "", nil
 }
 
 func (t RenamedPetByKind) ValueByDiscriminator() (interface{}, error) {
@@ -598,4 +993,170 @@ func (t *RenamedPetByKind) UnmarshalJSON(b []byte) error {
 	}
 
 	return err
+}
+
+func (t RenamedPetByKind) MarshalXML(e *xml.Encoder, start xml.StartElement) error {
+	// Marshal with fixed properties merged into the union content
+	if err := e.EncodeToken(start); err != nil {
+		return err
+	}
+
+	// Write union inner content first
+	if len(t.xunion) > 0 {
+		d := xml.NewDecoder(bytes.NewReader([]byte(t.xunion)))
+		// Skip the original start element
+		if _, err := d.Token(); err != nil {
+			return err
+		}
+		depth := 1
+		for depth > 0 {
+			tok, err := d.Token()
+			if err != nil {
+				return err
+			}
+			switch tok.(type) {
+			case xml.StartElement:
+				depth++
+			case xml.EndElement:
+				depth--
+			}
+			if depth > 0 {
+				if err := e.EncodeToken(xml.CopyToken(tok)); err != nil {
+					return err
+				}
+			}
+		}
+	}
+
+	// Write fixed properties (ensures they are present even if not in xunion)
+
+	if t.Species != nil {
+		if err := e.EncodeElement(t.Species, xml.StartElement{Name: xml.Name{Local: "kind"}}); err != nil {
+			return fmt.Errorf("error marshaling 'kind': %w", err)
+		}
+	}
+	return e.EncodeToken(start.End())
+}
+
+func (t *RenamedPetByKind) UnmarshalXML(d *xml.Decoder, start xml.StartElement) error {
+	var err error
+
+	t.xunion, err = CaptureXMLElement(d, start)
+	if err != nil {
+		return err
+	}
+
+	// Extract fixed properties from the captured XML
+	type xmlProps struct {
+		Species *string `xml:"kind"`
+	}
+	var props xmlProps
+	if err := xml.Unmarshal(t.xunion, &props); err != nil {
+		return err
+	}
+	t.Species = props.Species
+	return nil
+}
+
+type RawMessage []byte
+
+// MarshalJSON returns the raw bytes as JSON.
+func (r RawMessage) MarshalJSON() ([]byte, error) {
+	if r == nil {
+		return []byte("null"), nil
+	}
+	return r, nil
+}
+
+// UnmarshalJSON sets the raw bytes from JSON input.
+func (r *RawMessage) UnmarshalJSON(data []byte) error {
+	*r = append((*r)[0:0], data...)
+	return nil
+}
+
+// MarshalXML encodes the raw XML message into the encoder, re-wrapping
+// it within the provided start element.
+func (r RawMessage) MarshalXML(e *xml.Encoder, start xml.StartElement) error {
+	if len(r) == 0 {
+		return nil
+	}
+
+	d := xml.NewDecoder(bytes.NewReader(r))
+	// Skip the original start element from the stored raw XML
+	_, err := d.Token()
+	if err != nil {
+		return err
+	}
+
+	// Write the caller-provided start element
+	if err := e.EncodeToken(start); err != nil {
+		return err
+	}
+
+	// Copy all inner tokens until we reach the matching end element
+	depth := 1
+	for {
+		tok, err := d.Token()
+		if err != nil {
+			return err
+		}
+		switch tok.(type) {
+		case xml.StartElement:
+			depth++
+		case xml.EndElement:
+			depth--
+			if depth == 0 {
+				return e.EncodeToken(start.End())
+			}
+		}
+		if err := e.EncodeToken(xml.CopyToken(tok)); err != nil {
+			return err
+		}
+	}
+}
+
+// UnmarshalXML captures a full XML element (including children) into raw bytes.
+func (r *RawMessage) UnmarshalXML(d *xml.Decoder, start xml.StartElement) error {
+	data, err := CaptureXMLElement(d, start)
+	if err != nil {
+		return err
+	}
+	*r = data
+	return nil
+}
+
+// CaptureXMLElement reads an entire XML element from the decoder and returns it as bytes.
+func CaptureXMLElement(d *xml.Decoder, start xml.StartElement) ([]byte, error) {
+	buf := new(bytes.Buffer)
+	encoder := xml.NewEncoder(buf)
+
+	if err := encoder.EncodeToken(start); err != nil {
+		return nil, err
+	}
+
+	for {
+		tok, err := d.Token()
+		if err != nil {
+			return nil, err
+		}
+
+		if err = encoder.EncodeToken(tok); err != nil {
+			return nil, err
+		}
+
+		if end, ok := tok.(xml.EndElement); ok && end.Name == start.Name {
+			encoder.Flush()
+			break
+		}
+	}
+
+	return buf.Bytes(), nil
+}
+
+// setXMLDiscriminator points a union variant's optional discriminator field at
+// value. The type parameter is inferred from the field, so this works for plain
+// strings and named enum types alike, including types from other packages.
+func setXMLDiscriminator[T ~string](field **T, value string) {
+	v := T(value)
+	*field = &v
 }

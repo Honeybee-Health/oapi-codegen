@@ -22,22 +22,22 @@ const (
 
 // EnrichedUser defines model for EnrichedUser.
 type EnrichedUser struct {
-	ExtraField *string              `json:"extra_field,omitempty"`
-	Id         string               `json:"id"`
-	Roles      *[]externalRef0.Role `json:"roles,omitempty"`
-	Username   string               `json:"username"`
+	ExtraField *string              `json:"extra_field,omitempty" xml:"extra_field"`
+	Id         string               `json:"id" xml:"id"`
+	Roles      *[]externalRef0.Role `json:"roles,omitempty" xml:"roles"`
+	Username   string               `json:"username" xml:"username"`
 }
 
 // ObjectA defines model for ObjectA.
 type ObjectA struct {
-	Name    *string               `json:"name,omitempty"`
-	ObjectB *externalRef0.ObjectB `json:"object_b,omitempty"`
+	Name    *string               `json:"name,omitempty" xml:"name"`
+	ObjectB *externalRef0.ObjectB `json:"object_b,omitempty" xml:"object_b"`
 }
 
 // StatusPostPayload defines model for StatusPostPayload.
 type StatusPostPayload struct {
-	Reason *string                 `json:"reason,omitempty"`
-	Status externalRef0.StatusEnum `json:"status"`
+	Reason *string                 `json:"reason,omitempty" xml:"reason"`
+	Status externalRef0.StatusEnum `json:"status" xml:"status"`
 }
 
 // bearerAuthContextKey is the context key for BearerAuth security scheme

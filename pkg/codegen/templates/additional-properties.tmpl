@@ -68,5 +68,70 @@ func (a {{.TypeName}}) MarshalJSON() ([]byte, error) {
 	}
 	return json.Marshal(object)
 }
+
+// Override default XML handling for {{.TypeName}} to handle AdditionalProperties
+func (a *{{.TypeName}}) UnmarshalXML(d *xml.Decoder, start xml.StartElement) error {
+    {{$typeName := .TypeName -}}
+    knownFields := map[string]bool{
+        {{range .Schema.Properties -}}
+        "{{xmlFieldName .}}": true,
+        {{end -}}
+    }
+
+    for {
+        tok, err := d.Token()
+        if err != nil {
+            return err
+        }
+        switch t := tok.(type) {
+        case xml.StartElement:
+            switch t.Name.Local {
+            {{range .Schema.Properties -}}
+            case "{{xmlFieldName .}}":
+                if err := d.DecodeElement(&a.{{.GoFieldName}}, &t); err != nil {
+                    return fmt.Errorf("error reading '{{xmlFieldName .}}': %w", err)
+                }
+            {{end -}}
+            default:
+                if !knownFields[t.Name.Local] {
+                    if a.AdditionalProperties == nil {
+                        a.AdditionalProperties = make(map[string]{{$addType}})
+                    }
+                    var val {{$addType}}
+                    if err := d.DecodeElement(&val, &t); err != nil {
+                        return fmt.Errorf("error unmarshaling field %s: %w", t.Name.Local, err)
+                    }
+                    a.AdditionalProperties[t.Name.Local] = val
+                } else {
+                    if err := d.Skip(); err != nil {
+                        return err
+                    }
+                }
+            }
+        case xml.EndElement:
+            return nil
+        }
+    }
+}
+
+// Override default XML handling for {{.TypeName}} to handle AdditionalProperties
+func (a {{.TypeName}}) MarshalXML(e *xml.Encoder, start xml.StartElement) error {
+    if err := e.EncodeToken(start); err != nil {
+        return err
+    }
+{{range .Schema.Properties}}
+{{if .HasOptionalPointer}}if a.{{.GoFieldName}} != nil { {{end}}
+    if err := e.EncodeElement(a.{{.GoFieldName}}, xml.StartElement{Name: xml.Name{Local: "{{xmlFieldName .}}"}}); err != nil {
+        return fmt.Errorf("error marshaling '{{xmlFieldName .}}': %w", err)
+    }
+{{if .HasOptionalPointer}} }{{end}}
+{{end}}
+    for fieldName, field := range a.AdditionalProperties {
+        if err := e.EncodeElement(field, xml.StartElement{Name: xml.Name{Local: fieldName}}); err != nil {
+            return fmt.Errorf("error marshaling '%s': %w", fieldName, err)
+        }
+    }
+    return e.EncodeToken(start.End())
+}
 {{end}}
 {{end}}

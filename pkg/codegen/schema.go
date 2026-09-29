@@ -28,7 +28,8 @@ type Schema struct {
 
 	SkipOptionalPointer bool // Some types don't need a * in front when they're optional
 
-	Description string // The description of the element
+	Description string    // The description of the element
+	XmlProps    *XmlProps // Used for XML marshalling / unmarshalling
 
 	UnionElements []UnionElement // Possible elements of oneOf/anyOf union
 	Discriminator *Discriminator // Describes which value is stored in a union
@@ -53,6 +54,11 @@ func (s Schema) IsPrimitive() bool {
 	}
 	t := schemaPrimaryType(s.OAPISchema.Type)
 	return t.Is("string") || t.Is("integer") || t.Is("number") || t.Is("boolean")
+}
+
+type XmlProps struct {
+	Name      string
+	Attribute bool
 }
 
 func (s Schema) IsRef() bool {
@@ -128,6 +134,7 @@ type Property struct {
 	ReadOnly      bool
 	WriteOnly     bool
 	NeedsFormTag  bool
+	XmlProps      *XmlProps
 	Extensions    map[string]any
 	Deprecated    bool
 }
@@ -372,10 +379,25 @@ type Discriminator struct {
 
 	// JSON property name that holds the discriminator
 	Property string
+
+	// VariantProperties maps a union element's Go type to that variant's own
+	// discriminator field, when it declares one. The JSON stamp never touches
+	// the variant, so the XML helpers set this field before xml.Marshal to keep
+	// the discriminator in the XML output.
+	VariantProperties map[string]Property
 }
 
 func (d *Discriminator) JSONTag() string {
 	return fmt.Sprintf("`json:\"%s\"`", d.Property)
+}
+
+func (d *Discriminator) XMLTag() string {
+	return fmt.Sprintf("`xml:\"%s\"`", d.Property)
+}
+
+// CombinedTag returns a single Go struct tag with both JSON and XML tags.
+func (d *Discriminator) CombinedTag() string {
+	return fmt.Sprintf("`json:\"%s\" xml:\"%s\"`", d.Property, d.Property)
 }
 
 func (d *Discriminator) PropertyName() string {
@@ -405,6 +427,9 @@ type DiscriminatorStamp struct {
 	// literal: spec validation rejects discriminator property names and
 	// mapping keys containing quotes, backticks or control characters.
 	JSONPatch string
+	// VariantProperty is the union element's own discriminator field, set on
+	// the variant before xml.Marshal; nil when it can't be assigned safely.
+	VariantProperty *Property
 }
 
 // DiscriminatorStampFor resolves the discriminator stamp for the given union
@@ -435,6 +460,9 @@ func (s Schema) DiscriminatorStampFor(element UnionElement) *DiscriminatorStamp 
 		if s.Properties[i].JsonFieldName == d.Property {
 			stamp.Property = &s.Properties[i]
 		}
+	}
+	if p, ok := d.VariantProperties[element.String()]; ok {
+		stamp.VariantProperty = &p
 	}
 	return &stamp
 }
@@ -792,6 +820,7 @@ func GenerateGoSchema(sref *openapi3.SchemaRef, path []string) (Schema, error) {
 			DefineViaAlias:      true,
 			SkipOptionalPointer: skipOptionalPointer,
 			OAPISchema:          schema,
+			XmlProps:            readXmlProps(schema.XML),
 		}, nil
 	}
 
@@ -1040,6 +1069,7 @@ func GenerateGoSchema(sref *openapi3.SchemaRef, path []string) (Schema, error) {
 					WriteOnly:     p.Value.WriteOnly,
 					Extensions:    combinedSchemaExtensions(p),
 					Deprecated:    p.Value.Deprecated,
+					XmlProps:      readXmlProps(p.Value.XML),
 				}
 				outSchema.Properties = append(outSchema.Properties, prop)
 				if len(pSchema.AdditionalTypes) > 0 {
@@ -1455,6 +1485,20 @@ func GenFieldsFromProperties(props []Property) []string {
 			stringOrEmpty(omitEmpty, ",omitempty") +
 			stringOrEmpty(omitZero, ",omitzero")
 
+		// if we have XML properties use them, otherwise fallback to JSON field name
+		if p.XmlProps != nil {
+			if p.XmlProps.Name != "" {
+				fieldTags["xml"] = p.XmlProps.Name
+			} else {
+				fieldTags["xml"] = p.JsonFieldName
+			}
+			if p.XmlProps.Attribute {
+				fieldTags["xml"] += ",attr"
+			}
+		} else {
+			fieldTags["xml"] = p.JsonFieldName
+		}
+
 		if globalState.options.OutputOptions.EnableYamlTags {
 			fieldTags["yaml"] = p.JsonFieldName + stringOrEmpty(omitEmpty, ",omitempty")
 		}
@@ -1505,6 +1549,7 @@ func GenStructFromSchema(schema Schema) string {
 	// Start out with struct {
 	objectParts := []string{"struct {"}
 	// Append all the field definitions
+	objectParts = appendXMLNameField(objectParts, schema)
 	objectParts = append(objectParts, GenFieldsFromProperties(schema.Properties)...)
 	// Close the struct
 	if schema.HasAdditionalProperties {
@@ -1514,6 +1559,7 @@ func GenStructFromSchema(schema Schema) string {
 	}
 	if len(schema.UnionElements) != 0 {
 		objectParts = append(objectParts, "union json.RawMessage")
+		objectParts = append(objectParts, "xunion RawMessage")
 	}
 	objectParts = append(objectParts, "}")
 	return strings.Join(objectParts, "\n")
@@ -1662,6 +1708,13 @@ func generateUnion(outSchema *Schema, elements openapi3.SchemaRefs, discriminato
 			if !mapped {
 				outSchema.Discriminator.Mapping[RefPathToObjName(element.Ref)] = elementSchema.GoType
 			}
+
+			if prop, ok := variantDiscriminatorProperty(element, discriminator.PropertyName, elementPath); ok {
+				if outSchema.Discriminator.VariantProperties == nil {
+					outSchema.Discriminator.VariantProperties = make(map[string]Property)
+				}
+				outSchema.Discriminator.VariantProperties[elementSchema.GoType] = prop
+			}
 		}
 		outSchema.UnionElements = append(outSchema.UnionElements, UnionElement(elementSchema.GoType))
 	}
@@ -1737,4 +1790,52 @@ func hasInlineStructuralContent(s *Schema) bool {
 	return len(s.Properties) > 0 ||
 		s.HasAdditionalProperties ||
 		len(s.UnionElements) > 0
+}
+
+// Util function to read the XML properties from an openapiv3 schema. Currently
+// kin-openapi stores this an 'interface{}'. This can be removed if that
+// ever changes
+func readXmlProps(v *openapi3.XML) *XmlProps {
+	if v == nil {
+		return nil
+	}
+
+	return &XmlProps{
+		Name:      v.Name,
+		Attribute: v.Attribute,
+	}
+}
+
+// Used when constructing a 'struct' type - adds a 'XMLName` field to control
+// the document name if required by the schema. If not required, appends
+// nothing.
+func appendXMLNameField(objectParts []string, schema Schema) []string {
+	if schema.XmlProps == nil || schema.XmlProps.Name == "" {
+		return objectParts
+	}
+	xmlNameField := fmt.Sprintf("XMLName xml.Name `json:\"-\" xml:\"%s\"`", schema.XmlProps.Name)
+	return append(objectParts, xmlNameField)
+}
+
+// variantDiscriminatorProperty finds the union element's own discriminator
+// field so the XML helpers can set it before xml.Marshal. Only string-typed
+// fields qualify, since the value assigned is a string literal.
+func variantDiscriminatorProperty(element *openapi3.SchemaRef, propertyName string, path []string) (Property, bool) {
+	if element == nil || element.Value == nil {
+		return Property{}, false
+	}
+	variant, err := GenerateGoSchema(&openapi3.SchemaRef{Value: element.Value}, path)
+	if err != nil {
+		return Property{}, false
+	}
+	for _, p := range variant.Properties {
+		if p.JsonFieldName != propertyName {
+			continue
+		}
+		if p.Schema.OAPISchema == nil || !schemaPrimaryType(p.Schema.OAPISchema.Type).Is("string") {
+			return Property{}, false
+		}
+		return p, true
+	}
+	return Property{}, false
 }

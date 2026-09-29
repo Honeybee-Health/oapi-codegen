@@ -4,8 +4,10 @@
 package parameterssharedcollision
 
 import (
+	"bytes"
 	"context"
 	"encoding/json"
+	"encoding/xml"
 	"fmt"
 	"io"
 	"net/http"
@@ -43,8 +45,9 @@ type Wid1 = string
 // OnEventGetParams defines parameters for OnEventGet.
 type OnEventGetParams struct {
 	Whid *struct {
-		union json.RawMessage
-	} `form:"whid,omitempty" json:"whid,omitempty"`
+		union  json.RawMessage
+		xunion RawMessage
+	} `form:"whid,omitempty" json:"whid,omitempty" xml:"whid"`
 }
 
 // Whid0 defines parameters for OnEventGet.
@@ -56,15 +59,17 @@ type Whid1 = string
 // OnEventPostParams defines parameters for OnEventPost.
 type OnEventPostParams struct {
 	Whid *struct {
-		union json.RawMessage
-	} `form:"whid,omitempty" json:"whid,omitempty"`
+		union  json.RawMessage
+		xunion RawMessage
+	} `form:"whid,omitempty" json:"whid,omitempty" xml:"whid"`
 }
 
 // OnDataGetParams defines parameters for OnDataGet.
 type OnDataGetParams struct {
 	Cbid *struct {
-		union json.RawMessage
-	} `form:"cbid,omitempty" json:"cbid,omitempty"`
+		union  json.RawMessage
+		xunion RawMessage
+	} `form:"cbid,omitempty" json:"cbid,omitempty" xml:"cbid"`
 }
 
 // Cbid0 defines parameters for OnDataGet.
@@ -76,8 +81,9 @@ type Cbid1 = string
 // OnDataPostParams defines parameters for OnDataPost.
 type OnDataPostParams struct {
 	Cbid *struct {
-		union json.RawMessage
-	} `form:"cbid,omitempty" json:"cbid,omitempty"`
+		union  json.RawMessage
+		xunion RawMessage
+	} `form:"cbid,omitempty" json:"cbid,omitempty" xml:"cbid"`
 }
 
 // RequestEditorFn is the function signature for the RequestEditor callback function
@@ -156,17 +162,20 @@ type ClientInterface interface {
 
 	// DeleteGadget performs a DELETE /gadget/{id} (the `DeleteGadget` operationId) request.
 	DeleteGadget(ctx context.Context, id struct {
-		union json.RawMessage
+		union  json.RawMessage
+		xunion RawMessage
 	}, reqEditors ...RequestEditorFn) (*http.Response, error)
 
 	// GetGadgetPart performs a GET /gadget/{id}/part (the `GetGadgetPart` operationId) request.
 	GetGadgetPart(ctx context.Context, id struct {
-		union json.RawMessage
+		union  json.RawMessage
+		xunion RawMessage
 	}, reqEditors ...RequestEditorFn) (*http.Response, error)
 
 	// GetSprocket performs a GET /sprocket/{ref} (the `GetSprocket` operationId) request.
 	GetSprocket(ctx context.Context, ref struct {
-		union json.RawMessage
+		union  json.RawMessage
+		xunion RawMessage
 	}, reqEditors ...RequestEditorFn) (*http.Response, error)
 
 	// Subscribe performs a POST /subscribe (the `Subscribe` operationId) request.
@@ -174,18 +183,21 @@ type ClientInterface interface {
 
 	// DeleteWidget performs a DELETE /widget/{wid} (the `DeleteWidget` operationId) request.
 	DeleteWidget(ctx context.Context, wid struct {
-		union json.RawMessage
+		union  json.RawMessage
+		xunion RawMessage
 	}, reqEditors ...RequestEditorFn) (*http.Response, error)
 
 	// GetWidget performs a GET /widget/{wid} (the `GetWidget` operationId) request.
 	GetWidget(ctx context.Context, wid struct {
-		union json.RawMessage
+		union  json.RawMessage
+		xunion RawMessage
 	}, reqEditors ...RequestEditorFn) (*http.Response, error)
 }
 
 // DeleteGadget performs a DELETE /gadget/{id} (the `DeleteGadget` operationId) request.
 func (c *Client) DeleteGadget(ctx context.Context, id struct {
-	union json.RawMessage
+	union  json.RawMessage
+	xunion RawMessage
 }, reqEditors ...RequestEditorFn) (*http.Response, error) {
 	req, err := NewDeleteGadgetRequest(c.Server, id)
 	if err != nil {
@@ -200,7 +212,8 @@ func (c *Client) DeleteGadget(ctx context.Context, id struct {
 
 // GetGadgetPart performs a GET /gadget/{id}/part (the `GetGadgetPart` operationId) request.
 func (c *Client) GetGadgetPart(ctx context.Context, id struct {
-	union json.RawMessage
+	union  json.RawMessage
+	xunion RawMessage
 }, reqEditors ...RequestEditorFn) (*http.Response, error) {
 	req, err := NewGetGadgetPartRequest(c.Server, id)
 	if err != nil {
@@ -215,7 +228,8 @@ func (c *Client) GetGadgetPart(ctx context.Context, id struct {
 
 // GetSprocket performs a GET /sprocket/{ref} (the `GetSprocket` operationId) request.
 func (c *Client) GetSprocket(ctx context.Context, ref struct {
-	union json.RawMessage
+	union  json.RawMessage
+	xunion RawMessage
 }, reqEditors ...RequestEditorFn) (*http.Response, error) {
 	req, err := NewGetSprocketRequest(c.Server, ref)
 	if err != nil {
@@ -243,7 +257,8 @@ func (c *Client) Subscribe(ctx context.Context, reqEditors ...RequestEditorFn) (
 
 // DeleteWidget performs a DELETE /widget/{wid} (the `DeleteWidget` operationId) request.
 func (c *Client) DeleteWidget(ctx context.Context, wid struct {
-	union json.RawMessage
+	union  json.RawMessage
+	xunion RawMessage
 }, reqEditors ...RequestEditorFn) (*http.Response, error) {
 	req, err := NewDeleteWidgetRequest(c.Server, wid)
 	if err != nil {
@@ -258,7 +273,8 @@ func (c *Client) DeleteWidget(ctx context.Context, wid struct {
 
 // GetWidget performs a GET /widget/{wid} (the `GetWidget` operationId) request.
 func (c *Client) GetWidget(ctx context.Context, wid struct {
-	union json.RawMessage
+	union  json.RawMessage
+	xunion RawMessage
 }, reqEditors ...RequestEditorFn) (*http.Response, error) {
 	req, err := NewGetWidgetRequest(c.Server, wid)
 	if err != nil {
@@ -273,7 +289,8 @@ func (c *Client) GetWidget(ctx context.Context, wid struct {
 
 // NewDeleteGadgetRequest constructs an http.Request for the DeleteGadget method
 func NewDeleteGadgetRequest(server string, id struct {
-	union json.RawMessage
+	union  json.RawMessage
+	xunion RawMessage
 }) (*http.Request, error) {
 	var err error
 
@@ -309,7 +326,8 @@ func NewDeleteGadgetRequest(server string, id struct {
 
 // NewGetGadgetPartRequest constructs an http.Request for the GetGadgetPart method
 func NewGetGadgetPartRequest(server string, id struct {
-	union json.RawMessage
+	union  json.RawMessage
+	xunion RawMessage
 }) (*http.Request, error) {
 	var err error
 
@@ -345,7 +363,8 @@ func NewGetGadgetPartRequest(server string, id struct {
 
 // NewGetSprocketRequest constructs an http.Request for the GetSprocket method
 func NewGetSprocketRequest(server string, ref struct {
-	union json.RawMessage
+	union  json.RawMessage
+	xunion RawMessage
 }) (*http.Request, error) {
 	var err error
 
@@ -408,7 +427,8 @@ func NewSubscribeRequest(server string) (*http.Request, error) {
 
 // NewDeleteWidgetRequest constructs an http.Request for the DeleteWidget method
 func NewDeleteWidgetRequest(server string, wid struct {
-	union json.RawMessage
+	union  json.RawMessage
+	xunion RawMessage
 }) (*http.Request, error) {
 	var err error
 
@@ -444,7 +464,8 @@ func NewDeleteWidgetRequest(server string, wid struct {
 
 // NewGetWidgetRequest constructs an http.Request for the GetWidget method
 func NewGetWidgetRequest(server string, wid struct {
-	union json.RawMessage
+	union  json.RawMessage
+	xunion RawMessage
 }) (*http.Request, error) {
 	var err error
 
@@ -526,21 +547,24 @@ type ClientWithResponsesInterface interface {
 	//
 	// Returns a wrapper object for the known response body format(s).
 	DeleteGadgetWithResponse(ctx context.Context, id struct {
-		union json.RawMessage
+		union  json.RawMessage
+		xunion RawMessage
 	}, reqEditors ...RequestEditorFn) (*DeleteGadgetResponse, error)
 
 	// GetGadgetPartWithResponse performs a GET /gadget/{id}/part (the `GetGadgetPart` operationId) request.
 	//
 	// Returns a wrapper object for the known response body format(s).
 	GetGadgetPartWithResponse(ctx context.Context, id struct {
-		union json.RawMessage
+		union  json.RawMessage
+		xunion RawMessage
 	}, reqEditors ...RequestEditorFn) (*GetGadgetPartResponse, error)
 
 	// GetSprocketWithResponse performs a GET /sprocket/{ref} (the `GetSprocket` operationId) request.
 	//
 	// Returns a wrapper object for the known response body format(s).
 	GetSprocketWithResponse(ctx context.Context, ref struct {
-		union json.RawMessage
+		union  json.RawMessage
+		xunion RawMessage
 	}, reqEditors ...RequestEditorFn) (*GetSprocketResponse, error)
 
 	// SubscribeWithResponse performs a POST /subscribe (the `Subscribe` operationId) request.
@@ -552,14 +576,16 @@ type ClientWithResponsesInterface interface {
 	//
 	// Returns a wrapper object for the known response body format(s).
 	DeleteWidgetWithResponse(ctx context.Context, wid struct {
-		union json.RawMessage
+		union  json.RawMessage
+		xunion RawMessage
 	}, reqEditors ...RequestEditorFn) (*DeleteWidgetResponse, error)
 
 	// GetWidgetWithResponse performs a GET /widget/{wid} (the `GetWidget` operationId) request.
 	//
 	// Returns a wrapper object for the known response body format(s).
 	GetWidgetWithResponse(ctx context.Context, wid struct {
-		union json.RawMessage
+		union  json.RawMessage
+		xunion RawMessage
 	}, reqEditors ...RequestEditorFn) (*GetWidgetResponse, error)
 }
 
@@ -771,7 +797,8 @@ func (r GetWidgetResponse) ContentType() string {
 //
 // Returns a wrapper object for the known response body format(s).
 func (c *ClientWithResponses) DeleteGadgetWithResponse(ctx context.Context, id struct {
-	union json.RawMessage
+	union  json.RawMessage
+	xunion RawMessage
 }, reqEditors ...RequestEditorFn) (*DeleteGadgetResponse, error) {
 	rsp, err := c.DeleteGadget(ctx, id, reqEditors...)
 	if err != nil {
@@ -784,7 +811,8 @@ func (c *ClientWithResponses) DeleteGadgetWithResponse(ctx context.Context, id s
 //
 // Returns a wrapper object for the known response body format(s).
 func (c *ClientWithResponses) GetGadgetPartWithResponse(ctx context.Context, id struct {
-	union json.RawMessage
+	union  json.RawMessage
+	xunion RawMessage
 }, reqEditors ...RequestEditorFn) (*GetGadgetPartResponse, error) {
 	rsp, err := c.GetGadgetPart(ctx, id, reqEditors...)
 	if err != nil {
@@ -797,7 +825,8 @@ func (c *ClientWithResponses) GetGadgetPartWithResponse(ctx context.Context, id 
 //
 // Returns a wrapper object for the known response body format(s).
 func (c *ClientWithResponses) GetSprocketWithResponse(ctx context.Context, ref struct {
-	union json.RawMessage
+	union  json.RawMessage
+	xunion RawMessage
 }, reqEditors ...RequestEditorFn) (*GetSprocketResponse, error) {
 	rsp, err := c.GetSprocket(ctx, ref, reqEditors...)
 	if err != nil {
@@ -821,7 +850,8 @@ func (c *ClientWithResponses) SubscribeWithResponse(ctx context.Context, reqEdit
 //
 // Returns a wrapper object for the known response body format(s).
 func (c *ClientWithResponses) DeleteWidgetWithResponse(ctx context.Context, wid struct {
-	union json.RawMessage
+	union  json.RawMessage
+	xunion RawMessage
 }, reqEditors ...RequestEditorFn) (*DeleteWidgetResponse, error) {
 	rsp, err := c.DeleteWidget(ctx, wid, reqEditors...)
 	if err != nil {
@@ -834,7 +864,8 @@ func (c *ClientWithResponses) DeleteWidgetWithResponse(ctx context.Context, wid 
 //
 // Returns a wrapper object for the known response body format(s).
 func (c *ClientWithResponses) GetWidgetWithResponse(ctx context.Context, wid struct {
-	union json.RawMessage
+	union  json.RawMessage
+	xunion RawMessage
 }, reqEditors ...RequestEditorFn) (*GetWidgetResponse, error) {
 	rsp, err := c.GetWidget(ctx, wid, reqEditors...)
 	if err != nil {
@@ -1292,4 +1323,99 @@ func NewOnDataPostCallbackRequest(targetURL string, params *OnDataPostParams) (*
 	}
 
 	return req, nil
+}
+
+type RawMessage []byte
+
+// MarshalJSON returns the raw bytes as JSON.
+func (r RawMessage) MarshalJSON() ([]byte, error) {
+	if r == nil {
+		return []byte("null"), nil
+	}
+	return r, nil
+}
+
+// UnmarshalJSON sets the raw bytes from JSON input.
+func (r *RawMessage) UnmarshalJSON(data []byte) error {
+	*r = append((*r)[0:0], data...)
+	return nil
+}
+
+// MarshalXML encodes the raw XML message into the encoder, re-wrapping
+// it within the provided start element.
+func (r RawMessage) MarshalXML(e *xml.Encoder, start xml.StartElement) error {
+	if len(r) == 0 {
+		return nil
+	}
+
+	d := xml.NewDecoder(bytes.NewReader(r))
+	// Skip the original start element from the stored raw XML
+	_, err := d.Token()
+	if err != nil {
+		return err
+	}
+
+	// Write the caller-provided start element
+	if err := e.EncodeToken(start); err != nil {
+		return err
+	}
+
+	// Copy all inner tokens until we reach the matching end element
+	depth := 1
+	for {
+		tok, err := d.Token()
+		if err != nil {
+			return err
+		}
+		switch tok.(type) {
+		case xml.StartElement:
+			depth++
+		case xml.EndElement:
+			depth--
+			if depth == 0 {
+				return e.EncodeToken(start.End())
+			}
+		}
+		if err := e.EncodeToken(xml.CopyToken(tok)); err != nil {
+			return err
+		}
+	}
+}
+
+// UnmarshalXML captures a full XML element (including children) into raw bytes.
+func (r *RawMessage) UnmarshalXML(d *xml.Decoder, start xml.StartElement) error {
+	data, err := CaptureXMLElement(d, start)
+	if err != nil {
+		return err
+	}
+	*r = data
+	return nil
+}
+
+// CaptureXMLElement reads an entire XML element from the decoder and returns it as bytes.
+func CaptureXMLElement(d *xml.Decoder, start xml.StartElement) ([]byte, error) {
+	buf := new(bytes.Buffer)
+	encoder := xml.NewEncoder(buf)
+
+	if err := encoder.EncodeToken(start); err != nil {
+		return nil, err
+	}
+
+	for {
+		tok, err := d.Token()
+		if err != nil {
+			return nil, err
+		}
+
+		if err = encoder.EncodeToken(tok); err != nil {
+			return nil, err
+		}
+
+		if end, ok := tok.(xml.EndElement); ok && end.Name == start.Name {
+			encoder.Flush()
+			break
+		}
+	}
+
+	return buf.Bytes(), nil
 }

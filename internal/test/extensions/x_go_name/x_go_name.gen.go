@@ -17,34 +17,34 @@ import (
 // ReferenceToRenameMe When a Schema is renamed, $ref should refer to the new name
 type ReferenceToRenameMe struct {
 	// NewName This schema should be renamed via x-go-name when generating
-	NewName NewName `json:"ToNewName"`
+	NewName NewName `json:"ToNewName" xml:"ToNewName"`
 }
 
 // NewName This schema should be renamed via x-go-name when generating
 type NewName struct {
-	Prop1 string `json:"prop1"`
-	Prop2 string `json:"prop2"`
+	Prop1 string `json:"prop1" xml:"prop1"`
+	Prop2 string `json:"prop2" xml:"prop2"`
 }
 
 // SchemaObject defines model for SchemaObject.
 type SchemaObject struct {
-	FirstName string `json:"firstName"`
-	Role      string `json:"role"`
+	FirstName string `json:"firstName" xml:"firstName"`
+	Role      string `json:"role" xml:"role"`
 }
 
 // RenamedResponseObject defines model for ResponseObject.
 type RenamedResponseObject struct {
-	Field SchemaObject `json:"Field"`
+	Field SchemaObject `json:"Field" xml:"Field"`
 }
 
 // RenamedRequestBody defines model for RequestBody.
 type RenamedRequestBody struct {
-	Field SchemaObject `json:"Field"`
+	Field SchemaObject `json:"Field" xml:"Field"`
 }
 
 // XJSONBody defines parameters for X.
 type XJSONBody struct {
-	Field SchemaObject `json:"Field"`
+	Field SchemaObject `json:"Field" xml:"Field"`
 }
 
 // XTextBody defines parameters for X.

@@ -40,28 +40,28 @@ func (e RegisterWebhookParamsKind) Valid() bool {
 // Error defines model for Error.
 type Error struct {
 	// Code Error code
-	Code int32 `json:"code"`
+	Code int32 `json:"code" xml:"code"`
 
 	// Message Error message
-	Message string `json:"message"`
+	Message string `json:"message" xml:"message"`
 }
 
 // Person defines model for Person.
 type Person struct {
 	// Name Name of the person who badged in or out
-	Name string `json:"name"`
+	Name string `json:"name" xml:"name"`
 }
 
 // WebhookRegistration defines model for WebhookRegistration.
 type WebhookRegistration struct {
 	// URL URL to receive webhook events
-	URL string `json:"url"`
+	URL string `json:"url" xml:"url"`
 }
 
 // WebhookRegistrationResponse defines model for WebhookRegistrationResponse.
 type WebhookRegistrationResponse struct {
 	// ID Unique identifier for this webhook registration
-	ID openapi_types.UUID `json:"id"`
+	ID openapi_types.UUID `json:"id" xml:"id"`
 }
 
 // RegisterWebhookParamsKind defines parameters for RegisterWebhook.

@@ -8,6 +8,6 @@ type Example []MyItem
 
 // MyItem defines model for MyItem.
 type MyItem struct {
-	Age  *int    `json:"age,omitempty"`
-	Name *string `json:"name,omitempty"`
+	Age  *int    `json:"age,omitempty" xml:"age"`
+	Name *string `json:"name,omitempty" xml:"name"`
 }

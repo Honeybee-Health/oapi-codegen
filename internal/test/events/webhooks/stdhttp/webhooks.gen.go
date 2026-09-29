@@ -39,8 +39,8 @@ func (e PetStatusEventStatus) Valid() bool {
 
 // PetStatusEvent defines model for PetStatusEvent.
 type PetStatusEvent struct {
-	Id     string               `json:"id"`
-	Status PetStatusEventStatus `json:"status"`
+	Id     string               `json:"id" xml:"id"`
+	Status PetStatusEventStatus `json:"status" xml:"status"`
 }
 
 // PetStatusEventStatus defines model for PetStatusEvent.Status.

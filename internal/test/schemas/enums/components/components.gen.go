@@ -221,7 +221,7 @@ type Enum5 int
 
 // EnumInObjInArray defines model for EnumInObjInArray.
 type EnumInObjInArray = []struct {
-	Val *EnumInObjInArrayVal `json:"val,omitempty"`
+	Val *EnumInObjInArrayVal `json:"val,omitempty" xml:"val"`
 }
 
 // EnumInObjInArrayVal defines model for EnumInObjInArray.Val.

@@ -5,11 +5,11 @@ package aggregateshoisting
 
 // OuterTypeWithAnonymousInner defines model for OuterTypeWithAnonymousInner.
 type OuterTypeWithAnonymousInner struct {
-	Inner InnerRenamedAnonymousObject `json:"inner"`
-	Name  string                      `json:"name"`
+	Inner InnerRenamedAnonymousObject `json:"inner" xml:"inner"`
+	Name  string                      `json:"name" xml:"name"`
 }
 
 // InnerRenamedAnonymousObject defines model for OuterTypeWithAnonymousInner.inner.
 type InnerRenamedAnonymousObject struct {
-	Id int `json:"id"`
+	Id int `json:"id" xml:"id"`
 }

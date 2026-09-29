@@ -7,6 +7,7 @@ import (
 	"bytes"
 	"context"
 	"encoding/json"
+	"encoding/xml"
 	"fmt"
 	"io"
 	"net/http"
@@ -18,7 +19,7 @@ import (
 
 // ArrayContainer defines model for ArrayContainer.
 type ArrayContainer struct {
-	Values               []string               `json:"values,omitempty"`
+	Values               []string               `json:"values,omitempty" xml:"values"`
 	AdditionalProperties map[string]interface{} `json:"-"`
 }
 
@@ -28,19 +29,19 @@ type Default = int
 // Pong defines model for Pong.
 type Pong struct {
 	// Ping Example: pong
-	Ping string `json:"ping"`
+	Ping string `json:"ping" xml:"ping"`
 }
 
 // ResponseBody defines model for ResponseBody.
 type ResponseBody struct {
-	AMap                      map[string]Pong        `json:"a_map,omitempty"`
-	ASlice                    []Pong                 `json:"a_slice,omitempty"`
-	ASliceWithAdditionalProps []map[string]Pong      `json:"a_slice_with_additional_props,omitempty"`
-	AdditionalProps           map[string]Pong        `json:"additional_props,omitempty"`
-	Bytes                     []byte                 `json:"bytes,omitempty"`
-	BytesWithOverride         *[]byte                `json:"bytes_with_override,omitempty"`
-	RequiredSlice             []Pong                 `json:"required_slice"`
-	UnknownObject             map[string]interface{} `json:"unknown_object,omitempty"`
+	AMap                      map[string]Pong        `json:"a_map,omitempty" xml:"a_map"`
+	ASlice                    []Pong                 `json:"a_slice,omitempty" xml:"a_slice"`
+	ASliceWithAdditionalProps []map[string]Pong      `json:"a_slice_with_additional_props,omitempty" xml:"a_slice_with_additional_props"`
+	AdditionalProps           map[string]Pong        `json:"additional_props,omitempty" xml:"additional_props"`
+	Bytes                     []byte                 `json:"bytes,omitempty" xml:"bytes"`
+	BytesWithOverride         *[]byte                `json:"bytes_with_override,omitempty" xml:"bytes_with_override"`
+	RequiredSlice             []Pong                 `json:"required_slice" xml:"required_slice"`
+	UnknownObject             map[string]interface{} `json:"unknown_object,omitempty" xml:"unknown_object"`
 }
 
 // SkipOptionalTrue defines model for SkipOptionalTrue.
@@ -48,22 +49,22 @@ type SkipOptionalTrue = int
 
 // SomeObject defines model for SomeObject.
 type SomeObject struct {
-	SkipOptional                SkipOptionalTrue  `json:"skip_optional,omitempty"`
-	SkipOptionalNextToRef       Default           `json:"skip_optional_next_to_ref,omitempty"`
-	SkipOptionalOverrideToFalse *SkipOptionalTrue `json:"skip_optional_override_to_false,omitempty"`
+	SkipOptional                SkipOptionalTrue  `json:"skip_optional,omitempty" xml:"skip_optional"`
+	SkipOptionalNextToRef       Default           `json:"skip_optional_next_to_ref,omitempty" xml:"skip_optional_next_to_ref"`
+	SkipOptionalOverrideToFalse *SkipOptionalTrue `json:"skip_optional_override_to_false,omitempty" xml:"skip_optional_override_to_false"`
 }
 
 // Thing defines model for Thing.
 type Thing struct {
-	Labels               []string          `json:"labels,omitempty"`
-	Tags                 map[string]string `json:"tags,omitempty"`
+	Labels               []string          `json:"labels,omitempty" xml:"labels"`
+	Tags                 map[string]string `json:"tags,omitempty" xml:"tags"`
 	AdditionalProperties map[string]string `json:"-"`
 }
 
 // ListThingsParams defines parameters for ListThings.
 type ListThingsParams struct {
-	Tags   map[string]string `json:"tags,omitempty"`
-	Labels []string          `form:"labels,omitempty" json:"labels,omitempty"`
+	Tags   map[string]string `json:"tags,omitempty" xml:"tags"`
+	Labels []string          `form:"labels,omitempty" json:"labels,omitempty" xml:"labels"`
 }
 
 // CreateThingJSONRequestBody defines body for CreateThing for application/json ContentType.
@@ -135,6 +136,64 @@ func (a ArrayContainer) MarshalJSON() ([]byte, error) {
 		}
 	}
 	return json.Marshal(object)
+}
+
+// Override default XML handling for ArrayContainer to handle AdditionalProperties
+func (a *ArrayContainer) UnmarshalXML(d *xml.Decoder, start xml.StartElement) error {
+	knownFields := map[string]bool{
+		"values": true,
+	}
+
+	for {
+		tok, err := d.Token()
+		if err != nil {
+			return err
+		}
+		switch t := tok.(type) {
+		case xml.StartElement:
+			switch t.Name.Local {
+			case "values":
+				if err := d.DecodeElement(&a.Values, &t); err != nil {
+					return fmt.Errorf("error reading 'values': %w", err)
+				}
+			default:
+				if !knownFields[t.Name.Local] {
+					if a.AdditionalProperties == nil {
+						a.AdditionalProperties = make(map[string]interface{})
+					}
+					var val interface{}
+					if err := d.DecodeElement(&val, &t); err != nil {
+						return fmt.Errorf("error unmarshaling field %s: %w", t.Name.Local, err)
+					}
+					a.AdditionalProperties[t.Name.Local] = val
+				} else {
+					if err := d.Skip(); err != nil {
+						return err
+					}
+				}
+			}
+		case xml.EndElement:
+			return nil
+		}
+	}
+}
+
+// Override default XML handling for ArrayContainer to handle AdditionalProperties
+func (a ArrayContainer) MarshalXML(e *xml.Encoder, start xml.StartElement) error {
+	if err := e.EncodeToken(start); err != nil {
+		return err
+	}
+
+	if err := e.EncodeElement(a.Values, xml.StartElement{Name: xml.Name{Local: "values"}}); err != nil {
+		return fmt.Errorf("error marshaling 'values': %w", err)
+	}
+
+	for fieldName, field := range a.AdditionalProperties {
+		if err := e.EncodeElement(field, xml.StartElement{Name: xml.Name{Local: fieldName}}); err != nil {
+			return fmt.Errorf("error marshaling '%s': %w", fieldName, err)
+		}
+	}
+	return e.EncodeToken(start.End())
 }
 
 // Getter for additional properties for Thing. Returns the specified
@@ -218,6 +277,73 @@ func (a Thing) MarshalJSON() ([]byte, error) {
 		}
 	}
 	return json.Marshal(object)
+}
+
+// Override default XML handling for Thing to handle AdditionalProperties
+func (a *Thing) UnmarshalXML(d *xml.Decoder, start xml.StartElement) error {
+	knownFields := map[string]bool{
+		"labels": true,
+		"tags":   true,
+	}
+
+	for {
+		tok, err := d.Token()
+		if err != nil {
+			return err
+		}
+		switch t := tok.(type) {
+		case xml.StartElement:
+			switch t.Name.Local {
+			case "labels":
+				if err := d.DecodeElement(&a.Labels, &t); err != nil {
+					return fmt.Errorf("error reading 'labels': %w", err)
+				}
+			case "tags":
+				if err := d.DecodeElement(&a.Tags, &t); err != nil {
+					return fmt.Errorf("error reading 'tags': %w", err)
+				}
+			default:
+				if !knownFields[t.Name.Local] {
+					if a.AdditionalProperties == nil {
+						a.AdditionalProperties = make(map[string]string)
+					}
+					var val string
+					if err := d.DecodeElement(&val, &t); err != nil {
+						return fmt.Errorf("error unmarshaling field %s: %w", t.Name.Local, err)
+					}
+					a.AdditionalProperties[t.Name.Local] = val
+				} else {
+					if err := d.Skip(); err != nil {
+						return err
+					}
+				}
+			}
+		case xml.EndElement:
+			return nil
+		}
+	}
+}
+
+// Override default XML handling for Thing to handle AdditionalProperties
+func (a Thing) MarshalXML(e *xml.Encoder, start xml.StartElement) error {
+	if err := e.EncodeToken(start); err != nil {
+		return err
+	}
+
+	if err := e.EncodeElement(a.Labels, xml.StartElement{Name: xml.Name{Local: "labels"}}); err != nil {
+		return fmt.Errorf("error marshaling 'labels': %w", err)
+	}
+
+	if err := e.EncodeElement(a.Tags, xml.StartElement{Name: xml.Name{Local: "tags"}}); err != nil {
+		return fmt.Errorf("error marshaling 'tags': %w", err)
+	}
+
+	for fieldName, field := range a.AdditionalProperties {
+		if err := e.EncodeElement(field, xml.StartElement{Name: xml.Name{Local: fieldName}}); err != nil {
+			return fmt.Errorf("error marshaling '%s': %w", fieldName, err)
+		}
+	}
+	return e.EncodeToken(start.End())
 }
 
 // RequestEditorFn is the function signature for the RequestEditor callback function

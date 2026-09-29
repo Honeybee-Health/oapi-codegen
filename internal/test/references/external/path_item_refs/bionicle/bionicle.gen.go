@@ -9,6 +9,7 @@ import (
 	"context"
 	"encoding/base64"
 	"encoding/json"
+	"encoding/xml"
 	"fmt"
 	"net/http"
 	"net/url"
@@ -23,7 +24,7 @@ import (
 
 // Bionicle defines model for Bionicle.
 type Bionicle struct {
-	Name string `json:"name"`
+	Name string `json:"name" xml:"name"`
 }
 
 // BionicleName defines model for bionicleName.
@@ -31,21 +32,42 @@ type BionicleName = string
 
 // GetBionicleName400JSONResponseBody defines parameters for GetBionicleName.
 type GetBionicleName400JSONResponseBody struct {
-	union json.RawMessage
+	union  json.RawMessage
+	xunion RawMessage
 }
 
 // AsBionicle returns the union data inside the GetBionicleName400JSONResponseBody as a Bionicle
 func (t GetBionicleName400JSONResponseBody) AsBionicle() (Bionicle, error) {
 	var body Bionicle
-	err := json.Unmarshal(t.union, &body)
-	return body, err
+	if len(t.union) > 0 {
+		err := json.Unmarshal(t.union, &body)
+		if err != nil {
+			return body, err
+		}
+	}
+	if len(t.xunion) > 0 {
+		err := xml.Unmarshal(t.xunion, &body)
+		if err != nil {
+			return body, err
+		}
+	}
+	return body, nil
 }
 
 // FromBionicle overwrites any union data inside the GetBionicleName400JSONResponseBody as the provided Bionicle
 func (t *GetBionicleName400JSONResponseBody) FromBionicle(v Bionicle) error {
 	b, err := json.Marshal(v)
+	if err != nil {
+		return err
+	}
 	t.union = b
-	return err
+	b, err = xml.Marshal(v)
+	if err != nil {
+		return err
+	}
+	t.xunion = b
+
+	return nil
 }
 
 // MergeBionicle performs a merge with any union data inside the GetBionicleName400JSONResponseBody, using the provided Bionicle
@@ -57,6 +79,14 @@ func (t *GetBionicleName400JSONResponseBody) MergeBionicle(v Bionicle) error {
 
 	merged, err := runtime.JSONMerge(t.union, b)
 	t.union = merged
+
+	// For XML, re-marshal the merged result
+	bx, errx := xml.Marshal(v)
+	if errx != nil {
+		return errx
+	}
+	t.xunion = bx
+
 	return err
 }
 
@@ -68,6 +98,27 @@ func (t GetBionicleName400JSONResponseBody) MarshalJSON() ([]byte, error) {
 func (t *GetBionicleName400JSONResponseBody) UnmarshalJSON(b []byte) error {
 	err := t.union.UnmarshalJSON(b)
 	return err
+}
+
+func (t GetBionicleName400JSONResponseBody) MarshalXML(e *xml.Encoder, start xml.StartElement) error {
+	if len(t.xunion) > 0 {
+		return t.xunion.MarshalXML(e, start)
+	}
+	if err := e.EncodeToken(start); err != nil {
+		return err
+	}
+	return e.EncodeToken(start.End())
+}
+
+func (t *GetBionicleName400JSONResponseBody) UnmarshalXML(d *xml.Decoder, start xml.StartElement) error {
+	var err error
+
+	t.xunion, err = CaptureXMLElement(d, start)
+	if err != nil {
+		return err
+	}
+
+	return nil
 }
 
 // ServerInterface represents all server handlers.
@@ -446,4 +497,99 @@ func GetSpecJSON() ([]byte, error) {
 // backwards compatibility.
 func GetSwagger() (*openapi3.T, error) {
 	return GetSpec()
+}
+
+type RawMessage []byte
+
+// MarshalJSON returns the raw bytes as JSON.
+func (r RawMessage) MarshalJSON() ([]byte, error) {
+	if r == nil {
+		return []byte("null"), nil
+	}
+	return r, nil
+}
+
+// UnmarshalJSON sets the raw bytes from JSON input.
+func (r *RawMessage) UnmarshalJSON(data []byte) error {
+	*r = append((*r)[0:0], data...)
+	return nil
+}
+
+// MarshalXML encodes the raw XML message into the encoder, re-wrapping
+// it within the provided start element.
+func (r RawMessage) MarshalXML(e *xml.Encoder, start xml.StartElement) error {
+	if len(r) == 0 {
+		return nil
+	}
+
+	d := xml.NewDecoder(bytes.NewReader(r))
+	// Skip the original start element from the stored raw XML
+	_, err := d.Token()
+	if err != nil {
+		return err
+	}
+
+	// Write the caller-provided start element
+	if err := e.EncodeToken(start); err != nil {
+		return err
+	}
+
+	// Copy all inner tokens until we reach the matching end element
+	depth := 1
+	for {
+		tok, err := d.Token()
+		if err != nil {
+			return err
+		}
+		switch tok.(type) {
+		case xml.StartElement:
+			depth++
+		case xml.EndElement:
+			depth--
+			if depth == 0 {
+				return e.EncodeToken(start.End())
+			}
+		}
+		if err := e.EncodeToken(xml.CopyToken(tok)); err != nil {
+			return err
+		}
+	}
+}
+
+// UnmarshalXML captures a full XML element (including children) into raw bytes.
+func (r *RawMessage) UnmarshalXML(d *xml.Decoder, start xml.StartElement) error {
+	data, err := CaptureXMLElement(d, start)
+	if err != nil {
+		return err
+	}
+	*r = data
+	return nil
+}
+
+// CaptureXMLElement reads an entire XML element from the decoder and returns it as bytes.
+func CaptureXMLElement(d *xml.Decoder, start xml.StartElement) ([]byte, error) {
+	buf := new(bytes.Buffer)
+	encoder := xml.NewEncoder(buf)
+
+	if err := encoder.EncodeToken(start); err != nil {
+		return nil, err
+	}
+
+	for {
+		tok, err := d.Token()
+		if err != nil {
+			return nil, err
+		}
+
+		if err = encoder.EncodeToken(tok); err != nil {
+			return nil, err
+		}
+
+		if end, ok := tok.(xml.EndElement); ok && end.Name == start.Name {
+			encoder.Flush()
+			break
+		}
+	}
+
+	return buf.Bytes(), nil
 }

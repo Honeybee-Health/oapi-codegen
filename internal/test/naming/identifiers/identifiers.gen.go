@@ -10,10 +10,10 @@ import (
 // Alarm Alarm Information
 type Alarm struct {
 	// UnderscoreId Identifier of the Alarm.
-	UnderscoreId *openapi_types.UUID `json:"_id,omitempty"`
+	UnderscoreId *openapi_types.UUID `json:"_id,omitempty" xml:"_id"`
 
 	// Id Identifier of the Alarm.
-	Id *openapi_types.UUID `json:"id,omitempty"`
+	Id *openapi_types.UUID `json:"id,omitempty" xml:"id"`
 }
 
 type N200ResponseHeaders struct {

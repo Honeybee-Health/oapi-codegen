@@ -5,8 +5,8 @@ package xgotypename
 
 // Client defines model for Client.
 type Client struct {
-	Id   *float32 `json:"id,omitempty"`
-	Name string   `json:"name"`
+	Id   *float32 `json:"id,omitempty" xml:"id"`
+	Name string   `json:"name" xml:"name"`
 }
 
 // ClientWithExtension defines model for ClientWithExtension.
@@ -14,11 +14,11 @@ type ClientWithExtension = ClientRenamedByExtension
 
 // ClientRenamedByExtension defines model for ClientWithExtension.
 type ClientRenamedByExtension struct {
-	Id   *float32 `json:"id,omitempty"`
-	Name string   `json:"name"`
+	Id   *float32 `json:"id,omitempty" xml:"id"`
+	Name string   `json:"name" xml:"name"`
 }
 
 // ResponseRenamed defines parameters for ExampleGet.
 type ResponseRenamed struct {
-	Name *string `json:"name,omitempty"`
+	Name *string `json:"name,omitempty" xml:"name"`
 }

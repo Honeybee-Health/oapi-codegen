@@ -6,3 +6,6 @@ generate:
   std-http-server: true
   strict-server: true
   models: true
+output-options:
+  # discriminator.gen.go emits the XML helpers for this package.
+  skip-xml-helpers: true

@@ -23,18 +23,18 @@ import (
 
 // SuffixBody defines model for SuffixBody.
 type SuffixBody struct {
-	Field1 string `json:"field1"`
-	Field2 string `json:"field2"`
+	Field1 string `json:"field1" xml:"field1"`
+	Field2 string `json:"field2" xml:"field2"`
 }
 
 // Bar defines model for bar.
 type Bar struct {
-	Field2 *string `json:"field2,omitempty"`
+	Field2 *string `json:"field2,omitempty" xml:"field2"`
 }
 
 // Foo defines model for foo.
 type Foo struct {
-	Field1 *string `json:"field1,omitempty"`
+	Field1 *string `json:"field1,omitempty" xml:"field1"`
 }
 
 // BazApplicationBarPlusJSON defines model for baz.

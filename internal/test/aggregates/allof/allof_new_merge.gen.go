@@ -7,33 +7,33 @@ package aggregatesallof
 // number. This would be returned by a `Get` style API. We merge the person
 // properties with another Schema which only provides required fields.
 type NewMergePerson struct {
-	FirstName          string `json:"FirstName"`
-	GovernmentIDNumber *int64 `json:"GovernmentIDNumber,omitempty"`
-	LastName           string `json:"LastName"`
+	FirstName          string `json:"FirstName" xml:"FirstName"`
+	GovernmentIDNumber *int64 `json:"GovernmentIDNumber,omitempty" xml:"GovernmentIDNumber"`
+	LastName           string `json:"LastName" xml:"LastName"`
 }
 
 // NewMergePersonProperties These are fields that specify a person. They are all optional, and
 // would be used by an `Edit` style API endpoint, where each is optional.
 type NewMergePersonProperties struct {
-	FirstName          *string `json:"FirstName,omitempty"`
-	GovernmentIDNumber *int64  `json:"GovernmentIDNumber,omitempty"`
-	LastName           *string `json:"LastName,omitempty"`
+	FirstName          *string `json:"FirstName,omitempty" xml:"FirstName"`
+	GovernmentIDNumber *int64  `json:"GovernmentIDNumber,omitempty" xml:"GovernmentIDNumber"`
+	LastName           *string `json:"LastName,omitempty" xml:"LastName"`
 }
 
 // NewMergePersonWithID This is a person record as returned from a Create endpoint. It contains
 // all the fields of a Person, with an additional resource UUID.
 type NewMergePersonWithID struct {
-	FirstName          string `json:"FirstName"`
-	GovernmentIDNumber *int64 `json:"GovernmentIDNumber,omitempty"`
-	ID                 int64  `json:"ID"`
-	LastName           string `json:"LastName"`
+	FirstName          string `json:"FirstName" xml:"FirstName"`
+	GovernmentIDNumber *int64 `json:"GovernmentIDNumber,omitempty" xml:"GovernmentIDNumber"`
+	ID                 int64  `json:"ID" xml:"ID"`
+	LastName           string `json:"LastName" xml:"LastName"`
 }
 
 // NewMergePersonWithMorePropertiesOutsideOfAllOf This is a person record as returned from a Create endpoint. It contains
 // all the fields of a Person, with an additional property outside of allOf directives.
 type NewMergePersonWithMorePropertiesOutsideOfAllOf struct {
-	FirstName          string `json:"FirstName"`
-	GovernmentIDNumber *int64 `json:"GovernmentIDNumber,omitempty"`
-	LastName           string `json:"LastName"`
-	AdditionalProperty string `json:"additionalProperty"`
+	FirstName          string `json:"FirstName" xml:"FirstName"`
+	GovernmentIDNumber *int64 `json:"GovernmentIDNumber,omitempty" xml:"GovernmentIDNumber"`
+	LastName           string `json:"LastName" xml:"LastName"`
+	AdditionalProperty string `json:"additionalProperty" xml:"additionalProperty"`
 }

@@ -16,9 +16,9 @@ import (
 
 // ExtraTagsObject defines model for ExtraTagsObject.
 type ExtraTagsObject struct {
-	Port      *ExtraTagsPort `bson:"port" json:"port,omitempty"`
-	StartPort *ExtraTagsPort `bson:"start_port" json:"start_port,omitempty"`
-	EndPort   *ExtraTagsPort `bson:"end_port" json:"end_port,omitempty"`
+	Port      *ExtraTagsPort `bson:"port" json:"port,omitempty" xml:"port"`
+	StartPort *ExtraTagsPort `bson:"start_port" json:"start_port,omitempty" xml:"start_port"`
+	EndPort   *ExtraTagsPort `bson:"end_port" json:"end_port,omitempty" xml:"end_port"`
 }
 
 // ExtraTagsPort defines model for ExtraTagsPort.
@@ -32,9 +32,9 @@ type OmitemptyDefault = int
 
 // OmitemptyObject defines model for OmitemptyObject.
 type OmitemptyObject struct {
-	Omitempty                *OmitemptyTrue    `json:"omitempty,omitempty"`
-	OmitemptyNextToRef       *OmitemptyDefault `json:"omitempty_next_to_ref,omitempty"`
-	OmitemptyOverrideToFalse *OmitemptyTrue    `json:"omitempty_override_to_false"`
+	Omitempty                *OmitemptyTrue    `json:"omitempty,omitempty" xml:"omitempty"`
+	OmitemptyNextToRef       *OmitemptyDefault `json:"omitempty_next_to_ref,omitempty" xml:"omitempty_next_to_ref"`
+	OmitemptyOverrideToFalse *OmitemptyTrue    `json:"omitempty_override_to_false" xml:"omitempty_override_to_false"`
 }
 
 // OmitemptyTrue defines model for OmitemptyTrue.
@@ -42,7 +42,7 @@ type OmitemptyTrue = int
 
 // ListThingsParams defines parameters for ListThings.
 type ListThingsParams struct {
-	Filter *FilterValue `form:"filter" json:"filter"`
+	Filter *FilterValue `form:"filter" json:"filter" xml:"filter"`
 }
 
 // RequestEditorFn is the function signature for the RequestEditor callback function

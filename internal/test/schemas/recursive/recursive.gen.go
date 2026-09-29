@@ -4,7 +4,9 @@
 package schemasrecursive
 
 import (
+	"bytes"
 	"encoding/json"
+	"encoding/xml"
 
 	"github.com/oapi-codegen/runtime"
 )
@@ -14,17 +16,18 @@ type ArrayValue = []Value
 
 // Document defines model for Document.
 type Document struct {
-	Fields *map[string]Value `json:"fields,omitempty"`
+	Fields *map[string]Value `json:"fields,omitempty" xml:"fields"`
 }
 
 // FilterColumnIncludes defines model for FilterColumnIncludes.
 type FilterColumnIncludes struct {
-	Includes *FilterPredicate `json:"$includes,omitempty"`
+	Includes *FilterPredicate `json:"$includes,omitempty" xml:"$includes"`
 }
 
 // FilterPredicate defines model for FilterPredicate.
 type FilterPredicate struct {
-	union json.RawMessage
+	union  json.RawMessage
+	xunion RawMessage
 }
 
 // FilterPredicate1 defines model for FilterPredicate.1.
@@ -32,8 +35,8 @@ type FilterPredicate1 = []FilterPredicate
 
 // FilterPredicateOp defines model for FilterPredicateOp.
 type FilterPredicateOp struct {
-	Any  *FilterPredicateOp_Any  `json:"$any,omitempty"`
-	None *FilterPredicateOp_None `json:"$none,omitempty"`
+	Any  *FilterPredicateOp_Any  `json:"$any,omitempty" xml:"$any"`
+	None *FilterPredicateOp_None `json:"$none,omitempty" xml:"$none"`
 }
 
 // FilterPredicateOpAny0 defines model for FilterPredicateOp.Any.0.
@@ -41,7 +44,8 @@ type FilterPredicateOpAny0 = []FilterPredicate
 
 // FilterPredicateOp_Any defines model for FilterPredicateOp.Any.
 type FilterPredicateOp_Any struct {
-	union json.RawMessage
+	union  json.RawMessage
+	xunion RawMessage
 }
 
 // FilterPredicateOpNone1 defines model for FilterPredicateOp.None.1.
@@ -49,17 +53,19 @@ type FilterPredicateOpNone1 = []FilterPredicate
 
 // FilterPredicateOp_None defines model for FilterPredicateOp.None.
 type FilterPredicateOp_None struct {
-	union json.RawMessage
+	union  json.RawMessage
+	xunion RawMessage
 }
 
 // FilterPredicateRangeOp defines model for FilterPredicateRangeOp.
 type FilterPredicateRangeOp struct {
-	Lt *FilterRangeValue `json:"$lt,omitempty"`
+	Lt *FilterRangeValue `json:"$lt,omitempty" xml:"$lt"`
 }
 
 // FilterRangeValue defines model for FilterRangeValue.
 type FilterRangeValue struct {
-	union json.RawMessage
+	union  json.RawMessage
+	xunion RawMessage
 }
 
 // FilterRangeValue0 defines model for FilterRangeValue.0.
@@ -70,7 +76,8 @@ type FilterRangeValue1 = string
 
 // FilterValue defines model for FilterValue.
 type FilterValue struct {
-	union json.RawMessage
+	union  json.RawMessage
+	xunion RawMessage
 }
 
 // FilterValue0 defines model for FilterValue.0.
@@ -84,33 +91,53 @@ type FilterValue2 = bool
 
 // NonRecursiveObject defines model for NonRecursiveObject.
 type NonRecursiveObject struct {
-	FieldInNonRecursive *string `json:"FieldInNonRecursive,omitempty"`
+	FieldInNonRecursive *string `json:"FieldInNonRecursive,omitempty" xml:"FieldInNonRecursive"`
 }
 
 // RecursiveObject defines model for RecursiveObject.
 type RecursiveObject struct {
-	FieldInNonRecursive *string `json:"FieldInNonRecursive,omitempty"`
-	FieldInRecursive    *string `json:"FieldInRecursive:,omitempty"`
+	FieldInNonRecursive *string `json:"FieldInNonRecursive,omitempty" xml:"FieldInNonRecursive"`
+	FieldInRecursive    *string `json:"FieldInRecursive:,omitempty" xml:"FieldInRecursive:"`
 }
 
 // Value defines model for Value.
 type Value struct {
-	ArrayValue  *ArrayValue `json:"arrayValue,omitempty"`
-	StringValue *string     `json:"stringValue,omitempty"`
+	ArrayValue  *ArrayValue `json:"arrayValue,omitempty" xml:"arrayValue"`
+	StringValue *string     `json:"stringValue,omitempty" xml:"stringValue"`
 }
 
 // AsFilterValue returns the union data inside the FilterPredicate as a FilterValue
 func (t FilterPredicate) AsFilterValue() (FilterValue, error) {
 	var body FilterValue
-	err := json.Unmarshal(t.union, &body)
-	return body, err
+	if len(t.union) > 0 {
+		err := json.Unmarshal(t.union, &body)
+		if err != nil {
+			return body, err
+		}
+	}
+	if len(t.xunion) > 0 {
+		err := xml.Unmarshal(t.xunion, &body)
+		if err != nil {
+			return body, err
+		}
+	}
+	return body, nil
 }
 
 // FromFilterValue overwrites any union data inside the FilterPredicate as the provided FilterValue
 func (t *FilterPredicate) FromFilterValue(v FilterValue) error {
 	b, err := json.Marshal(v)
+	if err != nil {
+		return err
+	}
 	t.union = b
-	return err
+	b, err = xml.Marshal(v)
+	if err != nil {
+		return err
+	}
+	t.xunion = b
+
+	return nil
 }
 
 // MergeFilterValue performs a merge with any union data inside the FilterPredicate, using the provided FilterValue
@@ -122,21 +149,49 @@ func (t *FilterPredicate) MergeFilterValue(v FilterValue) error {
 
 	merged, err := runtime.JSONMerge(t.union, b)
 	t.union = merged
+
+	// For XML, re-marshal the merged result
+	bx, errx := xml.Marshal(v)
+	if errx != nil {
+		return errx
+	}
+	t.xunion = bx
+
 	return err
 }
 
 // AsFilterPredicate1 returns the union data inside the FilterPredicate as a FilterPredicate1
 func (t FilterPredicate) AsFilterPredicate1() (FilterPredicate1, error) {
 	var body FilterPredicate1
-	err := json.Unmarshal(t.union, &body)
-	return body, err
+	if len(t.union) > 0 {
+		err := json.Unmarshal(t.union, &body)
+		if err != nil {
+			return body, err
+		}
+	}
+	if len(t.xunion) > 0 {
+		err := xml.Unmarshal(t.xunion, &body)
+		if err != nil {
+			return body, err
+		}
+	}
+	return body, nil
 }
 
 // FromFilterPredicate1 overwrites any union data inside the FilterPredicate as the provided FilterPredicate1
 func (t *FilterPredicate) FromFilterPredicate1(v FilterPredicate1) error {
 	b, err := json.Marshal(v)
+	if err != nil {
+		return err
+	}
 	t.union = b
-	return err
+	b, err = xml.Marshal(v)
+	if err != nil {
+		return err
+	}
+	t.xunion = b
+
+	return nil
 }
 
 // MergeFilterPredicate1 performs a merge with any union data inside the FilterPredicate, using the provided FilterPredicate1
@@ -148,21 +203,49 @@ func (t *FilterPredicate) MergeFilterPredicate1(v FilterPredicate1) error {
 
 	merged, err := runtime.JSONMerge(t.union, b)
 	t.union = merged
+
+	// For XML, re-marshal the merged result
+	bx, errx := xml.Marshal(v)
+	if errx != nil {
+		return errx
+	}
+	t.xunion = bx
+
 	return err
 }
 
 // AsFilterPredicateOp returns the union data inside the FilterPredicate as a FilterPredicateOp
 func (t FilterPredicate) AsFilterPredicateOp() (FilterPredicateOp, error) {
 	var body FilterPredicateOp
-	err := json.Unmarshal(t.union, &body)
-	return body, err
+	if len(t.union) > 0 {
+		err := json.Unmarshal(t.union, &body)
+		if err != nil {
+			return body, err
+		}
+	}
+	if len(t.xunion) > 0 {
+		err := xml.Unmarshal(t.xunion, &body)
+		if err != nil {
+			return body, err
+		}
+	}
+	return body, nil
 }
 
 // FromFilterPredicateOp overwrites any union data inside the FilterPredicate as the provided FilterPredicateOp
 func (t *FilterPredicate) FromFilterPredicateOp(v FilterPredicateOp) error {
 	b, err := json.Marshal(v)
+	if err != nil {
+		return err
+	}
 	t.union = b
-	return err
+	b, err = xml.Marshal(v)
+	if err != nil {
+		return err
+	}
+	t.xunion = b
+
+	return nil
 }
 
 // MergeFilterPredicateOp performs a merge with any union data inside the FilterPredicate, using the provided FilterPredicateOp
@@ -174,21 +257,49 @@ func (t *FilterPredicate) MergeFilterPredicateOp(v FilterPredicateOp) error {
 
 	merged, err := runtime.JSONMerge(t.union, b)
 	t.union = merged
+
+	// For XML, re-marshal the merged result
+	bx, errx := xml.Marshal(v)
+	if errx != nil {
+		return errx
+	}
+	t.xunion = bx
+
 	return err
 }
 
 // AsFilterPredicateRangeOp returns the union data inside the FilterPredicate as a FilterPredicateRangeOp
 func (t FilterPredicate) AsFilterPredicateRangeOp() (FilterPredicateRangeOp, error) {
 	var body FilterPredicateRangeOp
-	err := json.Unmarshal(t.union, &body)
-	return body, err
+	if len(t.union) > 0 {
+		err := json.Unmarshal(t.union, &body)
+		if err != nil {
+			return body, err
+		}
+	}
+	if len(t.xunion) > 0 {
+		err := xml.Unmarshal(t.xunion, &body)
+		if err != nil {
+			return body, err
+		}
+	}
+	return body, nil
 }
 
 // FromFilterPredicateRangeOp overwrites any union data inside the FilterPredicate as the provided FilterPredicateRangeOp
 func (t *FilterPredicate) FromFilterPredicateRangeOp(v FilterPredicateRangeOp) error {
 	b, err := json.Marshal(v)
+	if err != nil {
+		return err
+	}
 	t.union = b
-	return err
+	b, err = xml.Marshal(v)
+	if err != nil {
+		return err
+	}
+	t.xunion = b
+
+	return nil
 }
 
 // MergeFilterPredicateRangeOp performs a merge with any union data inside the FilterPredicate, using the provided FilterPredicateRangeOp
@@ -200,6 +311,14 @@ func (t *FilterPredicate) MergeFilterPredicateRangeOp(v FilterPredicateRangeOp) 
 
 	merged, err := runtime.JSONMerge(t.union, b)
 	t.union = merged
+
+	// For XML, re-marshal the merged result
+	bx, errx := xml.Marshal(v)
+	if errx != nil {
+		return errx
+	}
+	t.xunion = bx
+
 	return err
 }
 
@@ -213,18 +332,59 @@ func (t *FilterPredicate) UnmarshalJSON(b []byte) error {
 	return err
 }
 
+func (t FilterPredicate) MarshalXML(e *xml.Encoder, start xml.StartElement) error {
+	if len(t.xunion) > 0 {
+		return t.xunion.MarshalXML(e, start)
+	}
+	if err := e.EncodeToken(start); err != nil {
+		return err
+	}
+	return e.EncodeToken(start.End())
+}
+
+func (t *FilterPredicate) UnmarshalXML(d *xml.Decoder, start xml.StartElement) error {
+	var err error
+
+	t.xunion, err = CaptureXMLElement(d, start)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
 // AsFilterPredicateOpAny0 returns the union data inside the FilterPredicateOp_Any as a FilterPredicateOpAny0
 func (t FilterPredicateOp_Any) AsFilterPredicateOpAny0() (FilterPredicateOpAny0, error) {
 	var body FilterPredicateOpAny0
-	err := json.Unmarshal(t.union, &body)
-	return body, err
+	if len(t.union) > 0 {
+		err := json.Unmarshal(t.union, &body)
+		if err != nil {
+			return body, err
+		}
+	}
+	if len(t.xunion) > 0 {
+		err := xml.Unmarshal(t.xunion, &body)
+		if err != nil {
+			return body, err
+		}
+	}
+	return body, nil
 }
 
 // FromFilterPredicateOpAny0 overwrites any union data inside the FilterPredicateOp_Any as the provided FilterPredicateOpAny0
 func (t *FilterPredicateOp_Any) FromFilterPredicateOpAny0(v FilterPredicateOpAny0) error {
 	b, err := json.Marshal(v)
+	if err != nil {
+		return err
+	}
 	t.union = b
-	return err
+	b, err = xml.Marshal(v)
+	if err != nil {
+		return err
+	}
+	t.xunion = b
+
+	return nil
 }
 
 // MergeFilterPredicateOpAny0 performs a merge with any union data inside the FilterPredicateOp_Any, using the provided FilterPredicateOpAny0
@@ -236,6 +396,14 @@ func (t *FilterPredicateOp_Any) MergeFilterPredicateOpAny0(v FilterPredicateOpAn
 
 	merged, err := runtime.JSONMerge(t.union, b)
 	t.union = merged
+
+	// For XML, re-marshal the merged result
+	bx, errx := xml.Marshal(v)
+	if errx != nil {
+		return errx
+	}
+	t.xunion = bx
+
 	return err
 }
 
@@ -249,18 +417,59 @@ func (t *FilterPredicateOp_Any) UnmarshalJSON(b []byte) error {
 	return err
 }
 
+func (t FilterPredicateOp_Any) MarshalXML(e *xml.Encoder, start xml.StartElement) error {
+	if len(t.xunion) > 0 {
+		return t.xunion.MarshalXML(e, start)
+	}
+	if err := e.EncodeToken(start); err != nil {
+		return err
+	}
+	return e.EncodeToken(start.End())
+}
+
+func (t *FilterPredicateOp_Any) UnmarshalXML(d *xml.Decoder, start xml.StartElement) error {
+	var err error
+
+	t.xunion, err = CaptureXMLElement(d, start)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
 // AsFilterPredicate returns the union data inside the FilterPredicateOp_None as a FilterPredicate
 func (t FilterPredicateOp_None) AsFilterPredicate() (FilterPredicate, error) {
 	var body FilterPredicate
-	err := json.Unmarshal(t.union, &body)
-	return body, err
+	if len(t.union) > 0 {
+		err := json.Unmarshal(t.union, &body)
+		if err != nil {
+			return body, err
+		}
+	}
+	if len(t.xunion) > 0 {
+		err := xml.Unmarshal(t.xunion, &body)
+		if err != nil {
+			return body, err
+		}
+	}
+	return body, nil
 }
 
 // FromFilterPredicate overwrites any union data inside the FilterPredicateOp_None as the provided FilterPredicate
 func (t *FilterPredicateOp_None) FromFilterPredicate(v FilterPredicate) error {
 	b, err := json.Marshal(v)
+	if err != nil {
+		return err
+	}
 	t.union = b
-	return err
+	b, err = xml.Marshal(v)
+	if err != nil {
+		return err
+	}
+	t.xunion = b
+
+	return nil
 }
 
 // MergeFilterPredicate performs a merge with any union data inside the FilterPredicateOp_None, using the provided FilterPredicate
@@ -272,21 +481,49 @@ func (t *FilterPredicateOp_None) MergeFilterPredicate(v FilterPredicate) error {
 
 	merged, err := runtime.JSONMerge(t.union, b)
 	t.union = merged
+
+	// For XML, re-marshal the merged result
+	bx, errx := xml.Marshal(v)
+	if errx != nil {
+		return errx
+	}
+	t.xunion = bx
+
 	return err
 }
 
 // AsFilterPredicateOpNone1 returns the union data inside the FilterPredicateOp_None as a FilterPredicateOpNone1
 func (t FilterPredicateOp_None) AsFilterPredicateOpNone1() (FilterPredicateOpNone1, error) {
 	var body FilterPredicateOpNone1
-	err := json.Unmarshal(t.union, &body)
-	return body, err
+	if len(t.union) > 0 {
+		err := json.Unmarshal(t.union, &body)
+		if err != nil {
+			return body, err
+		}
+	}
+	if len(t.xunion) > 0 {
+		err := xml.Unmarshal(t.xunion, &body)
+		if err != nil {
+			return body, err
+		}
+	}
+	return body, nil
 }
 
 // FromFilterPredicateOpNone1 overwrites any union data inside the FilterPredicateOp_None as the provided FilterPredicateOpNone1
 func (t *FilterPredicateOp_None) FromFilterPredicateOpNone1(v FilterPredicateOpNone1) error {
 	b, err := json.Marshal(v)
+	if err != nil {
+		return err
+	}
 	t.union = b
-	return err
+	b, err = xml.Marshal(v)
+	if err != nil {
+		return err
+	}
+	t.xunion = b
+
+	return nil
 }
 
 // MergeFilterPredicateOpNone1 performs a merge with any union data inside the FilterPredicateOp_None, using the provided FilterPredicateOpNone1
@@ -298,6 +535,14 @@ func (t *FilterPredicateOp_None) MergeFilterPredicateOpNone1(v FilterPredicateOp
 
 	merged, err := runtime.JSONMerge(t.union, b)
 	t.union = merged
+
+	// For XML, re-marshal the merged result
+	bx, errx := xml.Marshal(v)
+	if errx != nil {
+		return errx
+	}
+	t.xunion = bx
+
 	return err
 }
 
@@ -311,18 +556,59 @@ func (t *FilterPredicateOp_None) UnmarshalJSON(b []byte) error {
 	return err
 }
 
+func (t FilterPredicateOp_None) MarshalXML(e *xml.Encoder, start xml.StartElement) error {
+	if len(t.xunion) > 0 {
+		return t.xunion.MarshalXML(e, start)
+	}
+	if err := e.EncodeToken(start); err != nil {
+		return err
+	}
+	return e.EncodeToken(start.End())
+}
+
+func (t *FilterPredicateOp_None) UnmarshalXML(d *xml.Decoder, start xml.StartElement) error {
+	var err error
+
+	t.xunion, err = CaptureXMLElement(d, start)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
 // AsFilterRangeValue0 returns the union data inside the FilterRangeValue as a FilterRangeValue0
 func (t FilterRangeValue) AsFilterRangeValue0() (FilterRangeValue0, error) {
 	var body FilterRangeValue0
-	err := json.Unmarshal(t.union, &body)
-	return body, err
+	if len(t.union) > 0 {
+		err := json.Unmarshal(t.union, &body)
+		if err != nil {
+			return body, err
+		}
+	}
+	if len(t.xunion) > 0 {
+		err := xml.Unmarshal(t.xunion, &body)
+		if err != nil {
+			return body, err
+		}
+	}
+	return body, nil
 }
 
 // FromFilterRangeValue0 overwrites any union data inside the FilterRangeValue as the provided FilterRangeValue0
 func (t *FilterRangeValue) FromFilterRangeValue0(v FilterRangeValue0) error {
 	b, err := json.Marshal(v)
+	if err != nil {
+		return err
+	}
 	t.union = b
-	return err
+	b, err = xml.Marshal(v)
+	if err != nil {
+		return err
+	}
+	t.xunion = b
+
+	return nil
 }
 
 // MergeFilterRangeValue0 performs a merge with any union data inside the FilterRangeValue, using the provided FilterRangeValue0
@@ -334,21 +620,49 @@ func (t *FilterRangeValue) MergeFilterRangeValue0(v FilterRangeValue0) error {
 
 	merged, err := runtime.JSONMerge(t.union, b)
 	t.union = merged
+
+	// For XML, re-marshal the merged result
+	bx, errx := xml.Marshal(v)
+	if errx != nil {
+		return errx
+	}
+	t.xunion = bx
+
 	return err
 }
 
 // AsFilterRangeValue1 returns the union data inside the FilterRangeValue as a FilterRangeValue1
 func (t FilterRangeValue) AsFilterRangeValue1() (FilterRangeValue1, error) {
 	var body FilterRangeValue1
-	err := json.Unmarshal(t.union, &body)
-	return body, err
+	if len(t.union) > 0 {
+		err := json.Unmarshal(t.union, &body)
+		if err != nil {
+			return body, err
+		}
+	}
+	if len(t.xunion) > 0 {
+		err := xml.Unmarshal(t.xunion, &body)
+		if err != nil {
+			return body, err
+		}
+	}
+	return body, nil
 }
 
 // FromFilterRangeValue1 overwrites any union data inside the FilterRangeValue as the provided FilterRangeValue1
 func (t *FilterRangeValue) FromFilterRangeValue1(v FilterRangeValue1) error {
 	b, err := json.Marshal(v)
+	if err != nil {
+		return err
+	}
 	t.union = b
-	return err
+	b, err = xml.Marshal(v)
+	if err != nil {
+		return err
+	}
+	t.xunion = b
+
+	return nil
 }
 
 // MergeFilterRangeValue1 performs a merge with any union data inside the FilterRangeValue, using the provided FilterRangeValue1
@@ -360,6 +674,14 @@ func (t *FilterRangeValue) MergeFilterRangeValue1(v FilterRangeValue1) error {
 
 	merged, err := runtime.JSONMerge(t.union, b)
 	t.union = merged
+
+	// For XML, re-marshal the merged result
+	bx, errx := xml.Marshal(v)
+	if errx != nil {
+		return errx
+	}
+	t.xunion = bx
+
 	return err
 }
 
@@ -373,18 +695,59 @@ func (t *FilterRangeValue) UnmarshalJSON(b []byte) error {
 	return err
 }
 
+func (t FilterRangeValue) MarshalXML(e *xml.Encoder, start xml.StartElement) error {
+	if len(t.xunion) > 0 {
+		return t.xunion.MarshalXML(e, start)
+	}
+	if err := e.EncodeToken(start); err != nil {
+		return err
+	}
+	return e.EncodeToken(start.End())
+}
+
+func (t *FilterRangeValue) UnmarshalXML(d *xml.Decoder, start xml.StartElement) error {
+	var err error
+
+	t.xunion, err = CaptureXMLElement(d, start)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
 // AsFilterValue0 returns the union data inside the FilterValue as a FilterValue0
 func (t FilterValue) AsFilterValue0() (FilterValue0, error) {
 	var body FilterValue0
-	err := json.Unmarshal(t.union, &body)
-	return body, err
+	if len(t.union) > 0 {
+		err := json.Unmarshal(t.union, &body)
+		if err != nil {
+			return body, err
+		}
+	}
+	if len(t.xunion) > 0 {
+		err := xml.Unmarshal(t.xunion, &body)
+		if err != nil {
+			return body, err
+		}
+	}
+	return body, nil
 }
 
 // FromFilterValue0 overwrites any union data inside the FilterValue as the provided FilterValue0
 func (t *FilterValue) FromFilterValue0(v FilterValue0) error {
 	b, err := json.Marshal(v)
+	if err != nil {
+		return err
+	}
 	t.union = b
-	return err
+	b, err = xml.Marshal(v)
+	if err != nil {
+		return err
+	}
+	t.xunion = b
+
+	return nil
 }
 
 // MergeFilterValue0 performs a merge with any union data inside the FilterValue, using the provided FilterValue0
@@ -396,21 +759,49 @@ func (t *FilterValue) MergeFilterValue0(v FilterValue0) error {
 
 	merged, err := runtime.JSONMerge(t.union, b)
 	t.union = merged
+
+	// For XML, re-marshal the merged result
+	bx, errx := xml.Marshal(v)
+	if errx != nil {
+		return errx
+	}
+	t.xunion = bx
+
 	return err
 }
 
 // AsFilterValue1 returns the union data inside the FilterValue as a FilterValue1
 func (t FilterValue) AsFilterValue1() (FilterValue1, error) {
 	var body FilterValue1
-	err := json.Unmarshal(t.union, &body)
-	return body, err
+	if len(t.union) > 0 {
+		err := json.Unmarshal(t.union, &body)
+		if err != nil {
+			return body, err
+		}
+	}
+	if len(t.xunion) > 0 {
+		err := xml.Unmarshal(t.xunion, &body)
+		if err != nil {
+			return body, err
+		}
+	}
+	return body, nil
 }
 
 // FromFilterValue1 overwrites any union data inside the FilterValue as the provided FilterValue1
 func (t *FilterValue) FromFilterValue1(v FilterValue1) error {
 	b, err := json.Marshal(v)
+	if err != nil {
+		return err
+	}
 	t.union = b
-	return err
+	b, err = xml.Marshal(v)
+	if err != nil {
+		return err
+	}
+	t.xunion = b
+
+	return nil
 }
 
 // MergeFilterValue1 performs a merge with any union data inside the FilterValue, using the provided FilterValue1
@@ -422,21 +813,49 @@ func (t *FilterValue) MergeFilterValue1(v FilterValue1) error {
 
 	merged, err := runtime.JSONMerge(t.union, b)
 	t.union = merged
+
+	// For XML, re-marshal the merged result
+	bx, errx := xml.Marshal(v)
+	if errx != nil {
+		return errx
+	}
+	t.xunion = bx
+
 	return err
 }
 
 // AsFilterValue2 returns the union data inside the FilterValue as a FilterValue2
 func (t FilterValue) AsFilterValue2() (FilterValue2, error) {
 	var body FilterValue2
-	err := json.Unmarshal(t.union, &body)
-	return body, err
+	if len(t.union) > 0 {
+		err := json.Unmarshal(t.union, &body)
+		if err != nil {
+			return body, err
+		}
+	}
+	if len(t.xunion) > 0 {
+		err := xml.Unmarshal(t.xunion, &body)
+		if err != nil {
+			return body, err
+		}
+	}
+	return body, nil
 }
 
 // FromFilterValue2 overwrites any union data inside the FilterValue as the provided FilterValue2
 func (t *FilterValue) FromFilterValue2(v FilterValue2) error {
 	b, err := json.Marshal(v)
+	if err != nil {
+		return err
+	}
 	t.union = b
-	return err
+	b, err = xml.Marshal(v)
+	if err != nil {
+		return err
+	}
+	t.xunion = b
+
+	return nil
 }
 
 // MergeFilterValue2 performs a merge with any union data inside the FilterValue, using the provided FilterValue2
@@ -448,6 +867,14 @@ func (t *FilterValue) MergeFilterValue2(v FilterValue2) error {
 
 	merged, err := runtime.JSONMerge(t.union, b)
 	t.union = merged
+
+	// For XML, re-marshal the merged result
+	bx, errx := xml.Marshal(v)
+	if errx != nil {
+		return errx
+	}
+	t.xunion = bx
+
 	return err
 }
 
@@ -459,4 +886,120 @@ func (t FilterValue) MarshalJSON() ([]byte, error) {
 func (t *FilterValue) UnmarshalJSON(b []byte) error {
 	err := t.union.UnmarshalJSON(b)
 	return err
+}
+
+func (t FilterValue) MarshalXML(e *xml.Encoder, start xml.StartElement) error {
+	if len(t.xunion) > 0 {
+		return t.xunion.MarshalXML(e, start)
+	}
+	if err := e.EncodeToken(start); err != nil {
+		return err
+	}
+	return e.EncodeToken(start.End())
+}
+
+func (t *FilterValue) UnmarshalXML(d *xml.Decoder, start xml.StartElement) error {
+	var err error
+
+	t.xunion, err = CaptureXMLElement(d, start)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+type RawMessage []byte
+
+// MarshalJSON returns the raw bytes as JSON.
+func (r RawMessage) MarshalJSON() ([]byte, error) {
+	if r == nil {
+		return []byte("null"), nil
+	}
+	return r, nil
+}
+
+// UnmarshalJSON sets the raw bytes from JSON input.
+func (r *RawMessage) UnmarshalJSON(data []byte) error {
+	*r = append((*r)[0:0], data...)
+	return nil
+}
+
+// MarshalXML encodes the raw XML message into the encoder, re-wrapping
+// it within the provided start element.
+func (r RawMessage) MarshalXML(e *xml.Encoder, start xml.StartElement) error {
+	if len(r) == 0 {
+		return nil
+	}
+
+	d := xml.NewDecoder(bytes.NewReader(r))
+	// Skip the original start element from the stored raw XML
+	_, err := d.Token()
+	if err != nil {
+		return err
+	}
+
+	// Write the caller-provided start element
+	if err := e.EncodeToken(start); err != nil {
+		return err
+	}
+
+	// Copy all inner tokens until we reach the matching end element
+	depth := 1
+	for {
+		tok, err := d.Token()
+		if err != nil {
+			return err
+		}
+		switch tok.(type) {
+		case xml.StartElement:
+			depth++
+		case xml.EndElement:
+			depth--
+			if depth == 0 {
+				return e.EncodeToken(start.End())
+			}
+		}
+		if err := e.EncodeToken(xml.CopyToken(tok)); err != nil {
+			return err
+		}
+	}
+}
+
+// UnmarshalXML captures a full XML element (including children) into raw bytes.
+func (r *RawMessage) UnmarshalXML(d *xml.Decoder, start xml.StartElement) error {
+	data, err := CaptureXMLElement(d, start)
+	if err != nil {
+		return err
+	}
+	*r = data
+	return nil
+}
+
+// CaptureXMLElement reads an entire XML element from the decoder and returns it as bytes.
+func CaptureXMLElement(d *xml.Decoder, start xml.StartElement) ([]byte, error) {
+	buf := new(bytes.Buffer)
+	encoder := xml.NewEncoder(buf)
+
+	if err := encoder.EncodeToken(start); err != nil {
+		return nil, err
+	}
+
+	for {
+		tok, err := d.Token()
+		if err != nil {
+			return nil, err
+		}
+
+		if err = encoder.EncodeToken(tok); err != nil {
+			return nil, err
+		}
+
+		if end, ok := tok.(xml.EndElement); ok && end.Name == start.Name {
+			encoder.Flush()
+			break
+		}
+	}
+
+	return buf.Bytes(), nil
 }

@@ -6,17 +6,17 @@ package xgojsonignore
 // Client defines model for Client.
 type Client struct {
 	ComplexField *struct {
-		AccountName *string `json:"accountName,omitempty"`
-		Name        *string `json:"name,omitempty"`
-	} `json:"complexField,omitempty"`
-	Name string `json:"name"`
+		AccountName *string `json:"accountName,omitempty" xml:"accountName"`
+		Name        *string `json:"name,omitempty" xml:"name"`
+	} `json:"complexField,omitempty" xml:"complexField"`
+	Name string `json:"name" xml:"name"`
 }
 
 // ClientWithExtension defines model for ClientWithExtension.
 type ClientWithExtension struct {
 	ComplexField *struct {
-		AccountName *string `json:"accountName,omitempty"`
-		Name        *string `json:"name,omitempty"`
-	} `json:"-"`
-	Name string `json:"name"`
+		AccountName *string `json:"accountName,omitempty" xml:"accountName"`
+		Name        *string `json:"name,omitempty" xml:"name"`
+	} `json:"-" xml:"complexField"`
+	Name string `json:"name" xml:"name"`
 }

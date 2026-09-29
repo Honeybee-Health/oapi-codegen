@@ -15,12 +15,12 @@ import (
 
 // ClientTypeSkip defines model for ClientTypeSkip.
 type ClientTypeSkip struct {
-	Name string `json:"name"`
+	Name string `json:"name" xml:"name"`
 }
 
 // UnreferencedSkip defines model for UnreferencedSkip.
 type UnreferencedSkip struct {
-	Id string `json:"id"`
+	Id string `json:"id" xml:"id"`
 }
 
 // RequestEditorFn is the function signature for the RequestEditor callback function
@@ -290,13 +290,13 @@ type UpdateClientSkipResponse struct {
 	HTTPResponse *http.Response
 	// JSON400 the response for an HTTP 400 `application/json` response
 	JSON400 *struct {
-		Code string `json:"code"`
+		Code string `json:"code" xml:"code"`
 	}
 }
 
 // GetJSON400 returns the response for an HTTP 400 `application/json` response
 func (r UpdateClientSkipResponse) GetJSON400() *struct {
-	Code string `json:"code"`
+	Code string `json:"code" xml:"code"`
 } {
 	return r.JSON400
 }
@@ -399,7 +399,7 @@ func ParseUpdateClientSkipResponse(rsp *http.Response) (*UpdateClientSkipRespons
 	switch {
 	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 400:
 		var dest struct {
-			Code string `json:"code"`
+			Code string `json:"code" xml:"code"`
 		}
 		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
 			return nil, err

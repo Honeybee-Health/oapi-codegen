@@ -21,12 +21,12 @@ import (
 
 // Bar defines model for bar.
 type Bar struct {
-	Field2 *string `json:"field2,omitempty"`
+	Field2 *string `json:"field2,omitempty" xml:"field2"`
 }
 
 // Foo defines model for foo.
 type Foo struct {
-	Field1 *string `json:"field1,omitempty"`
+	Field1 *string `json:"field1,omitempty" xml:"field1"`
 }
 
 // RequestEditorFn is the function signature for the RequestEditor callback function

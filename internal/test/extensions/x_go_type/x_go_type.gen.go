@@ -67,8 +67,8 @@ func (e TestField1) Valid() bool {
 
 // Document defines model for Document.
 type Document struct {
-	Name   *string          `json:"name,omitempty"`
-	Status *Document_Status `json:"status,omitempty"`
+	Name   *string          `json:"name,omitempty" xml:"name"`
+	Status *Document_Status `json:"status,omitempty" xml:"status"`
 }
 
 // Document_Status defines model for Document.status.
@@ -76,7 +76,7 @@ type Document_Status string
 
 // DocumentStatus defines model for DocumentStatus.
 type DocumentStatus struct {
-	Value *string `json:"value,omitempty"`
+	Value *string `json:"value,omitempty" xml:"value"`
 }
 
 // ID defines model for ID.
@@ -87,9 +87,9 @@ type SomeInteger = int
 
 // SomeObject defines model for SomeObject.
 type SomeObject struct {
-	IntAsRateLimit *rate.Limit      `json:"int_as_rate_limit,omitempty"`
-	IntAsString    string           `json:"int_as_string"`
-	IntAsUuid      *googleuuid.UUID `json:"int_as_uuid,omitempty"`
+	IntAsRateLimit *rate.Limit      `json:"int_as_rate_limit,omitempty" xml:"int_as_rate_limit"`
+	IntAsString    string           `json:"int_as_string" xml:"int_as_string"`
+	IntAsUuid      *googleuuid.UUID `json:"int_as_uuid,omitempty" xml:"int_as_uuid"`
 }
 
 // Test defines model for Test.
@@ -100,39 +100,39 @@ type TestField1 string
 
 // MyTestRequestNestedField A nested object with allocated name
 type MyTestRequestNestedField struct {
-	Field1 bool   `json:"field1"`
-	Field2 string `json:"field2"`
+	Field1 bool   `json:"field1" xml:"field1"`
+	Field2 string `json:"field2" xml:"field2"`
 }
 
 // MyTestRequest defines model for Test.
 type MyTestRequest struct {
 	// Field1 A array of enum values
-	Field1 *[]TestField1 `json:"field1,omitempty"`
+	Field1 *[]TestField1 `json:"field1,omitempty" xml:"field1"`
 
 	// Field2 A nested object with allocated name
-	Field2 *MyTestRequestNestedField `json:"field2,omitempty"`
+	Field2 *MyTestRequestNestedField `json:"field2,omitempty" xml:"field2"`
 
 	// Field3 A nested object without allocated name
 	Field3 *struct {
-		Field1 bool   `json:"field1"`
-		Field2 string `json:"field2"`
-	} `json:"field3,omitempty"`
+		Field1 bool   `json:"field1" xml:"field1"`
+		Field2 string `json:"field2" xml:"field2"`
+	} `json:"field3,omitempty" xml:"field3"`
 }
 
 // TypeWithAllOf defines model for TypeWithAllOf.
 type TypeWithAllOf struct {
-	Id googleuuid.UUID `json:"id,omitempty"`
+	Id googleuuid.UUID `json:"id,omitempty" xml:"id"`
 }
 
 // TypeWithOptionalField defines model for TypeWithOptionalField.
 type TypeWithOptionalField struct {
-	At         googleuuid.UUID `json:"at,omitempty"`
-	AtRequired googleuuid.UUID `json:"at_required"`
+	At         googleuuid.UUID `json:"at,omitempty" xml:"at"`
+	AtRequired googleuuid.UUID `json:"at_required" xml:"at_required"`
 }
 
 // GetRootParams defines parameters for GetRoot.
 type GetRootParams struct {
-	At googleuuid.UUID `form:"at,omitempty" json:"at,omitempty"`
+	At googleuuid.UUID `form:"at,omitempty" json:"at,omitempty" xml:"at"`
 }
 
 // TestApplicationTestPlusJSONRequestBody defines body for Test for application/test+json ContentType.

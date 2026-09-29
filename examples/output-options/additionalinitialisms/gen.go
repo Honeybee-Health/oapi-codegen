@@ -6,5 +6,5 @@ package additionalinitialisms
 // Request defines model for Request.
 type Request struct {
 	// CSPName The Cloud Service Provider's name.
-	CSPName string `json:"csp_name"`
+	CSPName string `json:"csp_name" xml:"csp_name"`
 }

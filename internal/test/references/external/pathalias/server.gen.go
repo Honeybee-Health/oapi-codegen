@@ -12,7 +12,7 @@ import (
 
 // B defines model for B.
 type B struct {
-	A *string `json:"A,omitempty"`
+	A *string `json:"A,omitempty" xml:"A"`
 }
 
 // ServerInterface represents all server handlers.

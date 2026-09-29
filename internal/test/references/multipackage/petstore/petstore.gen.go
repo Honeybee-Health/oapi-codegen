@@ -82,63 +82,63 @@ func (e FindPetsByStatusParamsStatus) Valid() bool {
 // Address defines model for Address.
 type Address struct {
 	// City Example: Palo Alto
-	City *string `json:"city,omitempty"`
+	City *string `json:"city,omitempty" xml:"city"`
 
 	// State Example: CA
-	State *string `json:"state,omitempty"`
+	State *string `json:"state,omitempty" xml:"state"`
 
 	// Street Example: 437 Lytton
-	Street *string `json:"street,omitempty"`
+	Street *string `json:"street,omitempty" xml:"street"`
 
 	// Zip Example: 94301
-	Zip *string `json:"zip,omitempty"`
+	Zip *string `json:"zip,omitempty" xml:"zip"`
 }
 
 // ApiResponse defines model for ApiResponse.
 type ApiResponse struct {
-	Code    *int32  `json:"code,omitempty"`
-	Message *string `json:"message,omitempty"`
-	Type    *string `json:"type,omitempty"`
+	Code    *int32  `json:"code,omitempty" xml:"code"`
+	Message *string `json:"message,omitempty" xml:"message"`
+	Type    *string `json:"type,omitempty" xml:"type"`
 }
 
 // Category defines model for Category.
 type Category struct {
 	// Id Example: 1
-	Id *int64 `json:"id,omitempty"`
+	Id *int64 `json:"id,omitempty" xml:"id"`
 
 	// Name Example: Dogs
-	Name *string `json:"name,omitempty"`
+	Name *string `json:"name,omitempty" xml:"name"`
 }
 
 // Customer defines model for Customer.
 type Customer struct {
-	Address *[]Address `json:"address,omitempty"`
+	Address *[]Address `json:"address,omitempty" xml:"addresses"`
 
 	// Id Example: 100000
-	Id *int64 `json:"id,omitempty"`
+	Id *int64 `json:"id,omitempty" xml:"id"`
 
 	// Username Example: fehguy
-	Username *string `json:"username,omitempty"`
+	Username *string `json:"username,omitempty" xml:"username"`
 }
 
 // Order defines model for Order.
 type Order struct {
-	Complete *bool `json:"complete,omitempty"`
+	Complete *bool `json:"complete,omitempty" xml:"complete"`
 
 	// Id Example: 10
-	Id *int64 `json:"id,omitempty"`
+	Id *int64 `json:"id,omitempty" xml:"id"`
 
 	// PetId Example: 198772
-	PetId *int64 `json:"petId,omitempty"`
+	PetId *int64 `json:"petId,omitempty" xml:"petId"`
 
 	// Quantity Example: 7
-	Quantity *int32     `json:"quantity,omitempty"`
-	ShipDate *time.Time `json:"shipDate,omitempty"`
+	Quantity *int32     `json:"quantity,omitempty" xml:"quantity"`
+	ShipDate *time.Time `json:"shipDate,omitempty" xml:"shipDate"`
 
 	// Status Order Status
 	//
 	// Example: approved
-	Status *OrderStatus `json:"status,omitempty"`
+	Status *OrderStatus `json:"status,omitempty" xml:"status"`
 }
 
 // OrderStatus Order Status
@@ -148,18 +148,18 @@ type OrderStatus string
 
 // Pet defines model for Pet.
 type Pet struct {
-	Category *Category `json:"category,omitempty"`
+	Category *Category `json:"category,omitempty" xml:"category"`
 
 	// Id Example: 10
-	Id *int64 `json:"id,omitempty"`
+	Id *int64 `json:"id,omitempty" xml:"id"`
 
 	// Name Example: doggie
-	Name      string   `json:"name"`
-	PhotoUrls []string `json:"photoUrls"`
+	Name      string   `json:"name" xml:"name"`
+	PhotoUrls []string `json:"photoUrls" xml:"photoUrls"`
 
 	// Status pet status in the store
-	Status *PetStatus `json:"status,omitempty"`
-	Tags   *[]Tag     `json:"tags,omitempty"`
+	Status *PetStatus `json:"status,omitempty" xml:"status"`
+	Tags   *[]Tag     `json:"tags,omitempty" xml:"tags"`
 }
 
 // PetStatus pet status in the store
@@ -167,37 +167,37 @@ type PetStatus string
 
 // Tag defines model for Tag.
 type Tag struct {
-	Id   *int64  `json:"id,omitempty"`
-	Name *string `json:"name,omitempty"`
+	Id   *int64  `json:"id,omitempty" xml:"id"`
+	Name *string `json:"name,omitempty" xml:"name"`
 }
 
 // User defines model for User.
 type User struct {
 	// Email Example: john@email.com
-	Email *string `json:"email,omitempty"`
+	Email *string `json:"email,omitempty" xml:"email"`
 
 	// FirstName Example: John
-	FirstName *string `json:"firstName,omitempty"`
+	FirstName *string `json:"firstName,omitempty" xml:"firstName"`
 
 	// Id Example: 10
-	Id *int64 `json:"id,omitempty"`
+	Id *int64 `json:"id,omitempty" xml:"id"`
 
 	// LastName Example: James
-	LastName *string `json:"lastName,omitempty"`
+	LastName *string `json:"lastName,omitempty" xml:"lastName"`
 
 	// Password Example: 12345
-	Password *string `json:"password,omitempty"`
+	Password *string `json:"password,omitempty" xml:"password"`
 
 	// Phone Example: 12345
-	Phone *string `json:"phone,omitempty"`
+	Phone *string `json:"phone,omitempty" xml:"phone"`
 
 	// UserStatus User Status
 	//
 	// Example: 1
-	UserStatus *int32 `json:"userStatus,omitempty"`
+	UserStatus *int32 `json:"userStatus,omitempty" xml:"userStatus"`
 
 	// Username Example: theUser
-	Username *string `json:"username,omitempty"`
+	Username *string `json:"username,omitempty" xml:"username"`
 }
 
 // UserArray defines model for UserArray.
@@ -206,7 +206,7 @@ type UserArray = []User
 // FindPetsByStatusParams defines parameters for FindPetsByStatus.
 type FindPetsByStatusParams struct {
 	// Status Status values that need to be considered for filter
-	Status *FindPetsByStatusParamsStatus `form:"status,omitempty" json:"status,omitempty"`
+	Status *FindPetsByStatusParamsStatus `form:"status,omitempty" json:"status,omitempty" xml:"status"`
 }
 
 // FindPetsByStatusParamsStatus defines parameters for FindPetsByStatus.
@@ -215,27 +215,27 @@ type FindPetsByStatusParamsStatus string
 // FindPetsByTagsParams defines parameters for FindPetsByTags.
 type FindPetsByTagsParams struct {
 	// Tags Tags to filter by
-	Tags *[]string `form:"tags,omitempty" json:"tags,omitempty"`
+	Tags *[]string `form:"tags,omitempty" json:"tags,omitempty" xml:"tags"`
 }
 
 // DeletePetParams defines parameters for DeletePet.
 type DeletePetParams struct {
-	ApiKey *string `json:"api_key,omitempty"`
+	ApiKey *string `json:"api_key,omitempty" xml:"api_key"`
 }
 
 // UpdatePetWithFormParams defines parameters for UpdatePetWithForm.
 type UpdatePetWithFormParams struct {
 	// Name Name of pet that needs to be updated
-	Name *string `form:"name,omitempty" json:"name,omitempty"`
+	Name *string `form:"name,omitempty" json:"name,omitempty" xml:"name"`
 
 	// Status Status of pet that needs to be updated
-	Status *string `form:"status,omitempty" json:"status,omitempty"`
+	Status *string `form:"status,omitempty" json:"status,omitempty" xml:"status"`
 }
 
 // UploadFileParams defines parameters for UploadFile.
 type UploadFileParams struct {
 	// AdditionalMetadata Additional Metadata
-	AdditionalMetadata *string `form:"additionalMetadata,omitempty" json:"additionalMetadata,omitempty"`
+	AdditionalMetadata *string `form:"additionalMetadata,omitempty" json:"additionalMetadata,omitempty" xml:"additionalMetadata"`
 }
 
 // CreateUsersWithListInputJSONBody defines parameters for CreateUsersWithListInput.
@@ -244,10 +244,10 @@ type CreateUsersWithListInputJSONBody = []User
 // LoginUserParams defines parameters for LoginUser.
 type LoginUserParams struct {
 	// Username The user name for login
-	Username *string `form:"username,omitempty" json:"username,omitempty"`
+	Username *string `form:"username,omitempty" json:"username,omitempty" xml:"username"`
 
 	// Password The password for login in clear text
-	Password *string `form:"password,omitempty" json:"password,omitempty"`
+	Password *string `form:"password,omitempty" json:"password,omitempty" xml:"password"`
 }
 
 // AddPetJSONRequestBody defines body for AddPet for application/json ContentType.

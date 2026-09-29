@@ -24,10 +24,10 @@ const (
 
 // Container defines model for Container.
 type Container struct {
-	ObjectA *externalRef0.ObjectA   `json:"object_a,omitempty"`
-	ObjectB *package_b.ObjectB      `json:"object_b,omitempty"`
-	ObjectC *map[string]interface{} `json:"object_c,omitempty"`
-	Pet     *externalRef1.Pet       `json:"pet,omitempty"`
+	ObjectA *externalRef0.ObjectA   `json:"object_a,omitempty" xml:"object_a"`
+	ObjectB *package_b.ObjectB      `json:"object_b,omitempty" xml:"object_b"`
+	ObjectC *map[string]interface{} `json:"object_c,omitempty" xml:"object_c"`
+	Pet     *externalRef1.Pet       `json:"pet,omitempty" xml:"pet"`
 }
 
 // Base64 encoded, compressed with deflate, json marshaled OpenAPI spec.

@@ -15,7 +15,7 @@ import (
 
 // Client defines model for Client.
 type Client struct {
-	Name string `json:"name"`
+	Name string `json:"name" xml:"name"`
 }
 
 // RequestEditorFn is the function signature for the RequestEditor callback function

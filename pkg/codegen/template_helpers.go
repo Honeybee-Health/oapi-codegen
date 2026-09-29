@@ -459,4 +459,15 @@ var TemplateFunctions = template.FuncMap{
 
 	"genServerURLWithVariablesFunctionParams": genServerURLWithVariablesFunctionParams,
 	"httpMethodConstant":                      httpMethodConstant,
+	"xmlFieldName":                            xmlFieldName,
+}
+
+// xmlFieldName returns the XML element name for a property. If the property
+// has explicit XML properties with a name, that name is used. Otherwise,
+// the JSON field name is used as fallback.
+func xmlFieldName(p Property) string {
+	if p.XmlProps != nil && p.XmlProps.Name != "" {
+		return p.XmlProps.Name
+	}
+	return p.JsonFieldName
 }

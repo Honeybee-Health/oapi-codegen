@@ -18,7 +18,7 @@ import (
 
 // Data defines model for data.
 type Data struct {
-	Foo *string `json:"foo,omitempty"`
+	Foo *string `json:"foo,omitempty" xml:"foo"`
 }
 
 // NotFound defines model for NotFound.

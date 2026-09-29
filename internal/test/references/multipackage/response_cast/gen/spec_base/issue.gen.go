@@ -15,7 +15,7 @@ import (
 
 // N400 defines model for 400.
 type N400 struct {
-	Message string `json:"message"`
+	Message string `json:"message" xml:"message"`
 }
 
 // ServerInterface represents all server handlers.
@@ -178,7 +178,7 @@ func HandlerWithOptions(si ServerInterface, options ChiServerOptions) http.Handl
 }
 
 type N400JSONResponse struct {
-	Message string `json:"message"`
+	Message string `json:"message" xml:"message"`
 }
 
 type GetExampleRequestObject struct {

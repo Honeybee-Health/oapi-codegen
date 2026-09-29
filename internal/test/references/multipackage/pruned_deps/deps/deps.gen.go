@@ -20,22 +20,22 @@ type BaseError struct {
 	// Code The underlying http status code
 	//
 	// Example: 500
-	Code int32 `json:"code"`
+	Code int32 `json:"code" xml:"code"`
 
 	// Domain The domain where the error is originating from as defined by the service
 	//
 	// Example:
-	Domain string `json:"domain"`
+	Domain string `json:"domain" xml:"domain"`
 
 	// Message A simple message in english describing the error and can be returned to the consumer
 	//
 	// Example: Age cannot be less than 18
-	Message string `json:"message"`
+	Message string `json:"message" xml:"message"`
 
 	// Metadata Any additional details to be conveyed as determined by the service. If present, will return map of key value pairs
 	//
 	// Example: {"propertyName":"propertyName is required"}
-	Metadata *map[string]string `json:"metadata,omitempty"`
+	Metadata *map[string]string `json:"metadata,omitempty" xml:"metadata"`
 }
 
 // Error defines model for Error.
@@ -43,27 +43,27 @@ type Error struct {
 	// Code The underlying http status code
 	//
 	// Example: 500
-	Code int32 `json:"code"`
+	Code int32 `json:"code" xml:"code"`
 
 	// Domain The domain where the error is originating from as defined by the service
 	//
 	// Example:
-	Domain string `json:"domain"`
+	Domain string `json:"domain" xml:"domain"`
 
 	// Message A simple message in english describing the error and can be returned to the consumer
 	//
 	// Example: Age cannot be less than 18
-	Message string `json:"message"`
+	Message string `json:"message" xml:"message"`
 
 	// Metadata Any additional details to be conveyed as determined by the service. If present, will return map of key value pairs
 	//
 	// Example: {"propertyName":"propertyName is required"}
-	Metadata *map[string]string `json:"metadata,omitempty"`
+	Metadata *map[string]string `json:"metadata,omitempty" xml:"metadata"`
 
 	// Reason A reason code specific to the service and can be used to identify the exact issue. Should be unique within a domain
 	//
 	// Example: Reason_Code
-	Reason string `json:"reason"`
+	Reason string `json:"reason" xml:"reason"`
 }
 
 // N401 defines model for 401.

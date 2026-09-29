@@ -414,6 +414,11 @@ type OutputOptions struct {
 	// defined constants; set this to true to suppress that method when it
 	// conflicts with user-defined methods of the same name.
 	SkipEnumValidate bool `yaml:"skip-enum-validate,omitempty"`
+	// SkipXMLHelpers stops the XML helpers (RawMessage, CaptureXMLElement,
+	// XMLDate and setXMLDiscriminator) from being emitted into this file. Set it on every file but
+	// one when several generated files share a Go package, since each
+	// definition may appear only once per package.
+	SkipXMLHelpers bool `yaml:"skip-xml-helpers,omitempty"`
 	// SkipEnumViaOneOf disables detection of the OpenAPI 3.1 enum-via-oneOf
 	// idiom: a schema with `type: string|integer` and `oneOf:` members that
 	// each carry `const` + `title` will normally be emitted as a Go enum with

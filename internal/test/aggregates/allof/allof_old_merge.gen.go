@@ -15,9 +15,9 @@ type OldMergePerson struct {
 // OldMergePersonProperties These are fields that specify a person. They are all optional, and
 // would be used by an `Edit` style API endpoint, where each is optional.
 type OldMergePersonProperties struct {
-	FirstName          *string `json:"FirstName,omitempty"`
-	GovernmentIDNumber *int64  `json:"GovernmentIDNumber,omitempty"`
-	LastName           *string `json:"LastName,omitempty"`
+	FirstName          *string `json:"FirstName,omitempty" xml:"FirstName"`
+	GovernmentIDNumber *int64  `json:"GovernmentIDNumber,omitempty" xml:"GovernmentIDNumber"`
+	LastName           *string `json:"LastName,omitempty" xml:"LastName"`
 }
 
 // OldMergePersonWithID This is a person record as returned from a Create endpoint. It contains
@@ -26,7 +26,7 @@ type OldMergePersonWithID struct {
 	// Embedded struct due to allOf(#/components/schemas/OldMergePerson)
 	OldMergePerson `yaml:",inline"`
 	// Embedded fields due to inline allOf schema
-	ID int64 `json:"ID"`
+	ID int64 `json:"ID" xml:"ID"`
 }
 
 // OldMergePersonWithMorePropertiesOutsideOfAllOf This is a person record as returned from a Create endpoint. It contains
@@ -35,5 +35,5 @@ type OldMergePersonWithMorePropertiesOutsideOfAllOf struct {
 	// Embedded struct due to allOf(#/components/schemas/OldMergePerson)
 	OldMergePerson `yaml:",inline"`
 	// Embedded fields due to inline allOf schema
-	AdditionalProperty string `json:"additionalProperty"`
+	AdditionalProperty string `json:"additionalProperty" xml:"additionalProperty"`
 }

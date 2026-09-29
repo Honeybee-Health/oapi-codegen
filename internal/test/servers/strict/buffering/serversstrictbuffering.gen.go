@@ -19,17 +19,17 @@ import (
 
 // Request defines model for Request.
 type Request struct {
-	Value *string `json:"value,omitempty"`
+	Value *string `json:"value,omitempty" xml:"value"`
 }
 
 // Response defines model for Response.
 type Response struct {
-	Value *string `json:"value,omitempty"`
+	Value *string `json:"value,omitempty" xml:"value"`
 }
 
 // MultipartEndpointMultipartBody defines parameters for MultipartEndpoint.
 type MultipartEndpointMultipartBody struct {
-	Field *string `json:"field,omitempty"`
+	Field *string `json:"field,omitempty" xml:"field"`
 }
 
 // TextEndpointTextBody defines parameters for TextEndpoint.

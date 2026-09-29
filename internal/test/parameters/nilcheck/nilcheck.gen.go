@@ -16,17 +16,17 @@ import (
 
 // GetCookieParams defines parameters for GetCookie.
 type GetCookieParams struct {
-	Tags []string `form:"tags,omitempty" json:"tags,omitempty"`
+	Tags []string `form:"tags,omitempty" json:"tags,omitempty" xml:"tags"`
 }
 
 // GetHeaderParams defines parameters for GetHeader.
 type GetHeaderParams struct {
-	XTags []string `json:"X-Tags,omitempty"`
+	XTags []string `json:"X-Tags,omitempty" xml:"X-Tags"`
 }
 
 // GetQueryParams defines parameters for GetQuery.
 type GetQueryParams struct {
-	UserIds []int `form:"user_ids[],omitempty" json:"user_ids[],omitempty"`
+	UserIds []int `form:"user_ids[],omitempty" json:"user_ids[],omitempty" xml:"user_ids[]"`
 }
 
 // RequestEditorFn is the function signature for the RequestEditor callback function

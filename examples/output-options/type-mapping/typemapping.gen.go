@@ -5,6 +5,6 @@ package typemapping
 
 // EmployeeDatabaseRecord defines model for EmployeeDatabaseRecord.
 type EmployeeDatabaseRecord struct {
-	DateHired CustomDateHandler `json:"DateHired"`
-	ID        int64             `json:"ID"`
+	DateHired CustomDateHandler `json:"DateHired" xml:"DateHired"`
+	ID        int64             `json:"ID" xml:"ID"`
 }

@@ -95,7 +95,7 @@ func TestContentMediaTypeWinsOverContentEncoding(t *testing.T) {
 // though contentMediaType: application/octet-stream would otherwise have routed
 // to openapi_types.File.
 func TestExplicitFormatOverridesContentMediaType(t *testing.T) {
-	var d openapi_types.Date
+	var d XMLDate
 	fields := FileUploadFields{
 		OrderId:            1,
 		RawFile:            openapi_types.File{},

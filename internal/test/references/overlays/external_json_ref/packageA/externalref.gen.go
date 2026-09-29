@@ -17,7 +17,7 @@ import (
 
 // ObjectA defines model for ObjectA.
 type ObjectA struct {
-	Name *string `json:"name,omitempty"`
+	Name *string `json:"name,omitempty" xml:"name"`
 }
 
 // Base64 encoded, compressed with deflate, json marshaled OpenAPI spec.

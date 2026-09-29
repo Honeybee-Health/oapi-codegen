@@ -307,7 +307,7 @@ func TestNullableArrayAndObjectFields_3_1(t *testing.T) {
 		Name: "fluffy",
 		Tags: &tags,
 		Owner: &struct {
-			Id *string `json:"id,omitempty"`
+			Id *string `json:"id,omitempty" xml:"id"`
 		}{Id: &id},
 	}
 	require.NotNil(t, p.Tags)
@@ -332,7 +332,7 @@ func TestNullableArrayAndObjectFields_3_0(t *testing.T) {
 		Name: "fluffy",
 		Tags: &tags,
 		Owner: &struct {
-			Id *string `json:"id,omitempty"`
+			Id *string `json:"id,omitempty" xml:"id"`
 		}{Id: &id},
 	}
 	require.NotNil(t, p.Tags)

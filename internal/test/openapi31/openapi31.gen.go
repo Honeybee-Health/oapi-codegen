@@ -4,6 +4,9 @@
 package openapi31
 
 import (
+	"encoding/json"
+	"time"
+
 	openapi_types "github.com/oapi-codegen/runtime/types"
 )
 
@@ -71,7 +74,7 @@ type Color string
 type FileUploadFields struct {
 	// Base64Field Base64-encoded binary as a JSON string. Mirrors the
 	// 3.0 `format: byte` idiom -- expected Go shape: `[]byte`.
-	Base64Field []byte `json:"base64Field"`
+	Base64Field []byte `json:"base64Field" xml:"base64Field"`
 
 	// Base64UrlField base64url is intentionally NOT mapped to []byte: Go's
 	// encoding/json treats []byte as standard padded base64
@@ -80,28 +83,28 @@ type FileUploadFields struct {
 	// standard base64 on marshal. Expected Go shape: `string`,
 	// so the user retains the declared wire encoding and can
 	// apply the appropriate codec.
-	Base64UrlField *string `json:"base64UrlField,omitempty"`
+	Base64UrlField *string `json:"base64UrlField,omitempty" xml:"base64UrlField"`
 
 	// BothKeywords When both are set (base64-encoded binary of a specific
 	// media type), the file mapping wins: openapi_types.File.
 	// This matches the 3.0 behavior where `format: binary` would
 	// dominate over any encoding hint.
-	BothKeywords *openapi_types.File `json:"bothKeywords,omitempty"`
+	BothKeywords *openapi_types.File `json:"bothKeywords,omitempty" xml:"bothKeywords"`
 
 	// ExplicitFormatWins An explicit `format` always overrides the contentMediaType-
 	// derived synthesis. Here `format: date` keeps its Go type
 	// (openapi_types.Date) even though contentMediaType would
 	// otherwise have routed to openapi_types.File.
-	ExplicitFormatWins *openapi_types.Date `json:"explicitFormatWins,omitempty"`
+	ExplicitFormatWins *XMLDate `json:"explicitFormatWins,omitempty" xml:"explicitFormatWins"`
 
 	// ImageFile A non-octet-stream contentMediaType still routes to
 	// openapi_types.File -- any contentMediaType signals
 	// "this string is binary content of a specific type."
-	ImageFile *openapi_types.File `json:"imageFile,omitempty"`
-	OrderId   int                 `json:"orderId"`
+	ImageFile *openapi_types.File `json:"imageFile,omitempty" xml:"imageFile"`
+	OrderId   int                 `json:"orderId" xml:"orderId"`
 
 	// RawFile Raw binary file content.
-	RawFile openapi_types.File `json:"rawFile"`
+	RawFile openapi_types.File `json:"rawFile" xml:"rawFile"`
 }
 
 // MixedOneOf defines model for MixedOneOf.
@@ -110,12 +113,12 @@ type MixedOneOf = string
 // Pet defines model for Pet.
 type Pet struct {
 	// Lives Examples: 9
-	Lives int `json:"lives"`
+	Lives int `json:"lives" xml:"lives"`
 
 	// Name The pet's name.
 	//
 	// Examples: Whiskers, Rex
-	Name string `json:"name"`
+	Name string `json:"name" xml:"name"`
 }
 
 // Severity How urgent a problem is.
@@ -123,3 +126,59 @@ type Severity int
 
 // Status defines model for Status.
 type Status string
+
+// XMLDate is the Go type for OpenAPI `format: date` values. It renders as a
+// plain CCYY-MM-DD date in both JSON and XML, including when used as an XML
+// attribute.
+//
+// It deliberately has the same underlying type as
+// github.com/oapi-codegen/runtime/types.Date (a struct embedding time.Time)
+// rather than embedding that type, so it stays convertible to it. The runtime's
+// parameter binding detects dates with reflect ConvertibleTo checks against
+// types.Date; a type that merely embedded types.Date would fail those checks
+// and silently bind the zero date in deepObject parameters.
+type XMLDate struct {
+	time.Time
+}
+
+// MarshalText renders the date as CCYY-MM-DD.
+//
+// This is the method types.Date is missing. Without it, encoding/xml finds the
+// MarshalText promoted from the embedded time.Time and emits a full RFC3339
+// timestamp, which is invalid for an xsd:date element.
+func (d XMLDate) MarshalText() ([]byte, error) {
+	return []byte(d.Time.Format("2006-01-02")), nil
+}
+
+// UnmarshalText parses a CCYY-MM-DD date.
+func (d *XMLDate) UnmarshalText(data []byte) error {
+	parsed, err := time.Parse("2006-01-02", string(data))
+	if err != nil {
+		return err
+	}
+	d.Time = parsed
+	return nil
+}
+
+// MarshalJSON renders the date as a CCYY-MM-DD JSON string.
+func (d XMLDate) MarshalJSON() ([]byte, error) {
+	return json.Marshal(d.Time.Format("2006-01-02"))
+}
+
+// UnmarshalJSON parses a CCYY-MM-DD JSON string.
+func (d *XMLDate) UnmarshalJSON(data []byte) error {
+	var dateStr string
+	if err := json.Unmarshal(data, &dateStr); err != nil {
+		return err
+	}
+	parsed, err := time.Parse("2006-01-02", dateStr)
+	if err != nil {
+		return err
+	}
+	d.Time = parsed
+	return nil
+}
+
+func (d XMLDate) String() string {
+	return d.Time.Format("2006-01-02")
+}

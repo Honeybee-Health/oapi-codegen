@@ -20,7 +20,7 @@ import (
 // OverriddenPong defines model for Pong.
 type OverriddenPong struct {
 	// Ping Example: pong
-	Ping string `json:"ping"`
+	Ping string `json:"ping" xml:"ping"`
 }
 
 // ServerInterface represents all server handlers.

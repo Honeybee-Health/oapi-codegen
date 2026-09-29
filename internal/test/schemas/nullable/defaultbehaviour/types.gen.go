@@ -6,34 +6,34 @@ package defaultbehaviour
 // ComplexOptionalNullable Complex, optional and nullable
 type ComplexOptionalNullable struct {
 	// AliasName Optional and nullable
-	AliasName *string `json:"alias_name,omitempty"`
+	AliasName *string `json:"alias_name,omitempty" xml:"alias_name"`
 
 	// Name Optional and non nullable
-	Name *string `json:"name,omitempty"`
+	Name *string `json:"name,omitempty" xml:"name"`
 }
 
 // ComplexRequiredNullable Complex required and nullable
 type ComplexRequiredNullable struct {
 	// Name Optional and non nullable
-	Name *string `json:"name,omitempty"`
+	Name *string `json:"name,omitempty" xml:"name"`
 }
 
 // PatchRequest A request to patch an existing user object.
 type PatchRequest struct {
 	// ComplexOptionalNullable Complex, optional and nullable
-	ComplexOptionalNullable *ComplexOptionalNullable `json:"complex_optional_nullable,omitempty"`
+	ComplexOptionalNullable *ComplexOptionalNullable `json:"complex_optional_nullable,omitempty" xml:"complex_optional_nullable"`
 
 	// ComplexRequiredNullable Complex required and nullable
-	ComplexRequiredNullable *ComplexRequiredNullable `json:"complex_required_nullable"`
+	ComplexRequiredNullable *ComplexRequiredNullable `json:"complex_required_nullable" xml:"complex_required_nullable"`
 
 	// SimpleOptionalNonNullable Simple optional and non nullable
-	SimpleOptionalNonNullable *SimpleOptionalNonNullable `json:"simple_optional_non_nullable,omitempty"`
+	SimpleOptionalNonNullable *SimpleOptionalNonNullable `json:"simple_optional_non_nullable,omitempty" xml:"simple_optional_non_nullable"`
 
 	// SimpleOptionalNullable Simple optional and nullable
-	SimpleOptionalNullable *SimpleOptionalNullable `json:"simple_optional_nullable,omitempty"`
+	SimpleOptionalNullable *SimpleOptionalNullable `json:"simple_optional_nullable,omitempty" xml:"simple_optional_nullable"`
 
 	// SimpleRequiredNullable Simple required and nullable
-	SimpleRequiredNullable *SimpleRequiredNullable `json:"simple_required_nullable"`
+	SimpleRequiredNullable *SimpleRequiredNullable `json:"simple_required_nullable" xml:"simple_required_nullable"`
 }
 
 // SimpleOptionalNonNullable Simple optional and non nullable

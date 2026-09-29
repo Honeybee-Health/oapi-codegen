@@ -13,19 +13,19 @@ import (
 
 // CamelSchema defines model for CamelSchema.
 type CamelSchema struct {
-	Id *string `json:"id,omitempty"`
+	Id *string `json:"id,omitempty" xml:"id"`
 }
 
 // Foo defines model for Foo.
 type Foo struct {
-	CamelSchema  *CamelSchema  `json:"CamelSchema,omitempty"`
-	InternalAttr *string       `json:"internalAttr,omitempty"`
-	PascalSchema *PascalSchema `json:"pascalSchema,omitempty"`
+	CamelSchema  *CamelSchema  `json:"CamelSchema,omitempty" xml:"CamelSchema"`
+	InternalAttr *string       `json:"internalAttr,omitempty" xml:"internalAttr"`
+	PascalSchema *PascalSchema `json:"pascalSchema,omitempty" xml:"pascalSchema"`
 }
 
 // PascalSchema defines model for pascalSchema.
 type PascalSchema struct {
-	Id *string `json:"id,omitempty"`
+	Id *string `json:"id,omitempty" xml:"id"`
 }
 
 // Pascal defines model for pascal.

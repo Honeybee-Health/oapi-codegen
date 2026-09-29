@@ -95,9 +95,13 @@ var DefaultTypeMapping = TypeMapping{
 	String: FormatMapping{
 		Default: SimpleTypeSpec{Type: "string"},
 		Formats: map[string]SimpleTypeSpec{
-			"byte":      {Type: "[]byte"},
-			"email":     {Type: "openapi_types.Email"},
-			"date":      {Type: "openapi_types.Date"},
+			"byte":  {Type: "[]byte"},
+			"email": {Type: "openapi_types.Email"},
+			// Not openapi_types.Date: that type has no MarshalText of its own,
+			// so XML marshaling falls through to the embedded time.Time and
+			// emits RFC3339. XMLDate is generated into the output package with
+			// a MarshalText that renders CCYY-MM-DD.
+			"date":      {Type: "XMLDate"},
 			"date-time": {Type: "time.Time", Import: "time"},
 			"duration":  {Type: "openapi_types.Duration"},
 			"json":      {Type: "json.RawMessage", Import: "encoding/json"},

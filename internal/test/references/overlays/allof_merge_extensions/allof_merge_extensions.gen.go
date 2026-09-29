@@ -14,6 +14,6 @@ type ClientWithId = OverlayClientWithId
 
 // DerivedNoOverride defines model for DerivedNoOverride.
 type DerivedNoOverride struct {
-	Extra string `json:"extra"`
-	Name  string `json:"name"`
+	Extra string `json:"extra" xml:"extra"`
+	Name  string `json:"name" xml:"name"`
 }

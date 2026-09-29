@@ -16,18 +16,18 @@ import (
 
 // ErrorResponse defines model for errorResponse.
 type ErrorResponse struct {
-	Code    *int32  `json:"code,omitempty"`
-	Message *string `json:"message,omitempty"`
+	Code    *int32  `json:"code,omitempty" xml:"code"`
+	Message *string `json:"message,omitempty" xml:"message"`
 }
 
 // JsonError defines model for jsonError.
 type JsonError struct {
-	Code *int `json:"code,omitempty"`
+	Code *int `json:"code,omitempty" xml:"code"`
 }
 
 // XmlError defines model for xmlError.
 type XmlError struct {
-	Reason *string `json:"reason,omitempty"`
+	Reason *string `json:"reason,omitempty" xml:"reason"`
 }
 
 // MixedError defines model for mixedError.

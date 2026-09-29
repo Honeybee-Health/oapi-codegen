@@ -20,21 +20,21 @@ import (
 // ComplexOptionalNullable Complex, optional and nullable
 type ComplexOptionalNullable struct {
 	// AliasName Optional and nullable
-	AliasName nullable.Nullable[string] `json:"alias_name,omitempty"`
+	AliasName nullable.Nullable[string] `json:"alias_name,omitempty" xml:"alias_name"`
 
 	// Name Optional and non nullable
-	Name *string `json:"name,omitempty"`
+	Name *string `json:"name,omitempty" xml:"name"`
 }
 
 // ComplexRequiredNullable Complex required and nullable
 type ComplexRequiredNullable struct {
 	// Name Optional and non nullable
-	Name *string `json:"name,omitempty"`
+	Name *string `json:"name,omitempty" xml:"name"`
 }
 
 // Container defines model for Container.
 type Container struct {
-	MayBeNull []nullable.Nullable[string] `json:"may-be-null"`
+	MayBeNull []nullable.Nullable[string] `json:"may-be-null" xml:"may-be-null"`
 }
 
 // DecoratableValue defines model for DecoratableValue.
@@ -42,26 +42,26 @@ type DecoratableValue = string
 
 // DecoratedRef defines model for DecoratedRef.
 type DecoratedRef struct {
-	OptionalNullableRef nullable.Nullable[string] `json:"optional_nullable_ref,omitempty"`
-	RequiredNullableRef nullable.Nullable[string] `json:"required_nullable_ref"`
+	OptionalNullableRef nullable.Nullable[string] `json:"optional_nullable_ref,omitempty" xml:"optional_nullable_ref"`
+	RequiredNullableRef nullable.Nullable[string] `json:"required_nullable_ref" xml:"required_nullable_ref"`
 }
 
 // PatchRequest A request to patch an existing user object.
 type PatchRequest struct {
 	// ComplexOptionalNullable Complex, optional and nullable
-	ComplexOptionalNullable nullable.Nullable[ComplexOptionalNullable] `json:"complex_optional_nullable,omitempty"`
+	ComplexOptionalNullable nullable.Nullable[ComplexOptionalNullable] `json:"complex_optional_nullable,omitempty" xml:"complex_optional_nullable"`
 
 	// ComplexRequiredNullable Complex required and nullable
-	ComplexRequiredNullable nullable.Nullable[ComplexRequiredNullable] `json:"complex_required_nullable"`
+	ComplexRequiredNullable nullable.Nullable[ComplexRequiredNullable] `json:"complex_required_nullable" xml:"complex_required_nullable"`
 
 	// SimpleOptionalNonNullable Simple optional and non nullable
-	SimpleOptionalNonNullable *SimpleOptionalNonNullable `json:"simple_optional_non_nullable,omitempty"`
+	SimpleOptionalNonNullable *SimpleOptionalNonNullable `json:"simple_optional_non_nullable,omitempty" xml:"simple_optional_non_nullable"`
 
 	// SimpleOptionalNullable Simple optional and nullable
-	SimpleOptionalNullable nullable.Nullable[SimpleOptionalNullable] `json:"simple_optional_nullable,omitempty"`
+	SimpleOptionalNullable nullable.Nullable[SimpleOptionalNullable] `json:"simple_optional_nullable,omitempty" xml:"simple_optional_nullable"`
 
 	// SimpleRequiredNullable Simple required and nullable
-	SimpleRequiredNullable nullable.Nullable[SimpleRequiredNullable] `json:"simple_required_nullable"`
+	SimpleRequiredNullable nullable.Nullable[SimpleRequiredNullable] `json:"simple_required_nullable" xml:"simple_required_nullable"`
 }
 
 // SimpleOptionalNonNullable Simple optional and non nullable

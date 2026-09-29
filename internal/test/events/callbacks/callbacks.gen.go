@@ -18,14 +18,14 @@ import (
 
 // TreePlantingRequest defines model for TreePlantingRequest.
 type TreePlantingRequest struct {
-	CallbackUrl string `json:"callbackUrl"`
-	Kind        string `json:"kind"`
+	CallbackUrl string `json:"callbackUrl" xml:"callbackUrl"`
+	Kind        string `json:"kind" xml:"kind"`
 }
 
 // TreePlantingResult defines model for TreePlantingResult.
 type TreePlantingResult struct {
-	Id      string `json:"id"`
-	Success bool   `json:"success"`
+	Id      string `json:"id" xml:"id"`
+	Success bool   `json:"success" xml:"success"`
 }
 
 // PlantTreeJSONRequestBody defines body for PlantTree for application/json ContentType.

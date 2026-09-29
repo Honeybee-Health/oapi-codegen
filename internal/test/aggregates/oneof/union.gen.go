@@ -9,6 +9,7 @@ import (
 	"bytes"
 	"context"
 	"encoding/json"
+	"encoding/xml"
 	"fmt"
 	"net/http"
 
@@ -47,13 +48,14 @@ func (e RepeatableEventKind) Valid() bool {
 
 // Event defines model for Event.
 type Event struct {
-	union json.RawMessage
+	union  json.RawMessage
+	xunion RawMessage
 }
 
 // OnetimeEvent defines model for OnetimeEvent.
 type OnetimeEvent struct {
-	Kind OnetimeEventKind `json:"kind"`
-	Name string           `json:"name"`
+	Kind OnetimeEventKind `json:"kind" xml:"kind"`
+	Name string           `json:"name" xml:"name"`
 }
 
 // OnetimeEventKind defines model for OnetimeEvent.Kind.
@@ -61,8 +63,8 @@ type OnetimeEventKind string
 
 // RepeatableEvent defines model for RepeatableEvent.
 type RepeatableEvent struct {
-	Interval string              `json:"interval"`
-	Kind     RepeatableEventKind `json:"kind"`
+	Interval string              `json:"interval" xml:"interval"`
+	Kind     RepeatableEventKind `json:"kind" xml:"kind"`
 }
 
 // RepeatableEventKind defines model for RepeatableEvent.Kind.
@@ -71,15 +73,35 @@ type RepeatableEventKind string
 // AsOnetimeEvent returns the union data inside the Event as a OnetimeEvent
 func (t Event) AsOnetimeEvent() (OnetimeEvent, error) {
 	var body OnetimeEvent
-	err := json.Unmarshal(t.union, &body)
-	return body, err
+	if len(t.union) > 0 {
+		err := json.Unmarshal(t.union, &body)
+		if err != nil {
+			return body, err
+		}
+	}
+	if len(t.xunion) > 0 {
+		err := xml.Unmarshal(t.xunion, &body)
+		if err != nil {
+			return body, err
+		}
+	}
+	return body, nil
 }
 
 // FromOnetimeEvent overwrites any union data inside the Event as the provided OnetimeEvent
 func (t *Event) FromOnetimeEvent(v OnetimeEvent) error {
 	b, err := json.Marshal(v)
+	if err != nil {
+		return err
+	}
 	t.union = b
-	return err
+	b, err = xml.Marshal(v)
+	if err != nil {
+		return err
+	}
+	t.xunion = b
+
+	return nil
 }
 
 // MergeOnetimeEvent performs a merge with any union data inside the Event, using the provided OnetimeEvent
@@ -91,21 +113,49 @@ func (t *Event) MergeOnetimeEvent(v OnetimeEvent) error {
 
 	merged, err := runtime.JSONMerge(t.union, b)
 	t.union = merged
+
+	// For XML, re-marshal the merged result
+	bx, errx := xml.Marshal(v)
+	if errx != nil {
+		return errx
+	}
+	t.xunion = bx
+
 	return err
 }
 
 // AsRepeatableEvent returns the union data inside the Event as a RepeatableEvent
 func (t Event) AsRepeatableEvent() (RepeatableEvent, error) {
 	var body RepeatableEvent
-	err := json.Unmarshal(t.union, &body)
-	return body, err
+	if len(t.union) > 0 {
+		err := json.Unmarshal(t.union, &body)
+		if err != nil {
+			return body, err
+		}
+	}
+	if len(t.xunion) > 0 {
+		err := xml.Unmarshal(t.xunion, &body)
+		if err != nil {
+			return body, err
+		}
+	}
+	return body, nil
 }
 
 // FromRepeatableEvent overwrites any union data inside the Event as the provided RepeatableEvent
 func (t *Event) FromRepeatableEvent(v RepeatableEvent) error {
 	b, err := json.Marshal(v)
+	if err != nil {
+		return err
+	}
 	t.union = b
-	return err
+	b, err = xml.Marshal(v)
+	if err != nil {
+		return err
+	}
+	t.xunion = b
+
+	return nil
 }
 
 // MergeRepeatableEvent performs a merge with any union data inside the Event, using the provided RepeatableEvent
@@ -117,6 +167,14 @@ func (t *Event) MergeRepeatableEvent(v RepeatableEvent) error {
 
 	merged, err := runtime.JSONMerge(t.union, b)
 	t.union = merged
+
+	// For XML, re-marshal the merged result
+	bx, errx := xml.Marshal(v)
+	if errx != nil {
+		return errx
+	}
+	t.xunion = bx
+
 	return err
 }
 
@@ -128,6 +186,27 @@ func (t Event) MarshalJSON() ([]byte, error) {
 func (t *Event) UnmarshalJSON(b []byte) error {
 	err := t.union.UnmarshalJSON(b)
 	return err
+}
+
+func (t Event) MarshalXML(e *xml.Encoder, start xml.StartElement) error {
+	if len(t.xunion) > 0 {
+		return t.xunion.MarshalXML(e, start)
+	}
+	if err := e.EncodeToken(start); err != nil {
+		return err
+	}
+	return e.EncodeToken(start.End())
+}
+
+func (t *Event) UnmarshalXML(d *xml.Decoder, start xml.StartElement) error {
+	var err error
+
+	t.xunion, err = CaptureXMLElement(d, start)
+	if err != nil {
+		return err
+	}
+
+	return nil
 }
 
 // ServerInterface represents all server handlers.

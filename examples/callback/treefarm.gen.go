@@ -21,59 +21,59 @@ import (
 // Error defines model for Error.
 type Error struct {
 	// Code Error code
-	Code int32 `json:"code"`
+	Code int32 `json:"code" xml:"code"`
 
 	// Message Error message
-	Message string `json:"message"`
+	Message string `json:"message" xml:"message"`
 }
 
 // Tree A tree to be planted
 type Tree struct {
 	// Kind What kind of tree to plant (e.g. "oak")
-	Kind string `json:"kind"`
+	Kind string `json:"kind" xml:"kind"`
 
 	// Location Where to plant the tree (e.g. "north meadow")
-	Location string `json:"location"`
+	Location string `json:"location" xml:"location"`
 }
 
 // TreePlantingRequest A tree planting request, combining the tree details with a callback URL
 // for completion notification.
 type TreePlantingRequest struct {
 	// CallbackURL URL to receive the planting result callback
-	CallbackURL string `json:"callbackUrl"`
+	CallbackURL string `json:"callbackUrl" xml:"callbackUrl"`
 
 	// Kind What kind of tree to plant (e.g. "oak")
-	Kind string `json:"kind"`
+	Kind string `json:"kind" xml:"kind"`
 
 	// Location Where to plant the tree (e.g. "north meadow")
-	Location string `json:"location"`
+	Location string `json:"location" xml:"location"`
 }
 
 // TreePlantingResult The result of a tree planting operation, sent via callback
 type TreePlantingResult struct {
 	// ID Unique identifier for this planting request
-	ID openapi_types.UUID `json:"id"`
+	ID openapi_types.UUID `json:"id" xml:"id"`
 
 	// Kind What kind of tree to plant (e.g. "oak")
-	Kind string `json:"kind"`
+	Kind string `json:"kind" xml:"kind"`
 
 	// Location Where to plant the tree (e.g. "north meadow")
-	Location string `json:"location"`
+	Location string `json:"location" xml:"location"`
 
 	// Success Whether the tree was successfully planted
-	Success bool `json:"success"`
+	Success bool `json:"success" xml:"success"`
 }
 
 // TreeWithID A tree with a server-assigned identifier
 type TreeWithID struct {
 	// ID Unique identifier for this planting request
-	ID openapi_types.UUID `json:"id"`
+	ID openapi_types.UUID `json:"id" xml:"id"`
 
 	// Kind What kind of tree to plant (e.g. "oak")
-	Kind string `json:"kind"`
+	Kind string `json:"kind" xml:"kind"`
 
 	// Location Where to plant the tree (e.g. "north meadow")
-	Location string `json:"location"`
+	Location string `json:"location" xml:"location"`
 }
 
 // TreePlanting A tree planting request, combining the tree details with a callback URL

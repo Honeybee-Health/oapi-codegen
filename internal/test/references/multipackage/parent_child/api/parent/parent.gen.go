@@ -21,8 +21,8 @@ import (
 
 // Pet defines model for Pet.
 type Pet struct {
-	Name string  `json:"name"`
-	Tag  *string `json:"tag,omitempty"`
+	Name string  `json:"name" xml:"name"`
+	Tag  *string `json:"tag,omitempty" xml:"tag"`
 }
 
 // ServerInterface represents all server handlers.

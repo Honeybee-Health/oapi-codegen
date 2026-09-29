@@ -5,8 +5,8 @@ package common
 
 // ProblemDetails defines model for ProblemDetails.
 type ProblemDetails struct {
-	Status int    `json:"status"`
-	Title  string `json:"title"`
+	Status int    `json:"status" xml:"status"`
+	Title  string `json:"title" xml:"title"`
 }
 
 // StandardError defines model for StandardError.

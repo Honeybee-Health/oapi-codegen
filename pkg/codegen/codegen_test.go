@@ -82,17 +82,17 @@ type GetTestByNameResponse struct {
 
 	// Check the client method signatures:
 	assert.Contains(t, code, "type GetTestByNameParams struct {")
-	assert.Contains(t, code, "Top *int `form:\"$top,omitempty\" json:\"$top,omitempty\"`")
+	assert.Contains(t, code, "Top *int `form:\"$top,omitempty\" json:\"$top,omitempty\" xml:\"$top\"`")
 	assert.Contains(t, code, "func (c *Client) GetTestByName(ctx context.Context, name string, params *GetTestByNameParams, reqEditors ...RequestEditorFn) (*http.Response, error) {")
 	assert.Contains(t, code, "func (c *ClientWithResponses) GetTestByNameWithResponse(ctx context.Context, name string, params *GetTestByNameParams, reqEditors ...RequestEditorFn) (*GetTestByNameResponse, error) {")
-	assert.Contains(t, code, "FavouriteBirds     *[]*string          `json:\"favourite_birds,omitempty\"`")
-	assert.Contains(t, code, "DetestedBirds      *[]string           `json:\"detested_birds,omitempty\"`")
-	assert.Contains(t, code, "SlicedBirds        []string            `json:\"sliced_birds\"`")
-	assert.Contains(t, code, "ForgettableBirds   *map[string]*string `json:\"forgettable_birds,omitempty\"`")
-	assert.Contains(t, code, "MemorableBirds     *map[string]string  `json:\"memorable_birds,omitempty\"`")
-	assert.Contains(t, code, "VeryMemorableBirds map[string]string   `json:\"very_memorable_birds\"`")
-	assert.Contains(t, code, "DeadSince          *time.Time          `json:\"dead_since,omitempty\" tag1:\"value1\" tag2:\"value2\"`")
-	assert.Contains(t, code, "VeryDeadSince      time.Time           `json:\"very_dead_since\"`")
+	assert.Contains(t, code, "FavouriteBirds     *[]*string          `json:\"favourite_birds,omitempty\" xml:\"favourite_birds\"`")
+	assert.Contains(t, code, "DetestedBirds      *[]string           `json:\"detested_birds,omitempty\" xml:\"detested_birds\"`")
+	assert.Contains(t, code, "SlicedBirds        []string            `json:\"sliced_birds\" xml:\"sliced_birds\"`")
+	assert.Contains(t, code, "ForgettableBirds   *map[string]*string `json:\"forgettable_birds,omitempty\" xml:\"forgettable_birds\"`")
+	assert.Contains(t, code, "MemorableBirds     *map[string]string  `json:\"memorable_birds,omitempty\" xml:\"memorable_birds\"`")
+	assert.Contains(t, code, "VeryMemorableBirds map[string]string   `json:\"very_memorable_birds\" xml:\"very_memorable_birds\"`")
+	assert.Contains(t, code, "DeadSince          *time.Time          `json:\"dead_since,omitempty\" tag1:\"value1\" tag2:\"value2\" xml:\"dead_since\"`")
+	assert.Contains(t, code, "VeryDeadSince      time.Time           `json:\"very_dead_since\" xml:\"very_dead_since\"`")
 	assert.Contains(t, code, "type EnumTestNumerics int")
 	assert.Contains(t, code, "N2 EnumTestNumerics = 2")
 	assert.Contains(t, code, "type EnumTestEnumNames int")
@@ -125,17 +125,17 @@ func TestExtPropGoTypeSkipOptionalPointer(t *testing.T) {
 	assert.NoError(t, err)
 
 	// Check that optional pointer fields are skipped if requested
-	assert.Contains(t, code, "NullableFieldSkipFalse *string `json:\"nullableFieldSkipFalse,omitempty\"`")
-	assert.Contains(t, code, "NullableFieldSkipTrue  string  `json:\"nullableFieldSkipTrue,omitempty\"`")
-	assert.Contains(t, code, "OptionalField          *string `json:\"optionalField,omitempty\"`")
-	assert.Contains(t, code, "OptionalFieldSkipFalse *string `json:\"optionalFieldSkipFalse,omitempty\"`")
-	assert.Contains(t, code, "OptionalFieldSkipTrue  string  `json:\"optionalFieldSkipTrue,omitempty\"`")
+	assert.Contains(t, code, "NullableFieldSkipFalse *string `json:\"nullableFieldSkipFalse,omitempty\" xml:\"nullableFieldSkipFalse\"`")
+	assert.Contains(t, code, "NullableFieldSkipTrue  string  `json:\"nullableFieldSkipTrue,omitempty\" xml:\"nullableFieldSkipTrue\"`")
+	assert.Contains(t, code, "OptionalField          *string `json:\"optionalField,omitempty\" xml:\"optionalField\"`")
+	assert.Contains(t, code, "OptionalFieldSkipFalse *string `json:\"optionalFieldSkipFalse,omitempty\" xml:\"optionalFieldSkipFalse\"`")
+	assert.Contains(t, code, "OptionalFieldSkipTrue  string  `json:\"optionalFieldSkipTrue,omitempty\" xml:\"optionalFieldSkipTrue\"`")
 
 	// Check that the extension applies on custom types as well
-	assert.Contains(t, code, "CustomTypeWithSkipTrue string  `json:\"customTypeWithSkipTrue,omitempty\"`")
+	assert.Contains(t, code, "CustomTypeWithSkipTrue string  `json:\"customTypeWithSkipTrue,omitempty\" xml:\"customTypeWithSkipTrue\"`")
 
 	// Check that the extension has no effect on required fields
-	assert.Contains(t, code, "RequiredField          string  `json:\"requiredField\"`")
+	assert.Contains(t, code, "RequiredField          string  `json:\"requiredField\" xml:\"requiredField\"`")
 }
 
 func TestGoTypeImport(t *testing.T) {
@@ -254,7 +254,8 @@ func TestRemoteExternalReference(t *testing.T) {
 	assert.Contains(t, code, `
 // ExampleSchema_Item defines model for ExampleSchema.Item.
 type ExampleSchema_Item struct {
-	union json.RawMessage
+	union  json.RawMessage
+	xunion RawMessage
 }
 `)
 

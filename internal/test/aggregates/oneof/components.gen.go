@@ -4,7 +4,9 @@
 package aggregatesoneof
 
 import (
+	"bytes"
 	"encoding/json"
+	"encoding/xml"
 	"errors"
 	"fmt"
 
@@ -13,20 +15,23 @@ import (
 
 // AnyOfObject1 simple anyOf case
 type AnyOfObject1 struct {
-	union json.RawMessage
+	union  json.RawMessage
+	xunion RawMessage
 }
 
 // OneOfObject1 oneOf with references and no discriminator
 type OneOfObject1 struct {
-	union json.RawMessage
+	union  json.RawMessage
+	xunion RawMessage
 }
 
 // OneOfObject10 fixed properties, variable required - will compile, but not much sense
 type OneOfObject10 struct {
-	One   *string `json:"one,omitempty"`
-	Three *bool   `json:"three,omitempty"`
-	Two   *int    `json:"two,omitempty"`
-	union json.RawMessage
+	One    *string `json:"one,omitempty" xml:"one"`
+	Three  *bool   `json:"three,omitempty" xml:"three"`
+	Two    *int    `json:"two,omitempty" xml:"two"`
+	union  json.RawMessage
+	xunion RawMessage
 }
 
 // OneOfObject100 defines model for OneOfObject10.0.
@@ -49,12 +54,14 @@ type OneOfObject112 = string
 
 // OneOfObject11_AdditionalProperties defines model for OneOfObject11.AdditionalProperties.
 type OneOfObject11_AdditionalProperties struct {
-	union json.RawMessage
+	union  json.RawMessage
+	xunion RawMessage
 }
 
 // OneOfObject12 allOf of oneOfs
 type OneOfObject12 struct {
-	union json.RawMessage
+	union  json.RawMessage
+	xunion RawMessage
 }
 
 // OneOfObject120 defines model for OneOfObject12.0.
@@ -65,19 +72,21 @@ type OneOfObject121 = float32
 
 // OneOfObject13 oneOf with fixed discriminator and other fields allowed
 type OneOfObject13 struct {
-	Type                 string                 `json:"type"`
+	Type                 string                 `json:"type" xml:"type"`
 	AdditionalProperties map[string]interface{} `json:"-"`
 	union                json.RawMessage
+	xunion               RawMessage
 }
 
 // OneOfObject2 oneOf with inline elements
 type OneOfObject2 struct {
-	union json.RawMessage
+	union  json.RawMessage
+	xunion RawMessage
 }
 
 // OneOfObject20 defines model for OneOfObject2.0.
 type OneOfObject20 struct {
-	Name *string `json:"name,omitempty"`
+	Name *string `json:"name,omitempty" xml:"name"`
 }
 
 // OneOfObject21 defines model for OneOfObject2.1.
@@ -88,38 +97,44 @@ type OneOfObject22 = bool
 
 // OneOfObject3 inline OneOf
 type OneOfObject3 struct {
-	Union *OneOfObject3_Union `json:"union,omitempty"`
+	Union *OneOfObject3_Union `json:"union,omitempty" xml:"union"`
 }
 
 // OneOfObject3_Union defines model for OneOfObject3.Union.
 type OneOfObject3_Union struct {
-	union json.RawMessage
+	union  json.RawMessage
+	xunion RawMessage
 }
 
 // OneOfObject4 oneOf plus fixed type - custom marshaling/unmarshaling
 type OneOfObject4 struct {
-	FixedProperty *string `json:"fixedProperty,omitempty"`
+	FixedProperty *string `json:"fixedProperty,omitempty" xml:"fixedProperty"`
 	union         json.RawMessage
+	xunion        RawMessage
 }
 
 // OneOfObject5 oneOf with discriminator but no mapping
 type OneOfObject5 struct {
-	union json.RawMessage
+	union  json.RawMessage
+	xunion RawMessage
 }
 
 // OneOfObject6 oneOf with discriminator and mapping
 type OneOfObject6 struct {
-	union json.RawMessage
+	union  json.RawMessage
+	xunion RawMessage
 }
 
 // OneOfObject61 oneOf with discriminator and partial mapping
 type OneOfObject61 struct {
-	union json.RawMessage
+	union  json.RawMessage
+	xunion RawMessage
 }
 
 // OneOfObject62 oneOf with snake_case discriminator and partial snake_case mapping
 type OneOfObject62 struct {
-	union json.RawMessage
+	union  json.RawMessage
+	xunion RawMessage
 }
 
 // OneOfObject7 array of oneOf
@@ -127,24 +142,27 @@ type OneOfObject7 = []OneOfObject7_Item
 
 // OneOfObject7_Item defines model for OneOfObject7.Item.
 type OneOfObject7_Item struct {
-	union json.RawMessage
+	union  json.RawMessage
+	xunion RawMessage
 }
 
 // OneOfObject8 oneOf with fixed properties
 type OneOfObject8 struct {
-	Fixed *string `json:"fixed,omitempty"`
-	union json.RawMessage
+	Fixed  *string `json:"fixed,omitempty" xml:"fixed"`
+	union  json.RawMessage
+	xunion RawMessage
 }
 
 // OneOfObject9 oneOf with fixed discriminator
 type OneOfObject9 struct {
-	Type  string `json:"type"`
-	union json.RawMessage
+	Type   string `json:"type" xml:"type"`
+	union  json.RawMessage
+	xunion RawMessage
 }
 
 // OneOfVariant1 defines model for OneOfVariant1.
 type OneOfVariant1 struct {
-	Name string `json:"name"`
+	Name string `json:"name" xml:"name"`
 }
 
 // OneOfVariant2 defines model for OneOfVariant2.
@@ -155,25 +173,25 @@ type OneOfVariant3 = bool
 
 // OneOfVariant4 defines model for OneOfVariant4.
 type OneOfVariant4 struct {
-	Discriminator string `json:"discriminator"`
-	Name          string `json:"name"`
+	Discriminator string `json:"discriminator" xml:"discriminator"`
+	Name          string `json:"name" xml:"name"`
 }
 
 // OneOfVariant5 defines model for OneOfVariant5.
 type OneOfVariant5 struct {
-	Discriminator string `json:"discriminator"`
-	Id            int    `json:"id"`
+	Discriminator string `json:"discriminator" xml:"discriminator"`
+	Id            int    `json:"id" xml:"id"`
 }
 
 // OneOfVariant6 defines model for OneOfVariant6.
 type OneOfVariant6 struct {
-	Values OneOfVariant2 `json:"values"`
+	Values OneOfVariant2 `json:"values" xml:"values"`
 }
 
 // OneOfVariant51 defines model for one_of_variant51.
 type OneOfVariant51 struct {
-	Discriminator string `json:"discriminator"`
-	Id            int    `json:"id"`
+	Discriminator string `json:"discriminator" xml:"discriminator"`
+	Id            int    `json:"id" xml:"id"`
 }
 
 // Getter for additional properties for OneOfObject13. Returns the specified
@@ -196,15 +214,35 @@ func (a *OneOfObject13) Set(fieldName string, value interface{}) {
 // AsOneOfVariant4 returns the union data inside the AnyOfObject1 as a OneOfVariant4
 func (t AnyOfObject1) AsOneOfVariant4() (OneOfVariant4, error) {
 	var body OneOfVariant4
-	err := json.Unmarshal(t.union, &body)
-	return body, err
+	if len(t.union) > 0 {
+		err := json.Unmarshal(t.union, &body)
+		if err != nil {
+			return body, err
+		}
+	}
+	if len(t.xunion) > 0 {
+		err := xml.Unmarshal(t.xunion, &body)
+		if err != nil {
+			return body, err
+		}
+	}
+	return body, nil
 }
 
 // FromOneOfVariant4 overwrites any union data inside the AnyOfObject1 as the provided OneOfVariant4
 func (t *AnyOfObject1) FromOneOfVariant4(v OneOfVariant4) error {
 	b, err := json.Marshal(v)
+	if err != nil {
+		return err
+	}
 	t.union = b
-	return err
+	b, err = xml.Marshal(v)
+	if err != nil {
+		return err
+	}
+	t.xunion = b
+
+	return nil
 }
 
 // MergeOneOfVariant4 performs a merge with any union data inside the AnyOfObject1, using the provided OneOfVariant4
@@ -216,21 +254,49 @@ func (t *AnyOfObject1) MergeOneOfVariant4(v OneOfVariant4) error {
 
 	merged, err := runtime.JSONMerge(t.union, b)
 	t.union = merged
+
+	// For XML, re-marshal the merged result
+	bx, errx := xml.Marshal(v)
+	if errx != nil {
+		return errx
+	}
+	t.xunion = bx
+
 	return err
 }
 
 // AsOneOfVariant5 returns the union data inside the AnyOfObject1 as a OneOfVariant5
 func (t AnyOfObject1) AsOneOfVariant5() (OneOfVariant5, error) {
 	var body OneOfVariant5
-	err := json.Unmarshal(t.union, &body)
-	return body, err
+	if len(t.union) > 0 {
+		err := json.Unmarshal(t.union, &body)
+		if err != nil {
+			return body, err
+		}
+	}
+	if len(t.xunion) > 0 {
+		err := xml.Unmarshal(t.xunion, &body)
+		if err != nil {
+			return body, err
+		}
+	}
+	return body, nil
 }
 
 // FromOneOfVariant5 overwrites any union data inside the AnyOfObject1 as the provided OneOfVariant5
 func (t *AnyOfObject1) FromOneOfVariant5(v OneOfVariant5) error {
 	b, err := json.Marshal(v)
+	if err != nil {
+		return err
+	}
 	t.union = b
-	return err
+	b, err = xml.Marshal(v)
+	if err != nil {
+		return err
+	}
+	t.xunion = b
+
+	return nil
 }
 
 // MergeOneOfVariant5 performs a merge with any union data inside the AnyOfObject1, using the provided OneOfVariant5
@@ -242,6 +308,14 @@ func (t *AnyOfObject1) MergeOneOfVariant5(v OneOfVariant5) error {
 
 	merged, err := runtime.JSONMerge(t.union, b)
 	t.union = merged
+
+	// For XML, re-marshal the merged result
+	bx, errx := xml.Marshal(v)
+	if errx != nil {
+		return errx
+	}
+	t.xunion = bx
+
 	return err
 }
 
@@ -255,18 +329,59 @@ func (t *AnyOfObject1) UnmarshalJSON(b []byte) error {
 	return err
 }
 
+func (t AnyOfObject1) MarshalXML(e *xml.Encoder, start xml.StartElement) error {
+	if len(t.xunion) > 0 {
+		return t.xunion.MarshalXML(e, start)
+	}
+	if err := e.EncodeToken(start); err != nil {
+		return err
+	}
+	return e.EncodeToken(start.End())
+}
+
+func (t *AnyOfObject1) UnmarshalXML(d *xml.Decoder, start xml.StartElement) error {
+	var err error
+
+	t.xunion, err = CaptureXMLElement(d, start)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
 // AsOneOfVariant1 returns the union data inside the OneOfObject1 as a OneOfVariant1
 func (t OneOfObject1) AsOneOfVariant1() (OneOfVariant1, error) {
 	var body OneOfVariant1
-	err := json.Unmarshal(t.union, &body)
-	return body, err
+	if len(t.union) > 0 {
+		err := json.Unmarshal(t.union, &body)
+		if err != nil {
+			return body, err
+		}
+	}
+	if len(t.xunion) > 0 {
+		err := xml.Unmarshal(t.xunion, &body)
+		if err != nil {
+			return body, err
+		}
+	}
+	return body, nil
 }
 
 // FromOneOfVariant1 overwrites any union data inside the OneOfObject1 as the provided OneOfVariant1
 func (t *OneOfObject1) FromOneOfVariant1(v OneOfVariant1) error {
 	b, err := json.Marshal(v)
+	if err != nil {
+		return err
+	}
 	t.union = b
-	return err
+	b, err = xml.Marshal(v)
+	if err != nil {
+		return err
+	}
+	t.xunion = b
+
+	return nil
 }
 
 // MergeOneOfVariant1 performs a merge with any union data inside the OneOfObject1, using the provided OneOfVariant1
@@ -278,21 +393,49 @@ func (t *OneOfObject1) MergeOneOfVariant1(v OneOfVariant1) error {
 
 	merged, err := runtime.JSONMerge(t.union, b)
 	t.union = merged
+
+	// For XML, re-marshal the merged result
+	bx, errx := xml.Marshal(v)
+	if errx != nil {
+		return errx
+	}
+	t.xunion = bx
+
 	return err
 }
 
 // AsOneOfVariant2 returns the union data inside the OneOfObject1 as a OneOfVariant2
 func (t OneOfObject1) AsOneOfVariant2() (OneOfVariant2, error) {
 	var body OneOfVariant2
-	err := json.Unmarshal(t.union, &body)
-	return body, err
+	if len(t.union) > 0 {
+		err := json.Unmarshal(t.union, &body)
+		if err != nil {
+			return body, err
+		}
+	}
+	if len(t.xunion) > 0 {
+		err := xml.Unmarshal(t.xunion, &body)
+		if err != nil {
+			return body, err
+		}
+	}
+	return body, nil
 }
 
 // FromOneOfVariant2 overwrites any union data inside the OneOfObject1 as the provided OneOfVariant2
 func (t *OneOfObject1) FromOneOfVariant2(v OneOfVariant2) error {
 	b, err := json.Marshal(v)
+	if err != nil {
+		return err
+	}
 	t.union = b
-	return err
+	b, err = xml.Marshal(v)
+	if err != nil {
+		return err
+	}
+	t.xunion = b
+
+	return nil
 }
 
 // MergeOneOfVariant2 performs a merge with any union data inside the OneOfObject1, using the provided OneOfVariant2
@@ -304,21 +447,49 @@ func (t *OneOfObject1) MergeOneOfVariant2(v OneOfVariant2) error {
 
 	merged, err := runtime.JSONMerge(t.union, b)
 	t.union = merged
+
+	// For XML, re-marshal the merged result
+	bx, errx := xml.Marshal(v)
+	if errx != nil {
+		return errx
+	}
+	t.xunion = bx
+
 	return err
 }
 
 // AsOneOfVariant3 returns the union data inside the OneOfObject1 as a OneOfVariant3
 func (t OneOfObject1) AsOneOfVariant3() (OneOfVariant3, error) {
 	var body OneOfVariant3
-	err := json.Unmarshal(t.union, &body)
-	return body, err
+	if len(t.union) > 0 {
+		err := json.Unmarshal(t.union, &body)
+		if err != nil {
+			return body, err
+		}
+	}
+	if len(t.xunion) > 0 {
+		err := xml.Unmarshal(t.xunion, &body)
+		if err != nil {
+			return body, err
+		}
+	}
+	return body, nil
 }
 
 // FromOneOfVariant3 overwrites any union data inside the OneOfObject1 as the provided OneOfVariant3
 func (t *OneOfObject1) FromOneOfVariant3(v OneOfVariant3) error {
 	b, err := json.Marshal(v)
+	if err != nil {
+		return err
+	}
 	t.union = b
-	return err
+	b, err = xml.Marshal(v)
+	if err != nil {
+		return err
+	}
+	t.xunion = b
+
+	return nil
 }
 
 // MergeOneOfVariant3 performs a merge with any union data inside the OneOfObject1, using the provided OneOfVariant3
@@ -330,6 +501,14 @@ func (t *OneOfObject1) MergeOneOfVariant3(v OneOfVariant3) error {
 
 	merged, err := runtime.JSONMerge(t.union, b)
 	t.union = merged
+
+	// For XML, re-marshal the merged result
+	bx, errx := xml.Marshal(v)
+	if errx != nil {
+		return errx
+	}
+	t.xunion = bx
+
 	return err
 }
 
@@ -343,18 +522,59 @@ func (t *OneOfObject1) UnmarshalJSON(b []byte) error {
 	return err
 }
 
+func (t OneOfObject1) MarshalXML(e *xml.Encoder, start xml.StartElement) error {
+	if len(t.xunion) > 0 {
+		return t.xunion.MarshalXML(e, start)
+	}
+	if err := e.EncodeToken(start); err != nil {
+		return err
+	}
+	return e.EncodeToken(start.End())
+}
+
+func (t *OneOfObject1) UnmarshalXML(d *xml.Decoder, start xml.StartElement) error {
+	var err error
+
+	t.xunion, err = CaptureXMLElement(d, start)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
 // AsOneOfObject100 returns the union data inside the OneOfObject10 as a OneOfObject100
 func (t OneOfObject10) AsOneOfObject100() (OneOfObject100, error) {
 	var body OneOfObject100
-	err := json.Unmarshal(t.union, &body)
-	return body, err
+	if len(t.union) > 0 {
+		err := json.Unmarshal(t.union, &body)
+		if err != nil {
+			return body, err
+		}
+	}
+	if len(t.xunion) > 0 {
+		err := xml.Unmarshal(t.xunion, &body)
+		if err != nil {
+			return body, err
+		}
+	}
+	return body, nil
 }
 
 // FromOneOfObject100 overwrites any union data inside the OneOfObject10 as the provided OneOfObject100
 func (t *OneOfObject10) FromOneOfObject100(v OneOfObject100) error {
 	b, err := json.Marshal(v)
+	if err != nil {
+		return err
+	}
 	t.union = b
-	return err
+	b, err = xml.Marshal(v)
+	if err != nil {
+		return err
+	}
+	t.xunion = b
+
+	return nil
 }
 
 // MergeOneOfObject100 performs a merge with any union data inside the OneOfObject10, using the provided OneOfObject100
@@ -366,21 +586,49 @@ func (t *OneOfObject10) MergeOneOfObject100(v OneOfObject100) error {
 
 	merged, err := runtime.JSONMerge(t.union, b)
 	t.union = merged
+
+	// For XML, re-marshal the merged result
+	bx, errx := xml.Marshal(v)
+	if errx != nil {
+		return errx
+	}
+	t.xunion = bx
+
 	return err
 }
 
 // AsOneOfObject101 returns the union data inside the OneOfObject10 as a OneOfObject101
 func (t OneOfObject10) AsOneOfObject101() (OneOfObject101, error) {
 	var body OneOfObject101
-	err := json.Unmarshal(t.union, &body)
-	return body, err
+	if len(t.union) > 0 {
+		err := json.Unmarshal(t.union, &body)
+		if err != nil {
+			return body, err
+		}
+	}
+	if len(t.xunion) > 0 {
+		err := xml.Unmarshal(t.xunion, &body)
+		if err != nil {
+			return body, err
+		}
+	}
+	return body, nil
 }
 
 // FromOneOfObject101 overwrites any union data inside the OneOfObject10 as the provided OneOfObject101
 func (t *OneOfObject10) FromOneOfObject101(v OneOfObject101) error {
 	b, err := json.Marshal(v)
+	if err != nil {
+		return err
+	}
 	t.union = b
-	return err
+	b, err = xml.Marshal(v)
+	if err != nil {
+		return err
+	}
+	t.xunion = b
+
+	return nil
 }
 
 // MergeOneOfObject101 performs a merge with any union data inside the OneOfObject10, using the provided OneOfObject101
@@ -392,6 +640,14 @@ func (t *OneOfObject10) MergeOneOfObject101(v OneOfObject101) error {
 
 	merged, err := runtime.JSONMerge(t.union, b)
 	t.union = merged
+
+	// For XML, re-marshal the merged result
+	bx, errx := xml.Marshal(v)
+	if errx != nil {
+		return errx
+	}
+	t.xunion = bx
+
 	return err
 }
 
@@ -467,18 +723,117 @@ func (t *OneOfObject10) UnmarshalJSON(b []byte) error {
 	return err
 }
 
+func (t OneOfObject10) MarshalXML(e *xml.Encoder, start xml.StartElement) error {
+	// Marshal with fixed properties merged into the union content
+	if err := e.EncodeToken(start); err != nil {
+		return err
+	}
+
+	// Write union inner content first
+	if len(t.xunion) > 0 {
+		d := xml.NewDecoder(bytes.NewReader([]byte(t.xunion)))
+		// Skip the original start element
+		if _, err := d.Token(); err != nil {
+			return err
+		}
+		depth := 1
+		for depth > 0 {
+			tok, err := d.Token()
+			if err != nil {
+				return err
+			}
+			switch tok.(type) {
+			case xml.StartElement:
+				depth++
+			case xml.EndElement:
+				depth--
+			}
+			if depth > 0 {
+				if err := e.EncodeToken(xml.CopyToken(tok)); err != nil {
+					return err
+				}
+			}
+		}
+	}
+
+	// Write fixed properties (ensures they are present even if not in xunion)
+
+	if t.One != nil {
+		if err := e.EncodeElement(t.One, xml.StartElement{Name: xml.Name{Local: "one"}}); err != nil {
+			return fmt.Errorf("error marshaling 'one': %w", err)
+		}
+	}
+
+	if t.Three != nil {
+		if err := e.EncodeElement(t.Three, xml.StartElement{Name: xml.Name{Local: "three"}}); err != nil {
+			return fmt.Errorf("error marshaling 'three': %w", err)
+		}
+	}
+
+	if t.Two != nil {
+		if err := e.EncodeElement(t.Two, xml.StartElement{Name: xml.Name{Local: "two"}}); err != nil {
+			return fmt.Errorf("error marshaling 'two': %w", err)
+		}
+	}
+	return e.EncodeToken(start.End())
+}
+
+func (t *OneOfObject10) UnmarshalXML(d *xml.Decoder, start xml.StartElement) error {
+	var err error
+
+	t.xunion, err = CaptureXMLElement(d, start)
+	if err != nil {
+		return err
+	}
+
+	// Extract fixed properties from the captured XML
+	type xmlProps struct {
+		One   *string `xml:"one"`
+		Three *bool   `xml:"three"`
+		Two   *int    `xml:"two"`
+	}
+	var props xmlProps
+	if err := xml.Unmarshal(t.xunion, &props); err != nil {
+		return err
+	}
+	t.One = props.One
+	t.Three = props.Three
+	t.Two = props.Two
+	return nil
+}
+
 // AsOneOfObject110 returns the union data inside the OneOfObject11_AdditionalProperties as a OneOfObject110
 func (t OneOfObject11_AdditionalProperties) AsOneOfObject110() (OneOfObject110, error) {
 	var body OneOfObject110
-	err := json.Unmarshal(t.union, &body)
-	return body, err
+	if len(t.union) > 0 {
+		err := json.Unmarshal(t.union, &body)
+		if err != nil {
+			return body, err
+		}
+	}
+	if len(t.xunion) > 0 {
+		err := xml.Unmarshal(t.xunion, &body)
+		if err != nil {
+			return body, err
+		}
+	}
+	return body, nil
 }
 
 // FromOneOfObject110 overwrites any union data inside the OneOfObject11_AdditionalProperties as the provided OneOfObject110
 func (t *OneOfObject11_AdditionalProperties) FromOneOfObject110(v OneOfObject110) error {
 	b, err := json.Marshal(v)
+	if err != nil {
+		return err
+	}
 	t.union = b
-	return err
+	b, err = xml.Marshal(v)
+	if err != nil {
+		return err
+	}
+	t.xunion = b
+
+	return nil
 }
 
 // MergeOneOfObject110 performs a merge with any union data inside the OneOfObject11_AdditionalProperties, using the provided OneOfObject110
@@ -490,21 +845,49 @@ func (t *OneOfObject11_AdditionalProperties) MergeOneOfObject110(v OneOfObject11
 
 	merged, err := runtime.JSONMerge(t.union, b)
 	t.union = merged
+
+	// For XML, re-marshal the merged result
+	bx, errx := xml.Marshal(v)
+	if errx != nil {
+		return errx
+	}
+	t.xunion = bx
+
 	return err
 }
 
 // AsOneOfObject111 returns the union data inside the OneOfObject11_AdditionalProperties as a OneOfObject111
 func (t OneOfObject11_AdditionalProperties) AsOneOfObject111() (OneOfObject111, error) {
 	var body OneOfObject111
-	err := json.Unmarshal(t.union, &body)
-	return body, err
+	if len(t.union) > 0 {
+		err := json.Unmarshal(t.union, &body)
+		if err != nil {
+			return body, err
+		}
+	}
+	if len(t.xunion) > 0 {
+		err := xml.Unmarshal(t.xunion, &body)
+		if err != nil {
+			return body, err
+		}
+	}
+	return body, nil
 }
 
 // FromOneOfObject111 overwrites any union data inside the OneOfObject11_AdditionalProperties as the provided OneOfObject111
 func (t *OneOfObject11_AdditionalProperties) FromOneOfObject111(v OneOfObject111) error {
 	b, err := json.Marshal(v)
+	if err != nil {
+		return err
+	}
 	t.union = b
-	return err
+	b, err = xml.Marshal(v)
+	if err != nil {
+		return err
+	}
+	t.xunion = b
+
+	return nil
 }
 
 // MergeOneOfObject111 performs a merge with any union data inside the OneOfObject11_AdditionalProperties, using the provided OneOfObject111
@@ -516,21 +899,49 @@ func (t *OneOfObject11_AdditionalProperties) MergeOneOfObject111(v OneOfObject11
 
 	merged, err := runtime.JSONMerge(t.union, b)
 	t.union = merged
+
+	// For XML, re-marshal the merged result
+	bx, errx := xml.Marshal(v)
+	if errx != nil {
+		return errx
+	}
+	t.xunion = bx
+
 	return err
 }
 
 // AsOneOfObject112 returns the union data inside the OneOfObject11_AdditionalProperties as a OneOfObject112
 func (t OneOfObject11_AdditionalProperties) AsOneOfObject112() (OneOfObject112, error) {
 	var body OneOfObject112
-	err := json.Unmarshal(t.union, &body)
-	return body, err
+	if len(t.union) > 0 {
+		err := json.Unmarshal(t.union, &body)
+		if err != nil {
+			return body, err
+		}
+	}
+	if len(t.xunion) > 0 {
+		err := xml.Unmarshal(t.xunion, &body)
+		if err != nil {
+			return body, err
+		}
+	}
+	return body, nil
 }
 
 // FromOneOfObject112 overwrites any union data inside the OneOfObject11_AdditionalProperties as the provided OneOfObject112
 func (t *OneOfObject11_AdditionalProperties) FromOneOfObject112(v OneOfObject112) error {
 	b, err := json.Marshal(v)
+	if err != nil {
+		return err
+	}
 	t.union = b
-	return err
+	b, err = xml.Marshal(v)
+	if err != nil {
+		return err
+	}
+	t.xunion = b
+
+	return nil
 }
 
 // MergeOneOfObject112 performs a merge with any union data inside the OneOfObject11_AdditionalProperties, using the provided OneOfObject112
@@ -542,6 +953,14 @@ func (t *OneOfObject11_AdditionalProperties) MergeOneOfObject112(v OneOfObject11
 
 	merged, err := runtime.JSONMerge(t.union, b)
 	t.union = merged
+
+	// For XML, re-marshal the merged result
+	bx, errx := xml.Marshal(v)
+	if errx != nil {
+		return errx
+	}
+	t.xunion = bx
+
 	return err
 }
 
@@ -555,18 +974,59 @@ func (t *OneOfObject11_AdditionalProperties) UnmarshalJSON(b []byte) error {
 	return err
 }
 
+func (t OneOfObject11_AdditionalProperties) MarshalXML(e *xml.Encoder, start xml.StartElement) error {
+	if len(t.xunion) > 0 {
+		return t.xunion.MarshalXML(e, start)
+	}
+	if err := e.EncodeToken(start); err != nil {
+		return err
+	}
+	return e.EncodeToken(start.End())
+}
+
+func (t *OneOfObject11_AdditionalProperties) UnmarshalXML(d *xml.Decoder, start xml.StartElement) error {
+	var err error
+
+	t.xunion, err = CaptureXMLElement(d, start)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
 // AsOneOfObject120 returns the union data inside the OneOfObject12 as a OneOfObject120
 func (t OneOfObject12) AsOneOfObject120() (OneOfObject120, error) {
 	var body OneOfObject120
-	err := json.Unmarshal(t.union, &body)
-	return body, err
+	if len(t.union) > 0 {
+		err := json.Unmarshal(t.union, &body)
+		if err != nil {
+			return body, err
+		}
+	}
+	if len(t.xunion) > 0 {
+		err := xml.Unmarshal(t.xunion, &body)
+		if err != nil {
+			return body, err
+		}
+	}
+	return body, nil
 }
 
 // FromOneOfObject120 overwrites any union data inside the OneOfObject12 as the provided OneOfObject120
 func (t *OneOfObject12) FromOneOfObject120(v OneOfObject120) error {
 	b, err := json.Marshal(v)
+	if err != nil {
+		return err
+	}
 	t.union = b
-	return err
+	b, err = xml.Marshal(v)
+	if err != nil {
+		return err
+	}
+	t.xunion = b
+
+	return nil
 }
 
 // MergeOneOfObject120 performs a merge with any union data inside the OneOfObject12, using the provided OneOfObject120
@@ -578,21 +1038,49 @@ func (t *OneOfObject12) MergeOneOfObject120(v OneOfObject120) error {
 
 	merged, err := runtime.JSONMerge(t.union, b)
 	t.union = merged
+
+	// For XML, re-marshal the merged result
+	bx, errx := xml.Marshal(v)
+	if errx != nil {
+		return errx
+	}
+	t.xunion = bx
+
 	return err
 }
 
 // AsOneOfObject121 returns the union data inside the OneOfObject12 as a OneOfObject121
 func (t OneOfObject12) AsOneOfObject121() (OneOfObject121, error) {
 	var body OneOfObject121
-	err := json.Unmarshal(t.union, &body)
-	return body, err
+	if len(t.union) > 0 {
+		err := json.Unmarshal(t.union, &body)
+		if err != nil {
+			return body, err
+		}
+	}
+	if len(t.xunion) > 0 {
+		err := xml.Unmarshal(t.xunion, &body)
+		if err != nil {
+			return body, err
+		}
+	}
+	return body, nil
 }
 
 // FromOneOfObject121 overwrites any union data inside the OneOfObject12 as the provided OneOfObject121
 func (t *OneOfObject12) FromOneOfObject121(v OneOfObject121) error {
 	b, err := json.Marshal(v)
+	if err != nil {
+		return err
+	}
 	t.union = b
-	return err
+	b, err = xml.Marshal(v)
+	if err != nil {
+		return err
+	}
+	t.xunion = b
+
+	return nil
 }
 
 // MergeOneOfObject121 performs a merge with any union data inside the OneOfObject12, using the provided OneOfObject121
@@ -604,21 +1092,49 @@ func (t *OneOfObject12) MergeOneOfObject121(v OneOfObject121) error {
 
 	merged, err := runtime.JSONMerge(t.union, b)
 	t.union = merged
+
+	// For XML, re-marshal the merged result
+	bx, errx := xml.Marshal(v)
+	if errx != nil {
+		return errx
+	}
+	t.xunion = bx
+
 	return err
 }
 
 // AsOneOfVariant3 returns the union data inside the OneOfObject12 as a OneOfVariant3
 func (t OneOfObject12) AsOneOfVariant3() (OneOfVariant3, error) {
 	var body OneOfVariant3
-	err := json.Unmarshal(t.union, &body)
-	return body, err
+	if len(t.union) > 0 {
+		err := json.Unmarshal(t.union, &body)
+		if err != nil {
+			return body, err
+		}
+	}
+	if len(t.xunion) > 0 {
+		err := xml.Unmarshal(t.xunion, &body)
+		if err != nil {
+			return body, err
+		}
+	}
+	return body, nil
 }
 
 // FromOneOfVariant3 overwrites any union data inside the OneOfObject12 as the provided OneOfVariant3
 func (t *OneOfObject12) FromOneOfVariant3(v OneOfVariant3) error {
 	b, err := json.Marshal(v)
+	if err != nil {
+		return err
+	}
 	t.union = b
-	return err
+	b, err = xml.Marshal(v)
+	if err != nil {
+		return err
+	}
+	t.xunion = b
+
+	return nil
 }
 
 // MergeOneOfVariant3 performs a merge with any union data inside the OneOfObject12, using the provided OneOfVariant3
@@ -630,21 +1146,49 @@ func (t *OneOfObject12) MergeOneOfVariant3(v OneOfVariant3) error {
 
 	merged, err := runtime.JSONMerge(t.union, b)
 	t.union = merged
+
+	// For XML, re-marshal the merged result
+	bx, errx := xml.Marshal(v)
+	if errx != nil {
+		return errx
+	}
+	t.xunion = bx
+
 	return err
 }
 
 // AsOneOfVariant4 returns the union data inside the OneOfObject12 as a OneOfVariant4
 func (t OneOfObject12) AsOneOfVariant4() (OneOfVariant4, error) {
 	var body OneOfVariant4
-	err := json.Unmarshal(t.union, &body)
-	return body, err
+	if len(t.union) > 0 {
+		err := json.Unmarshal(t.union, &body)
+		if err != nil {
+			return body, err
+		}
+	}
+	if len(t.xunion) > 0 {
+		err := xml.Unmarshal(t.xunion, &body)
+		if err != nil {
+			return body, err
+		}
+	}
+	return body, nil
 }
 
 // FromOneOfVariant4 overwrites any union data inside the OneOfObject12 as the provided OneOfVariant4
 func (t *OneOfObject12) FromOneOfVariant4(v OneOfVariant4) error {
 	b, err := json.Marshal(v)
+	if err != nil {
+		return err
+	}
 	t.union = b
-	return err
+	b, err = xml.Marshal(v)
+	if err != nil {
+		return err
+	}
+	t.xunion = b
+
+	return nil
 }
 
 // MergeOneOfVariant4 performs a merge with any union data inside the OneOfObject12, using the provided OneOfVariant4
@@ -656,6 +1200,14 @@ func (t *OneOfObject12) MergeOneOfVariant4(v OneOfVariant4) error {
 
 	merged, err := runtime.JSONMerge(t.union, b)
 	t.union = merged
+
+	// For XML, re-marshal the merged result
+	bx, errx := xml.Marshal(v)
+	if errx != nil {
+		return errx
+	}
+	t.xunion = bx
+
 	return err
 }
 
@@ -669,11 +1221,43 @@ func (t *OneOfObject12) UnmarshalJSON(b []byte) error {
 	return err
 }
 
+func (t OneOfObject12) MarshalXML(e *xml.Encoder, start xml.StartElement) error {
+	if len(t.xunion) > 0 {
+		return t.xunion.MarshalXML(e, start)
+	}
+	if err := e.EncodeToken(start); err != nil {
+		return err
+	}
+	return e.EncodeToken(start.End())
+}
+
+func (t *OneOfObject12) UnmarshalXML(d *xml.Decoder, start xml.StartElement) error {
+	var err error
+
+	t.xunion, err = CaptureXMLElement(d, start)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
 // AsOneOfVariant1 returns the union data inside the OneOfObject13 as a OneOfVariant1
 func (t OneOfObject13) AsOneOfVariant1() (OneOfVariant1, error) {
 	var body OneOfVariant1
-	err := json.Unmarshal(t.union, &body)
-	return body, err
+	if len(t.union) > 0 {
+		err := json.Unmarshal(t.union, &body)
+		if err != nil {
+			return body, err
+		}
+	}
+	if len(t.xunion) > 0 {
+		err := xml.Unmarshal(t.xunion, &body)
+		if err != nil {
+			return body, err
+		}
+	}
+	return body, nil
 }
 
 // FromOneOfVariant1 overwrites any union data inside the OneOfObject13 as the provided OneOfVariant1
@@ -684,8 +1268,17 @@ func (t *OneOfObject13) FromOneOfVariant1(v OneOfVariant1) error {
 		return err
 	}
 	b, err = runtime.JSONMerge(b, []byte(`{"type":"v1"}`))
+	if err != nil {
+		return err
+	}
 	t.union = b
-	return err
+	b, err = xml.Marshal(v)
+	if err != nil {
+		return err
+	}
+	t.xunion = b
+
+	return nil
 }
 
 // MergeOneOfVariant1 performs a merge with any union data inside the OneOfObject13, using the provided OneOfVariant1
@@ -702,14 +1295,33 @@ func (t *OneOfObject13) MergeOneOfVariant1(v OneOfVariant1) error {
 
 	merged, err := runtime.JSONMerge(t.union, b)
 	t.union = merged
+
+	// For XML, re-marshal the merged result
+	bx, errx := xml.Marshal(v)
+	if errx != nil {
+		return errx
+	}
+	t.xunion = bx
+
 	return err
 }
 
 // AsOneOfVariant6 returns the union data inside the OneOfObject13 as a OneOfVariant6
 func (t OneOfObject13) AsOneOfVariant6() (OneOfVariant6, error) {
 	var body OneOfVariant6
-	err := json.Unmarshal(t.union, &body)
-	return body, err
+	if len(t.union) > 0 {
+		err := json.Unmarshal(t.union, &body)
+		if err != nil {
+			return body, err
+		}
+	}
+	if len(t.xunion) > 0 {
+		err := xml.Unmarshal(t.xunion, &body)
+		if err != nil {
+			return body, err
+		}
+	}
+	return body, nil
 }
 
 // FromOneOfVariant6 overwrites any union data inside the OneOfObject13 as the provided OneOfVariant6
@@ -720,8 +1332,17 @@ func (t *OneOfObject13) FromOneOfVariant6(v OneOfVariant6) error {
 		return err
 	}
 	b, err = runtime.JSONMerge(b, []byte(`{"type":"v6"}`))
+	if err != nil {
+		return err
+	}
 	t.union = b
-	return err
+	b, err = xml.Marshal(v)
+	if err != nil {
+		return err
+	}
+	t.xunion = b
+
+	return nil
 }
 
 // MergeOneOfVariant6 performs a merge with any union data inside the OneOfObject13, using the provided OneOfVariant6
@@ -738,15 +1359,36 @@ func (t *OneOfObject13) MergeOneOfVariant6(v OneOfVariant6) error {
 
 	merged, err := runtime.JSONMerge(t.union, b)
 	t.union = merged
+
+	// For XML, re-marshal the merged result
+	bx, errx := xml.Marshal(v)
+	if errx != nil {
+		return errx
+	}
+	t.xunion = bx
+
 	return err
 }
 
 func (t OneOfObject13) Discriminator() (string, error) {
 	var discriminator struct {
-		Discriminator string `json:"type"`
+		Discriminator string `json:"type" xml:"type"`
 	}
-	err := json.Unmarshal(t.union, &discriminator)
-	return discriminator.Discriminator, err
+	if len(t.union) > 0 {
+		err := json.Unmarshal(t.union, &discriminator)
+		if err != nil {
+			return "", err
+		}
+		return discriminator.Discriminator, nil
+	}
+	if len(t.xunion) > 0 {
+		err := xml.Unmarshal(t.xunion, &discriminator)
+		if err != nil {
+			return "", err
+		}
+		return discriminator.Discriminator, nil
+	}
+	return "", nil
 }
 
 func (t OneOfObject13) ValueByDiscriminator() (interface{}, error) {
@@ -767,15 +1409,35 @@ func (t OneOfObject13) ValueByDiscriminator() (interface{}, error) {
 // AsOneOfObject20 returns the union data inside the OneOfObject2 as a OneOfObject20
 func (t OneOfObject2) AsOneOfObject20() (OneOfObject20, error) {
 	var body OneOfObject20
-	err := json.Unmarshal(t.union, &body)
-	return body, err
+	if len(t.union) > 0 {
+		err := json.Unmarshal(t.union, &body)
+		if err != nil {
+			return body, err
+		}
+	}
+	if len(t.xunion) > 0 {
+		err := xml.Unmarshal(t.xunion, &body)
+		if err != nil {
+			return body, err
+		}
+	}
+	return body, nil
 }
 
 // FromOneOfObject20 overwrites any union data inside the OneOfObject2 as the provided OneOfObject20
 func (t *OneOfObject2) FromOneOfObject20(v OneOfObject20) error {
 	b, err := json.Marshal(v)
+	if err != nil {
+		return err
+	}
 	t.union = b
-	return err
+	b, err = xml.Marshal(v)
+	if err != nil {
+		return err
+	}
+	t.xunion = b
+
+	return nil
 }
 
 // MergeOneOfObject20 performs a merge with any union data inside the OneOfObject2, using the provided OneOfObject20
@@ -787,21 +1449,49 @@ func (t *OneOfObject2) MergeOneOfObject20(v OneOfObject20) error {
 
 	merged, err := runtime.JSONMerge(t.union, b)
 	t.union = merged
+
+	// For XML, re-marshal the merged result
+	bx, errx := xml.Marshal(v)
+	if errx != nil {
+		return errx
+	}
+	t.xunion = bx
+
 	return err
 }
 
 // AsOneOfObject21 returns the union data inside the OneOfObject2 as a OneOfObject21
 func (t OneOfObject2) AsOneOfObject21() (OneOfObject21, error) {
 	var body OneOfObject21
-	err := json.Unmarshal(t.union, &body)
-	return body, err
+	if len(t.union) > 0 {
+		err := json.Unmarshal(t.union, &body)
+		if err != nil {
+			return body, err
+		}
+	}
+	if len(t.xunion) > 0 {
+		err := xml.Unmarshal(t.xunion, &body)
+		if err != nil {
+			return body, err
+		}
+	}
+	return body, nil
 }
 
 // FromOneOfObject21 overwrites any union data inside the OneOfObject2 as the provided OneOfObject21
 func (t *OneOfObject2) FromOneOfObject21(v OneOfObject21) error {
 	b, err := json.Marshal(v)
+	if err != nil {
+		return err
+	}
 	t.union = b
-	return err
+	b, err = xml.Marshal(v)
+	if err != nil {
+		return err
+	}
+	t.xunion = b
+
+	return nil
 }
 
 // MergeOneOfObject21 performs a merge with any union data inside the OneOfObject2, using the provided OneOfObject21
@@ -813,21 +1503,49 @@ func (t *OneOfObject2) MergeOneOfObject21(v OneOfObject21) error {
 
 	merged, err := runtime.JSONMerge(t.union, b)
 	t.union = merged
+
+	// For XML, re-marshal the merged result
+	bx, errx := xml.Marshal(v)
+	if errx != nil {
+		return errx
+	}
+	t.xunion = bx
+
 	return err
 }
 
 // AsOneOfObject22 returns the union data inside the OneOfObject2 as a OneOfObject22
 func (t OneOfObject2) AsOneOfObject22() (OneOfObject22, error) {
 	var body OneOfObject22
-	err := json.Unmarshal(t.union, &body)
-	return body, err
+	if len(t.union) > 0 {
+		err := json.Unmarshal(t.union, &body)
+		if err != nil {
+			return body, err
+		}
+	}
+	if len(t.xunion) > 0 {
+		err := xml.Unmarshal(t.xunion, &body)
+		if err != nil {
+			return body, err
+		}
+	}
+	return body, nil
 }
 
 // FromOneOfObject22 overwrites any union data inside the OneOfObject2 as the provided OneOfObject22
 func (t *OneOfObject2) FromOneOfObject22(v OneOfObject22) error {
 	b, err := json.Marshal(v)
+	if err != nil {
+		return err
+	}
 	t.union = b
-	return err
+	b, err = xml.Marshal(v)
+	if err != nil {
+		return err
+	}
+	t.xunion = b
+
+	return nil
 }
 
 // MergeOneOfObject22 performs a merge with any union data inside the OneOfObject2, using the provided OneOfObject22
@@ -839,6 +1557,14 @@ func (t *OneOfObject2) MergeOneOfObject22(v OneOfObject22) error {
 
 	merged, err := runtime.JSONMerge(t.union, b)
 	t.union = merged
+
+	// For XML, re-marshal the merged result
+	bx, errx := xml.Marshal(v)
+	if errx != nil {
+		return errx
+	}
+	t.xunion = bx
+
 	return err
 }
 
@@ -852,18 +1578,59 @@ func (t *OneOfObject2) UnmarshalJSON(b []byte) error {
 	return err
 }
 
+func (t OneOfObject2) MarshalXML(e *xml.Encoder, start xml.StartElement) error {
+	if len(t.xunion) > 0 {
+		return t.xunion.MarshalXML(e, start)
+	}
+	if err := e.EncodeToken(start); err != nil {
+		return err
+	}
+	return e.EncodeToken(start.End())
+}
+
+func (t *OneOfObject2) UnmarshalXML(d *xml.Decoder, start xml.StartElement) error {
+	var err error
+
+	t.xunion, err = CaptureXMLElement(d, start)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
 // AsOneOfVariant1 returns the union data inside the OneOfObject3_Union as a OneOfVariant1
 func (t OneOfObject3_Union) AsOneOfVariant1() (OneOfVariant1, error) {
 	var body OneOfVariant1
-	err := json.Unmarshal(t.union, &body)
-	return body, err
+	if len(t.union) > 0 {
+		err := json.Unmarshal(t.union, &body)
+		if err != nil {
+			return body, err
+		}
+	}
+	if len(t.xunion) > 0 {
+		err := xml.Unmarshal(t.xunion, &body)
+		if err != nil {
+			return body, err
+		}
+	}
+	return body, nil
 }
 
 // FromOneOfVariant1 overwrites any union data inside the OneOfObject3_Union as the provided OneOfVariant1
 func (t *OneOfObject3_Union) FromOneOfVariant1(v OneOfVariant1) error {
 	b, err := json.Marshal(v)
+	if err != nil {
+		return err
+	}
 	t.union = b
-	return err
+	b, err = xml.Marshal(v)
+	if err != nil {
+		return err
+	}
+	t.xunion = b
+
+	return nil
 }
 
 // MergeOneOfVariant1 performs a merge with any union data inside the OneOfObject3_Union, using the provided OneOfVariant1
@@ -875,21 +1642,49 @@ func (t *OneOfObject3_Union) MergeOneOfVariant1(v OneOfVariant1) error {
 
 	merged, err := runtime.JSONMerge(t.union, b)
 	t.union = merged
+
+	// For XML, re-marshal the merged result
+	bx, errx := xml.Marshal(v)
+	if errx != nil {
+		return errx
+	}
+	t.xunion = bx
+
 	return err
 }
 
 // AsOneOfVariant2 returns the union data inside the OneOfObject3_Union as a OneOfVariant2
 func (t OneOfObject3_Union) AsOneOfVariant2() (OneOfVariant2, error) {
 	var body OneOfVariant2
-	err := json.Unmarshal(t.union, &body)
-	return body, err
+	if len(t.union) > 0 {
+		err := json.Unmarshal(t.union, &body)
+		if err != nil {
+			return body, err
+		}
+	}
+	if len(t.xunion) > 0 {
+		err := xml.Unmarshal(t.xunion, &body)
+		if err != nil {
+			return body, err
+		}
+	}
+	return body, nil
 }
 
 // FromOneOfVariant2 overwrites any union data inside the OneOfObject3_Union as the provided OneOfVariant2
 func (t *OneOfObject3_Union) FromOneOfVariant2(v OneOfVariant2) error {
 	b, err := json.Marshal(v)
+	if err != nil {
+		return err
+	}
 	t.union = b
-	return err
+	b, err = xml.Marshal(v)
+	if err != nil {
+		return err
+	}
+	t.xunion = b
+
+	return nil
 }
 
 // MergeOneOfVariant2 performs a merge with any union data inside the OneOfObject3_Union, using the provided OneOfVariant2
@@ -901,21 +1696,49 @@ func (t *OneOfObject3_Union) MergeOneOfVariant2(v OneOfVariant2) error {
 
 	merged, err := runtime.JSONMerge(t.union, b)
 	t.union = merged
+
+	// For XML, re-marshal the merged result
+	bx, errx := xml.Marshal(v)
+	if errx != nil {
+		return errx
+	}
+	t.xunion = bx
+
 	return err
 }
 
 // AsOneOfVariant3 returns the union data inside the OneOfObject3_Union as a OneOfVariant3
 func (t OneOfObject3_Union) AsOneOfVariant3() (OneOfVariant3, error) {
 	var body OneOfVariant3
-	err := json.Unmarshal(t.union, &body)
-	return body, err
+	if len(t.union) > 0 {
+		err := json.Unmarshal(t.union, &body)
+		if err != nil {
+			return body, err
+		}
+	}
+	if len(t.xunion) > 0 {
+		err := xml.Unmarshal(t.xunion, &body)
+		if err != nil {
+			return body, err
+		}
+	}
+	return body, nil
 }
 
 // FromOneOfVariant3 overwrites any union data inside the OneOfObject3_Union as the provided OneOfVariant3
 func (t *OneOfObject3_Union) FromOneOfVariant3(v OneOfVariant3) error {
 	b, err := json.Marshal(v)
+	if err != nil {
+		return err
+	}
 	t.union = b
-	return err
+	b, err = xml.Marshal(v)
+	if err != nil {
+		return err
+	}
+	t.xunion = b
+
+	return nil
 }
 
 // MergeOneOfVariant3 performs a merge with any union data inside the OneOfObject3_Union, using the provided OneOfVariant3
@@ -927,6 +1750,14 @@ func (t *OneOfObject3_Union) MergeOneOfVariant3(v OneOfVariant3) error {
 
 	merged, err := runtime.JSONMerge(t.union, b)
 	t.union = merged
+
+	// For XML, re-marshal the merged result
+	bx, errx := xml.Marshal(v)
+	if errx != nil {
+		return errx
+	}
+	t.xunion = bx
+
 	return err
 }
 
@@ -940,18 +1771,59 @@ func (t *OneOfObject3_Union) UnmarshalJSON(b []byte) error {
 	return err
 }
 
+func (t OneOfObject3_Union) MarshalXML(e *xml.Encoder, start xml.StartElement) error {
+	if len(t.xunion) > 0 {
+		return t.xunion.MarshalXML(e, start)
+	}
+	if err := e.EncodeToken(start); err != nil {
+		return err
+	}
+	return e.EncodeToken(start.End())
+}
+
+func (t *OneOfObject3_Union) UnmarshalXML(d *xml.Decoder, start xml.StartElement) error {
+	var err error
+
+	t.xunion, err = CaptureXMLElement(d, start)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
 // AsOneOfVariant1 returns the union data inside the OneOfObject4 as a OneOfVariant1
 func (t OneOfObject4) AsOneOfVariant1() (OneOfVariant1, error) {
 	var body OneOfVariant1
-	err := json.Unmarshal(t.union, &body)
-	return body, err
+	if len(t.union) > 0 {
+		err := json.Unmarshal(t.union, &body)
+		if err != nil {
+			return body, err
+		}
+	}
+	if len(t.xunion) > 0 {
+		err := xml.Unmarshal(t.xunion, &body)
+		if err != nil {
+			return body, err
+		}
+	}
+	return body, nil
 }
 
 // FromOneOfVariant1 overwrites any union data inside the OneOfObject4 as the provided OneOfVariant1
 func (t *OneOfObject4) FromOneOfVariant1(v OneOfVariant1) error {
 	b, err := json.Marshal(v)
+	if err != nil {
+		return err
+	}
 	t.union = b
-	return err
+	b, err = xml.Marshal(v)
+	if err != nil {
+		return err
+	}
+	t.xunion = b
+
+	return nil
 }
 
 // MergeOneOfVariant1 performs a merge with any union data inside the OneOfObject4, using the provided OneOfVariant1
@@ -963,21 +1835,49 @@ func (t *OneOfObject4) MergeOneOfVariant1(v OneOfVariant1) error {
 
 	merged, err := runtime.JSONMerge(t.union, b)
 	t.union = merged
+
+	// For XML, re-marshal the merged result
+	bx, errx := xml.Marshal(v)
+	if errx != nil {
+		return errx
+	}
+	t.xunion = bx
+
 	return err
 }
 
 // AsOneOfVariant2 returns the union data inside the OneOfObject4 as a OneOfVariant2
 func (t OneOfObject4) AsOneOfVariant2() (OneOfVariant2, error) {
 	var body OneOfVariant2
-	err := json.Unmarshal(t.union, &body)
-	return body, err
+	if len(t.union) > 0 {
+		err := json.Unmarshal(t.union, &body)
+		if err != nil {
+			return body, err
+		}
+	}
+	if len(t.xunion) > 0 {
+		err := xml.Unmarshal(t.xunion, &body)
+		if err != nil {
+			return body, err
+		}
+	}
+	return body, nil
 }
 
 // FromOneOfVariant2 overwrites any union data inside the OneOfObject4 as the provided OneOfVariant2
 func (t *OneOfObject4) FromOneOfVariant2(v OneOfVariant2) error {
 	b, err := json.Marshal(v)
+	if err != nil {
+		return err
+	}
 	t.union = b
-	return err
+	b, err = xml.Marshal(v)
+	if err != nil {
+		return err
+	}
+	t.xunion = b
+
+	return nil
 }
 
 // MergeOneOfVariant2 performs a merge with any union data inside the OneOfObject4, using the provided OneOfVariant2
@@ -989,21 +1889,49 @@ func (t *OneOfObject4) MergeOneOfVariant2(v OneOfVariant2) error {
 
 	merged, err := runtime.JSONMerge(t.union, b)
 	t.union = merged
+
+	// For XML, re-marshal the merged result
+	bx, errx := xml.Marshal(v)
+	if errx != nil {
+		return errx
+	}
+	t.xunion = bx
+
 	return err
 }
 
 // AsOneOfVariant3 returns the union data inside the OneOfObject4 as a OneOfVariant3
 func (t OneOfObject4) AsOneOfVariant3() (OneOfVariant3, error) {
 	var body OneOfVariant3
-	err := json.Unmarshal(t.union, &body)
-	return body, err
+	if len(t.union) > 0 {
+		err := json.Unmarshal(t.union, &body)
+		if err != nil {
+			return body, err
+		}
+	}
+	if len(t.xunion) > 0 {
+		err := xml.Unmarshal(t.xunion, &body)
+		if err != nil {
+			return body, err
+		}
+	}
+	return body, nil
 }
 
 // FromOneOfVariant3 overwrites any union data inside the OneOfObject4 as the provided OneOfVariant3
 func (t *OneOfObject4) FromOneOfVariant3(v OneOfVariant3) error {
 	b, err := json.Marshal(v)
+	if err != nil {
+		return err
+	}
 	t.union = b
-	return err
+	b, err = xml.Marshal(v)
+	if err != nil {
+		return err
+	}
+	t.xunion = b
+
+	return nil
 }
 
 // MergeOneOfVariant3 performs a merge with any union data inside the OneOfObject4, using the provided OneOfVariant3
@@ -1015,6 +1943,14 @@ func (t *OneOfObject4) MergeOneOfVariant3(v OneOfVariant3) error {
 
 	merged, err := runtime.JSONMerge(t.union, b)
 	t.union = merged
+
+	// For XML, re-marshal the merged result
+	bx, errx := xml.Marshal(v)
+	if errx != nil {
+		return errx
+	}
+	t.xunion = bx
+
 	return err
 }
 
@@ -1062,11 +1998,85 @@ func (t *OneOfObject4) UnmarshalJSON(b []byte) error {
 	return err
 }
 
+func (t OneOfObject4) MarshalXML(e *xml.Encoder, start xml.StartElement) error {
+	// Marshal with fixed properties merged into the union content
+	if err := e.EncodeToken(start); err != nil {
+		return err
+	}
+
+	// Write union inner content first
+	if len(t.xunion) > 0 {
+		d := xml.NewDecoder(bytes.NewReader([]byte(t.xunion)))
+		// Skip the original start element
+		if _, err := d.Token(); err != nil {
+			return err
+		}
+		depth := 1
+		for depth > 0 {
+			tok, err := d.Token()
+			if err != nil {
+				return err
+			}
+			switch tok.(type) {
+			case xml.StartElement:
+				depth++
+			case xml.EndElement:
+				depth--
+			}
+			if depth > 0 {
+				if err := e.EncodeToken(xml.CopyToken(tok)); err != nil {
+					return err
+				}
+			}
+		}
+	}
+
+	// Write fixed properties (ensures they are present even if not in xunion)
+
+	if t.FixedProperty != nil {
+		if err := e.EncodeElement(t.FixedProperty, xml.StartElement{Name: xml.Name{Local: "fixedProperty"}}); err != nil {
+			return fmt.Errorf("error marshaling 'fixedProperty': %w", err)
+		}
+	}
+	return e.EncodeToken(start.End())
+}
+
+func (t *OneOfObject4) UnmarshalXML(d *xml.Decoder, start xml.StartElement) error {
+	var err error
+
+	t.xunion, err = CaptureXMLElement(d, start)
+	if err != nil {
+		return err
+	}
+
+	// Extract fixed properties from the captured XML
+	type xmlProps struct {
+		FixedProperty *string `xml:"fixedProperty"`
+	}
+	var props xmlProps
+	if err := xml.Unmarshal(t.xunion, &props); err != nil {
+		return err
+	}
+	t.FixedProperty = props.FixedProperty
+	return nil
+}
+
 // AsOneOfVariant4 returns the union data inside the OneOfObject5 as a OneOfVariant4
 func (t OneOfObject5) AsOneOfVariant4() (OneOfVariant4, error) {
 	var body OneOfVariant4
-	err := json.Unmarshal(t.union, &body)
-	return body, err
+	if len(t.union) > 0 {
+		err := json.Unmarshal(t.union, &body)
+		if err != nil {
+			return body, err
+		}
+	}
+	if len(t.xunion) > 0 {
+		err := xml.Unmarshal(t.xunion, &body)
+		if err != nil {
+			return body, err
+		}
+	}
+	return body, nil
 }
 
 // FromOneOfVariant4 overwrites any union data inside the OneOfObject5 as the provided OneOfVariant4
@@ -1076,8 +2086,20 @@ func (t *OneOfObject5) FromOneOfVariant4(v OneOfVariant4) error {
 		return err
 	}
 	b, err = runtime.JSONMerge(b, []byte(`{"discriminator":"OneOfVariant4"}`))
+	if err != nil {
+		return err
+	}
 	t.union = b
-	return err
+	// The JSON stamp above never reaches v, so set the variant's own
+	// discriminator field for the XML copy.
+	v.Discriminator = "OneOfVariant4"
+	b, err = xml.Marshal(v)
+	if err != nil {
+		return err
+	}
+	t.xunion = b
+
+	return nil
 }
 
 // MergeOneOfVariant4 performs a merge with any union data inside the OneOfObject5, using the provided OneOfVariant4
@@ -1093,14 +2115,34 @@ func (t *OneOfObject5) MergeOneOfVariant4(v OneOfVariant4) error {
 
 	merged, err := runtime.JSONMerge(t.union, b)
 	t.union = merged
+
+	// For XML, re-marshal the merged result
+	v.Discriminator = "OneOfVariant4"
+	bx, errx := xml.Marshal(v)
+	if errx != nil {
+		return errx
+	}
+	t.xunion = bx
+
 	return err
 }
 
 // AsOneOfVariant5 returns the union data inside the OneOfObject5 as a OneOfVariant5
 func (t OneOfObject5) AsOneOfVariant5() (OneOfVariant5, error) {
 	var body OneOfVariant5
-	err := json.Unmarshal(t.union, &body)
-	return body, err
+	if len(t.union) > 0 {
+		err := json.Unmarshal(t.union, &body)
+		if err != nil {
+			return body, err
+		}
+	}
+	if len(t.xunion) > 0 {
+		err := xml.Unmarshal(t.xunion, &body)
+		if err != nil {
+			return body, err
+		}
+	}
+	return body, nil
 }
 
 // FromOneOfVariant5 overwrites any union data inside the OneOfObject5 as the provided OneOfVariant5
@@ -1110,8 +2152,20 @@ func (t *OneOfObject5) FromOneOfVariant5(v OneOfVariant5) error {
 		return err
 	}
 	b, err = runtime.JSONMerge(b, []byte(`{"discriminator":"OneOfVariant5"}`))
+	if err != nil {
+		return err
+	}
 	t.union = b
-	return err
+	// The JSON stamp above never reaches v, so set the variant's own
+	// discriminator field for the XML copy.
+	v.Discriminator = "OneOfVariant5"
+	b, err = xml.Marshal(v)
+	if err != nil {
+		return err
+	}
+	t.xunion = b
+
+	return nil
 }
 
 // MergeOneOfVariant5 performs a merge with any union data inside the OneOfObject5, using the provided OneOfVariant5
@@ -1127,15 +2181,37 @@ func (t *OneOfObject5) MergeOneOfVariant5(v OneOfVariant5) error {
 
 	merged, err := runtime.JSONMerge(t.union, b)
 	t.union = merged
+
+	// For XML, re-marshal the merged result
+	v.Discriminator = "OneOfVariant5"
+	bx, errx := xml.Marshal(v)
+	if errx != nil {
+		return errx
+	}
+	t.xunion = bx
+
 	return err
 }
 
 func (t OneOfObject5) Discriminator() (string, error) {
 	var discriminator struct {
-		Discriminator string `json:"discriminator"`
+		Discriminator string `json:"discriminator" xml:"discriminator"`
 	}
-	err := json.Unmarshal(t.union, &discriminator)
-	return discriminator.Discriminator, err
+	if len(t.union) > 0 {
+		err := json.Unmarshal(t.union, &discriminator)
+		if err != nil {
+			return "", err
+		}
+		return discriminator.Discriminator, nil
+	}
+	if len(t.xunion) > 0 {
+		err := xml.Unmarshal(t.xunion, &discriminator)
+		if err != nil {
+			return "", err
+		}
+		return discriminator.Discriminator, nil
+	}
+	return "", nil
 }
 
 func (t OneOfObject5) ValueByDiscriminator() (interface{}, error) {
@@ -1163,11 +2239,43 @@ func (t *OneOfObject5) UnmarshalJSON(b []byte) error {
 	return err
 }
 
+func (t OneOfObject5) MarshalXML(e *xml.Encoder, start xml.StartElement) error {
+	if len(t.xunion) > 0 {
+		return t.xunion.MarshalXML(e, start)
+	}
+	if err := e.EncodeToken(start); err != nil {
+		return err
+	}
+	return e.EncodeToken(start.End())
+}
+
+func (t *OneOfObject5) UnmarshalXML(d *xml.Decoder, start xml.StartElement) error {
+	var err error
+
+	t.xunion, err = CaptureXMLElement(d, start)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
 // AsOneOfVariant4 returns the union data inside the OneOfObject6 as a OneOfVariant4
 func (t OneOfObject6) AsOneOfVariant4() (OneOfVariant4, error) {
 	var body OneOfVariant4
-	err := json.Unmarshal(t.union, &body)
-	return body, err
+	if len(t.union) > 0 {
+		err := json.Unmarshal(t.union, &body)
+		if err != nil {
+			return body, err
+		}
+	}
+	if len(t.xunion) > 0 {
+		err := xml.Unmarshal(t.xunion, &body)
+		if err != nil {
+			return body, err
+		}
+	}
+	return body, nil
 }
 
 // FromOneOfVariant4 overwrites any union data inside the OneOfObject6 as the provided OneOfVariant4
@@ -1177,8 +2285,20 @@ func (t *OneOfObject6) FromOneOfVariant4(v OneOfVariant4) error {
 		return err
 	}
 	b, err = runtime.JSONMerge(b, []byte(`{"discriminator":"v4"}`))
+	if err != nil {
+		return err
+	}
 	t.union = b
-	return err
+	// The JSON stamp above never reaches v, so set the variant's own
+	// discriminator field for the XML copy.
+	v.Discriminator = "v4"
+	b, err = xml.Marshal(v)
+	if err != nil {
+		return err
+	}
+	t.xunion = b
+
+	return nil
 }
 
 // MergeOneOfVariant4 performs a merge with any union data inside the OneOfObject6, using the provided OneOfVariant4
@@ -1194,14 +2314,34 @@ func (t *OneOfObject6) MergeOneOfVariant4(v OneOfVariant4) error {
 
 	merged, err := runtime.JSONMerge(t.union, b)
 	t.union = merged
+
+	// For XML, re-marshal the merged result
+	v.Discriminator = "v4"
+	bx, errx := xml.Marshal(v)
+	if errx != nil {
+		return errx
+	}
+	t.xunion = bx
+
 	return err
 }
 
 // AsOneOfVariant5 returns the union data inside the OneOfObject6 as a OneOfVariant5
 func (t OneOfObject6) AsOneOfVariant5() (OneOfVariant5, error) {
 	var body OneOfVariant5
-	err := json.Unmarshal(t.union, &body)
-	return body, err
+	if len(t.union) > 0 {
+		err := json.Unmarshal(t.union, &body)
+		if err != nil {
+			return body, err
+		}
+	}
+	if len(t.xunion) > 0 {
+		err := xml.Unmarshal(t.xunion, &body)
+		if err != nil {
+			return body, err
+		}
+	}
+	return body, nil
 }
 
 // FromOneOfVariant5 overwrites any union data inside the OneOfObject6 as the provided OneOfVariant5
@@ -1211,8 +2351,20 @@ func (t *OneOfObject6) FromOneOfVariant5(v OneOfVariant5) error {
 		return err
 	}
 	b, err = runtime.JSONMerge(b, []byte(`{"discriminator":"v5"}`))
+	if err != nil {
+		return err
+	}
 	t.union = b
-	return err
+	// The JSON stamp above never reaches v, so set the variant's own
+	// discriminator field for the XML copy.
+	v.Discriminator = "v5"
+	b, err = xml.Marshal(v)
+	if err != nil {
+		return err
+	}
+	t.xunion = b
+
+	return nil
 }
 
 // MergeOneOfVariant5 performs a merge with any union data inside the OneOfObject6, using the provided OneOfVariant5
@@ -1228,15 +2380,37 @@ func (t *OneOfObject6) MergeOneOfVariant5(v OneOfVariant5) error {
 
 	merged, err := runtime.JSONMerge(t.union, b)
 	t.union = merged
+
+	// For XML, re-marshal the merged result
+	v.Discriminator = "v5"
+	bx, errx := xml.Marshal(v)
+	if errx != nil {
+		return errx
+	}
+	t.xunion = bx
+
 	return err
 }
 
 func (t OneOfObject6) Discriminator() (string, error) {
 	var discriminator struct {
-		Discriminator string `json:"discriminator"`
+		Discriminator string `json:"discriminator" xml:"discriminator"`
 	}
-	err := json.Unmarshal(t.union, &discriminator)
-	return discriminator.Discriminator, err
+	if len(t.union) > 0 {
+		err := json.Unmarshal(t.union, &discriminator)
+		if err != nil {
+			return "", err
+		}
+		return discriminator.Discriminator, nil
+	}
+	if len(t.xunion) > 0 {
+		err := xml.Unmarshal(t.xunion, &discriminator)
+		if err != nil {
+			return "", err
+		}
+		return discriminator.Discriminator, nil
+	}
+	return "", nil
 }
 
 func (t OneOfObject6) ValueByDiscriminator() (interface{}, error) {
@@ -1264,11 +2438,43 @@ func (t *OneOfObject6) UnmarshalJSON(b []byte) error {
 	return err
 }
 
+func (t OneOfObject6) MarshalXML(e *xml.Encoder, start xml.StartElement) error {
+	if len(t.xunion) > 0 {
+		return t.xunion.MarshalXML(e, start)
+	}
+	if err := e.EncodeToken(start); err != nil {
+		return err
+	}
+	return e.EncodeToken(start.End())
+}
+
+func (t *OneOfObject6) UnmarshalXML(d *xml.Decoder, start xml.StartElement) error {
+	var err error
+
+	t.xunion, err = CaptureXMLElement(d, start)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
 // AsOneOfVariant4 returns the union data inside the OneOfObject61 as a OneOfVariant4
 func (t OneOfObject61) AsOneOfVariant4() (OneOfVariant4, error) {
 	var body OneOfVariant4
-	err := json.Unmarshal(t.union, &body)
-	return body, err
+	if len(t.union) > 0 {
+		err := json.Unmarshal(t.union, &body)
+		if err != nil {
+			return body, err
+		}
+	}
+	if len(t.xunion) > 0 {
+		err := xml.Unmarshal(t.xunion, &body)
+		if err != nil {
+			return body, err
+		}
+	}
+	return body, nil
 }
 
 // FromOneOfVariant4 overwrites any union data inside the OneOfObject61 as the provided OneOfVariant4
@@ -1278,8 +2484,20 @@ func (t *OneOfObject61) FromOneOfVariant4(v OneOfVariant4) error {
 		return err
 	}
 	b, err = runtime.JSONMerge(b, []byte(`{"discriminator":"v4"}`))
+	if err != nil {
+		return err
+	}
 	t.union = b
-	return err
+	// The JSON stamp above never reaches v, so set the variant's own
+	// discriminator field for the XML copy.
+	v.Discriminator = "v4"
+	b, err = xml.Marshal(v)
+	if err != nil {
+		return err
+	}
+	t.xunion = b
+
+	return nil
 }
 
 // MergeOneOfVariant4 performs a merge with any union data inside the OneOfObject61, using the provided OneOfVariant4
@@ -1295,14 +2513,34 @@ func (t *OneOfObject61) MergeOneOfVariant4(v OneOfVariant4) error {
 
 	merged, err := runtime.JSONMerge(t.union, b)
 	t.union = merged
+
+	// For XML, re-marshal the merged result
+	v.Discriminator = "v4"
+	bx, errx := xml.Marshal(v)
+	if errx != nil {
+		return errx
+	}
+	t.xunion = bx
+
 	return err
 }
 
 // AsOneOfVariant5 returns the union data inside the OneOfObject61 as a OneOfVariant5
 func (t OneOfObject61) AsOneOfVariant5() (OneOfVariant5, error) {
 	var body OneOfVariant5
-	err := json.Unmarshal(t.union, &body)
-	return body, err
+	if len(t.union) > 0 {
+		err := json.Unmarshal(t.union, &body)
+		if err != nil {
+			return body, err
+		}
+	}
+	if len(t.xunion) > 0 {
+		err := xml.Unmarshal(t.xunion, &body)
+		if err != nil {
+			return body, err
+		}
+	}
+	return body, nil
 }
 
 // FromOneOfVariant5 overwrites any union data inside the OneOfObject61 as the provided OneOfVariant5
@@ -1312,8 +2550,20 @@ func (t *OneOfObject61) FromOneOfVariant5(v OneOfVariant5) error {
 		return err
 	}
 	b, err = runtime.JSONMerge(b, []byte(`{"discriminator":"OneOfVariant5"}`))
+	if err != nil {
+		return err
+	}
 	t.union = b
-	return err
+	// The JSON stamp above never reaches v, so set the variant's own
+	// discriminator field for the XML copy.
+	v.Discriminator = "OneOfVariant5"
+	b, err = xml.Marshal(v)
+	if err != nil {
+		return err
+	}
+	t.xunion = b
+
+	return nil
 }
 
 // MergeOneOfVariant5 performs a merge with any union data inside the OneOfObject61, using the provided OneOfVariant5
@@ -1329,15 +2579,37 @@ func (t *OneOfObject61) MergeOneOfVariant5(v OneOfVariant5) error {
 
 	merged, err := runtime.JSONMerge(t.union, b)
 	t.union = merged
+
+	// For XML, re-marshal the merged result
+	v.Discriminator = "OneOfVariant5"
+	bx, errx := xml.Marshal(v)
+	if errx != nil {
+		return errx
+	}
+	t.xunion = bx
+
 	return err
 }
 
 func (t OneOfObject61) Discriminator() (string, error) {
 	var discriminator struct {
-		Discriminator string `json:"discriminator"`
+		Discriminator string `json:"discriminator" xml:"discriminator"`
 	}
-	err := json.Unmarshal(t.union, &discriminator)
-	return discriminator.Discriminator, err
+	if len(t.union) > 0 {
+		err := json.Unmarshal(t.union, &discriminator)
+		if err != nil {
+			return "", err
+		}
+		return discriminator.Discriminator, nil
+	}
+	if len(t.xunion) > 0 {
+		err := xml.Unmarshal(t.xunion, &discriminator)
+		if err != nil {
+			return "", err
+		}
+		return discriminator.Discriminator, nil
+	}
+	return "", nil
 }
 
 func (t OneOfObject61) ValueByDiscriminator() (interface{}, error) {
@@ -1365,11 +2637,43 @@ func (t *OneOfObject61) UnmarshalJSON(b []byte) error {
 	return err
 }
 
+func (t OneOfObject61) MarshalXML(e *xml.Encoder, start xml.StartElement) error {
+	if len(t.xunion) > 0 {
+		return t.xunion.MarshalXML(e, start)
+	}
+	if err := e.EncodeToken(start); err != nil {
+		return err
+	}
+	return e.EncodeToken(start.End())
+}
+
+func (t *OneOfObject61) UnmarshalXML(d *xml.Decoder, start xml.StartElement) error {
+	var err error
+
+	t.xunion, err = CaptureXMLElement(d, start)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
 // AsOneOfVariant4 returns the union data inside the OneOfObject62 as a OneOfVariant4
 func (t OneOfObject62) AsOneOfVariant4() (OneOfVariant4, error) {
 	var body OneOfVariant4
-	err := json.Unmarshal(t.union, &body)
-	return body, err
+	if len(t.union) > 0 {
+		err := json.Unmarshal(t.union, &body)
+		if err != nil {
+			return body, err
+		}
+	}
+	if len(t.xunion) > 0 {
+		err := xml.Unmarshal(t.xunion, &body)
+		if err != nil {
+			return body, err
+		}
+	}
+	return body, nil
 }
 
 // FromOneOfVariant4 overwrites any union data inside the OneOfObject62 as the provided OneOfVariant4
@@ -1379,8 +2683,20 @@ func (t *OneOfObject62) FromOneOfVariant4(v OneOfVariant4) error {
 		return err
 	}
 	b, err = runtime.JSONMerge(b, []byte(`{"discriminator":"variant_four"}`))
+	if err != nil {
+		return err
+	}
 	t.union = b
-	return err
+	// The JSON stamp above never reaches v, so set the variant's own
+	// discriminator field for the XML copy.
+	v.Discriminator = "variant_four"
+	b, err = xml.Marshal(v)
+	if err != nil {
+		return err
+	}
+	t.xunion = b
+
+	return nil
 }
 
 // MergeOneOfVariant4 performs a merge with any union data inside the OneOfObject62, using the provided OneOfVariant4
@@ -1396,14 +2712,34 @@ func (t *OneOfObject62) MergeOneOfVariant4(v OneOfVariant4) error {
 
 	merged, err := runtime.JSONMerge(t.union, b)
 	t.union = merged
+
+	// For XML, re-marshal the merged result
+	v.Discriminator = "variant_four"
+	bx, errx := xml.Marshal(v)
+	if errx != nil {
+		return errx
+	}
+	t.xunion = bx
+
 	return err
 }
 
 // AsOneOfVariant51 returns the union data inside the OneOfObject62 as a OneOfVariant51
 func (t OneOfObject62) AsOneOfVariant51() (OneOfVariant51, error) {
 	var body OneOfVariant51
-	err := json.Unmarshal(t.union, &body)
-	return body, err
+	if len(t.union) > 0 {
+		err := json.Unmarshal(t.union, &body)
+		if err != nil {
+			return body, err
+		}
+	}
+	if len(t.xunion) > 0 {
+		err := xml.Unmarshal(t.xunion, &body)
+		if err != nil {
+			return body, err
+		}
+	}
+	return body, nil
 }
 
 // FromOneOfVariant51 overwrites any union data inside the OneOfObject62 as the provided OneOfVariant51
@@ -1413,8 +2749,20 @@ func (t *OneOfObject62) FromOneOfVariant51(v OneOfVariant51) error {
 		return err
 	}
 	b, err = runtime.JSONMerge(b, []byte(`{"discriminator":"one_of_variant51"}`))
+	if err != nil {
+		return err
+	}
 	t.union = b
-	return err
+	// The JSON stamp above never reaches v, so set the variant's own
+	// discriminator field for the XML copy.
+	v.Discriminator = "one_of_variant51"
+	b, err = xml.Marshal(v)
+	if err != nil {
+		return err
+	}
+	t.xunion = b
+
+	return nil
 }
 
 // MergeOneOfVariant51 performs a merge with any union data inside the OneOfObject62, using the provided OneOfVariant51
@@ -1430,15 +2778,37 @@ func (t *OneOfObject62) MergeOneOfVariant51(v OneOfVariant51) error {
 
 	merged, err := runtime.JSONMerge(t.union, b)
 	t.union = merged
+
+	// For XML, re-marshal the merged result
+	v.Discriminator = "one_of_variant51"
+	bx, errx := xml.Marshal(v)
+	if errx != nil {
+		return errx
+	}
+	t.xunion = bx
+
 	return err
 }
 
 func (t OneOfObject62) Discriminator() (string, error) {
 	var discriminator struct {
-		Discriminator string `json:"discriminator"`
+		Discriminator string `json:"discriminator" xml:"discriminator"`
 	}
-	err := json.Unmarshal(t.union, &discriminator)
-	return discriminator.Discriminator, err
+	if len(t.union) > 0 {
+		err := json.Unmarshal(t.union, &discriminator)
+		if err != nil {
+			return "", err
+		}
+		return discriminator.Discriminator, nil
+	}
+	if len(t.xunion) > 0 {
+		err := xml.Unmarshal(t.xunion, &discriminator)
+		if err != nil {
+			return "", err
+		}
+		return discriminator.Discriminator, nil
+	}
+	return "", nil
 }
 
 func (t OneOfObject62) ValueByDiscriminator() (interface{}, error) {
@@ -1466,18 +2836,59 @@ func (t *OneOfObject62) UnmarshalJSON(b []byte) error {
 	return err
 }
 
+func (t OneOfObject62) MarshalXML(e *xml.Encoder, start xml.StartElement) error {
+	if len(t.xunion) > 0 {
+		return t.xunion.MarshalXML(e, start)
+	}
+	if err := e.EncodeToken(start); err != nil {
+		return err
+	}
+	return e.EncodeToken(start.End())
+}
+
+func (t *OneOfObject62) UnmarshalXML(d *xml.Decoder, start xml.StartElement) error {
+	var err error
+
+	t.xunion, err = CaptureXMLElement(d, start)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
 // AsOneOfVariant1 returns the union data inside the OneOfObject7_Item as a OneOfVariant1
 func (t OneOfObject7_Item) AsOneOfVariant1() (OneOfVariant1, error) {
 	var body OneOfVariant1
-	err := json.Unmarshal(t.union, &body)
-	return body, err
+	if len(t.union) > 0 {
+		err := json.Unmarshal(t.union, &body)
+		if err != nil {
+			return body, err
+		}
+	}
+	if len(t.xunion) > 0 {
+		err := xml.Unmarshal(t.xunion, &body)
+		if err != nil {
+			return body, err
+		}
+	}
+	return body, nil
 }
 
 // FromOneOfVariant1 overwrites any union data inside the OneOfObject7_Item as the provided OneOfVariant1
 func (t *OneOfObject7_Item) FromOneOfVariant1(v OneOfVariant1) error {
 	b, err := json.Marshal(v)
+	if err != nil {
+		return err
+	}
 	t.union = b
-	return err
+	b, err = xml.Marshal(v)
+	if err != nil {
+		return err
+	}
+	t.xunion = b
+
+	return nil
 }
 
 // MergeOneOfVariant1 performs a merge with any union data inside the OneOfObject7_Item, using the provided OneOfVariant1
@@ -1489,21 +2900,49 @@ func (t *OneOfObject7_Item) MergeOneOfVariant1(v OneOfVariant1) error {
 
 	merged, err := runtime.JSONMerge(t.union, b)
 	t.union = merged
+
+	// For XML, re-marshal the merged result
+	bx, errx := xml.Marshal(v)
+	if errx != nil {
+		return errx
+	}
+	t.xunion = bx
+
 	return err
 }
 
 // AsOneOfVariant2 returns the union data inside the OneOfObject7_Item as a OneOfVariant2
 func (t OneOfObject7_Item) AsOneOfVariant2() (OneOfVariant2, error) {
 	var body OneOfVariant2
-	err := json.Unmarshal(t.union, &body)
-	return body, err
+	if len(t.union) > 0 {
+		err := json.Unmarshal(t.union, &body)
+		if err != nil {
+			return body, err
+		}
+	}
+	if len(t.xunion) > 0 {
+		err := xml.Unmarshal(t.xunion, &body)
+		if err != nil {
+			return body, err
+		}
+	}
+	return body, nil
 }
 
 // FromOneOfVariant2 overwrites any union data inside the OneOfObject7_Item as the provided OneOfVariant2
 func (t *OneOfObject7_Item) FromOneOfVariant2(v OneOfVariant2) error {
 	b, err := json.Marshal(v)
+	if err != nil {
+		return err
+	}
 	t.union = b
-	return err
+	b, err = xml.Marshal(v)
+	if err != nil {
+		return err
+	}
+	t.xunion = b
+
+	return nil
 }
 
 // MergeOneOfVariant2 performs a merge with any union data inside the OneOfObject7_Item, using the provided OneOfVariant2
@@ -1515,6 +2954,14 @@ func (t *OneOfObject7_Item) MergeOneOfVariant2(v OneOfVariant2) error {
 
 	merged, err := runtime.JSONMerge(t.union, b)
 	t.union = merged
+
+	// For XML, re-marshal the merged result
+	bx, errx := xml.Marshal(v)
+	if errx != nil {
+		return errx
+	}
+	t.xunion = bx
+
 	return err
 }
 
@@ -1528,18 +2975,59 @@ func (t *OneOfObject7_Item) UnmarshalJSON(b []byte) error {
 	return err
 }
 
+func (t OneOfObject7_Item) MarshalXML(e *xml.Encoder, start xml.StartElement) error {
+	if len(t.xunion) > 0 {
+		return t.xunion.MarshalXML(e, start)
+	}
+	if err := e.EncodeToken(start); err != nil {
+		return err
+	}
+	return e.EncodeToken(start.End())
+}
+
+func (t *OneOfObject7_Item) UnmarshalXML(d *xml.Decoder, start xml.StartElement) error {
+	var err error
+
+	t.xunion, err = CaptureXMLElement(d, start)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
 // AsOneOfVariant1 returns the union data inside the OneOfObject8 as a OneOfVariant1
 func (t OneOfObject8) AsOneOfVariant1() (OneOfVariant1, error) {
 	var body OneOfVariant1
-	err := json.Unmarshal(t.union, &body)
-	return body, err
+	if len(t.union) > 0 {
+		err := json.Unmarshal(t.union, &body)
+		if err != nil {
+			return body, err
+		}
+	}
+	if len(t.xunion) > 0 {
+		err := xml.Unmarshal(t.xunion, &body)
+		if err != nil {
+			return body, err
+		}
+	}
+	return body, nil
 }
 
 // FromOneOfVariant1 overwrites any union data inside the OneOfObject8 as the provided OneOfVariant1
 func (t *OneOfObject8) FromOneOfVariant1(v OneOfVariant1) error {
 	b, err := json.Marshal(v)
+	if err != nil {
+		return err
+	}
 	t.union = b
-	return err
+	b, err = xml.Marshal(v)
+	if err != nil {
+		return err
+	}
+	t.xunion = b
+
+	return nil
 }
 
 // MergeOneOfVariant1 performs a merge with any union data inside the OneOfObject8, using the provided OneOfVariant1
@@ -1551,21 +3039,49 @@ func (t *OneOfObject8) MergeOneOfVariant1(v OneOfVariant1) error {
 
 	merged, err := runtime.JSONMerge(t.union, b)
 	t.union = merged
+
+	// For XML, re-marshal the merged result
+	bx, errx := xml.Marshal(v)
+	if errx != nil {
+		return errx
+	}
+	t.xunion = bx
+
 	return err
 }
 
 // AsOneOfVariant2 returns the union data inside the OneOfObject8 as a OneOfVariant2
 func (t OneOfObject8) AsOneOfVariant2() (OneOfVariant2, error) {
 	var body OneOfVariant2
-	err := json.Unmarshal(t.union, &body)
-	return body, err
+	if len(t.union) > 0 {
+		err := json.Unmarshal(t.union, &body)
+		if err != nil {
+			return body, err
+		}
+	}
+	if len(t.xunion) > 0 {
+		err := xml.Unmarshal(t.xunion, &body)
+		if err != nil {
+			return body, err
+		}
+	}
+	return body, nil
 }
 
 // FromOneOfVariant2 overwrites any union data inside the OneOfObject8 as the provided OneOfVariant2
 func (t *OneOfObject8) FromOneOfVariant2(v OneOfVariant2) error {
 	b, err := json.Marshal(v)
+	if err != nil {
+		return err
+	}
 	t.union = b
-	return err
+	b, err = xml.Marshal(v)
+	if err != nil {
+		return err
+	}
+	t.xunion = b
+
+	return nil
 }
 
 // MergeOneOfVariant2 performs a merge with any union data inside the OneOfObject8, using the provided OneOfVariant2
@@ -1577,6 +3093,14 @@ func (t *OneOfObject8) MergeOneOfVariant2(v OneOfVariant2) error {
 
 	merged, err := runtime.JSONMerge(t.union, b)
 	t.union = merged
+
+	// For XML, re-marshal the merged result
+	bx, errx := xml.Marshal(v)
+	if errx != nil {
+		return errx
+	}
+	t.xunion = bx
+
 	return err
 }
 
@@ -1624,11 +3148,85 @@ func (t *OneOfObject8) UnmarshalJSON(b []byte) error {
 	return err
 }
 
+func (t OneOfObject8) MarshalXML(e *xml.Encoder, start xml.StartElement) error {
+	// Marshal with fixed properties merged into the union content
+	if err := e.EncodeToken(start); err != nil {
+		return err
+	}
+
+	// Write union inner content first
+	if len(t.xunion) > 0 {
+		d := xml.NewDecoder(bytes.NewReader([]byte(t.xunion)))
+		// Skip the original start element
+		if _, err := d.Token(); err != nil {
+			return err
+		}
+		depth := 1
+		for depth > 0 {
+			tok, err := d.Token()
+			if err != nil {
+				return err
+			}
+			switch tok.(type) {
+			case xml.StartElement:
+				depth++
+			case xml.EndElement:
+				depth--
+			}
+			if depth > 0 {
+				if err := e.EncodeToken(xml.CopyToken(tok)); err != nil {
+					return err
+				}
+			}
+		}
+	}
+
+	// Write fixed properties (ensures they are present even if not in xunion)
+
+	if t.Fixed != nil {
+		if err := e.EncodeElement(t.Fixed, xml.StartElement{Name: xml.Name{Local: "fixed"}}); err != nil {
+			return fmt.Errorf("error marshaling 'fixed': %w", err)
+		}
+	}
+	return e.EncodeToken(start.End())
+}
+
+func (t *OneOfObject8) UnmarshalXML(d *xml.Decoder, start xml.StartElement) error {
+	var err error
+
+	t.xunion, err = CaptureXMLElement(d, start)
+	if err != nil {
+		return err
+	}
+
+	// Extract fixed properties from the captured XML
+	type xmlProps struct {
+		Fixed *string `xml:"fixed"`
+	}
+	var props xmlProps
+	if err := xml.Unmarshal(t.xunion, &props); err != nil {
+		return err
+	}
+	t.Fixed = props.Fixed
+	return nil
+}
+
 // AsOneOfVariant1 returns the union data inside the OneOfObject9 as a OneOfVariant1
 func (t OneOfObject9) AsOneOfVariant1() (OneOfVariant1, error) {
 	var body OneOfVariant1
-	err := json.Unmarshal(t.union, &body)
-	return body, err
+	if len(t.union) > 0 {
+		err := json.Unmarshal(t.union, &body)
+		if err != nil {
+			return body, err
+		}
+	}
+	if len(t.xunion) > 0 {
+		err := xml.Unmarshal(t.xunion, &body)
+		if err != nil {
+			return body, err
+		}
+	}
+	return body, nil
 }
 
 // FromOneOfVariant1 overwrites any union data inside the OneOfObject9 as the provided OneOfVariant1
@@ -1639,8 +3237,17 @@ func (t *OneOfObject9) FromOneOfVariant1(v OneOfVariant1) error {
 		return err
 	}
 	b, err = runtime.JSONMerge(b, []byte(`{"type":"v1"}`))
+	if err != nil {
+		return err
+	}
 	t.union = b
-	return err
+	b, err = xml.Marshal(v)
+	if err != nil {
+		return err
+	}
+	t.xunion = b
+
+	return nil
 }
 
 // MergeOneOfVariant1 performs a merge with any union data inside the OneOfObject9, using the provided OneOfVariant1
@@ -1657,14 +3264,33 @@ func (t *OneOfObject9) MergeOneOfVariant1(v OneOfVariant1) error {
 
 	merged, err := runtime.JSONMerge(t.union, b)
 	t.union = merged
+
+	// For XML, re-marshal the merged result
+	bx, errx := xml.Marshal(v)
+	if errx != nil {
+		return errx
+	}
+	t.xunion = bx
+
 	return err
 }
 
 // AsOneOfVariant6 returns the union data inside the OneOfObject9 as a OneOfVariant6
 func (t OneOfObject9) AsOneOfVariant6() (OneOfVariant6, error) {
 	var body OneOfVariant6
-	err := json.Unmarshal(t.union, &body)
-	return body, err
+	if len(t.union) > 0 {
+		err := json.Unmarshal(t.union, &body)
+		if err != nil {
+			return body, err
+		}
+	}
+	if len(t.xunion) > 0 {
+		err := xml.Unmarshal(t.xunion, &body)
+		if err != nil {
+			return body, err
+		}
+	}
+	return body, nil
 }
 
 // FromOneOfVariant6 overwrites any union data inside the OneOfObject9 as the provided OneOfVariant6
@@ -1675,8 +3301,17 @@ func (t *OneOfObject9) FromOneOfVariant6(v OneOfVariant6) error {
 		return err
 	}
 	b, err = runtime.JSONMerge(b, []byte(`{"type":"v6"}`))
+	if err != nil {
+		return err
+	}
 	t.union = b
-	return err
+	b, err = xml.Marshal(v)
+	if err != nil {
+		return err
+	}
+	t.xunion = b
+
+	return nil
 }
 
 // MergeOneOfVariant6 performs a merge with any union data inside the OneOfObject9, using the provided OneOfVariant6
@@ -1693,15 +3328,36 @@ func (t *OneOfObject9) MergeOneOfVariant6(v OneOfVariant6) error {
 
 	merged, err := runtime.JSONMerge(t.union, b)
 	t.union = merged
+
+	// For XML, re-marshal the merged result
+	bx, errx := xml.Marshal(v)
+	if errx != nil {
+		return errx
+	}
+	t.xunion = bx
+
 	return err
 }
 
 func (t OneOfObject9) Discriminator() (string, error) {
 	var discriminator struct {
-		Discriminator string `json:"type"`
+		Discriminator string `json:"type" xml:"type"`
 	}
-	err := json.Unmarshal(t.union, &discriminator)
-	return discriminator.Discriminator, err
+	if len(t.union) > 0 {
+		err := json.Unmarshal(t.union, &discriminator)
+		if err != nil {
+			return "", err
+		}
+		return discriminator.Discriminator, nil
+	}
+	if len(t.xunion) > 0 {
+		err := xml.Unmarshal(t.xunion, &discriminator)
+		if err != nil {
+			return "", err
+		}
+		return discriminator.Discriminator, nil
+	}
+	return "", nil
 }
 
 func (t OneOfObject9) ValueByDiscriminator() (interface{}, error) {
@@ -1762,6 +3418,68 @@ func (t *OneOfObject9) UnmarshalJSON(b []byte) error {
 	return err
 }
 
+func (t OneOfObject9) MarshalXML(e *xml.Encoder, start xml.StartElement) error {
+	// Marshal with fixed properties merged into the union content
+	if err := e.EncodeToken(start); err != nil {
+		return err
+	}
+
+	// Write union inner content first
+	if len(t.xunion) > 0 {
+		d := xml.NewDecoder(bytes.NewReader([]byte(t.xunion)))
+		// Skip the original start element
+		if _, err := d.Token(); err != nil {
+			return err
+		}
+		depth := 1
+		for depth > 0 {
+			tok, err := d.Token()
+			if err != nil {
+				return err
+			}
+			switch tok.(type) {
+			case xml.StartElement:
+				depth++
+			case xml.EndElement:
+				depth--
+			}
+			if depth > 0 {
+				if err := e.EncodeToken(xml.CopyToken(tok)); err != nil {
+					return err
+				}
+			}
+		}
+	}
+
+	// Write fixed properties (ensures they are present even if not in xunion)
+
+	if err := e.EncodeElement(t.Type, xml.StartElement{Name: xml.Name{Local: "type"}}); err != nil {
+		return fmt.Errorf("error marshaling 'type': %w", err)
+	}
+
+	return e.EncodeToken(start.End())
+}
+
+func (t *OneOfObject9) UnmarshalXML(d *xml.Decoder, start xml.StartElement) error {
+	var err error
+
+	t.xunion, err = CaptureXMLElement(d, start)
+	if err != nil {
+		return err
+	}
+
+	// Extract fixed properties from the captured XML
+	type xmlProps struct {
+		Type string `xml:"type"`
+	}
+	var props xmlProps
+	if err := xml.Unmarshal(t.xunion, &props); err != nil {
+		return err
+	}
+	t.Type = props.Type
+	return nil
+}
+
 // Override default JSON handling for OneOfObject13 to handle AdditionalProperties and union
 func (a *OneOfObject13) UnmarshalJSON(b []byte) error {
 	err := a.union.UnmarshalJSON(b)
@@ -1796,6 +3514,60 @@ func (a *OneOfObject13) UnmarshalJSON(b []byte) error {
 	return nil
 }
 
+// Override default XML handling for OneOfObject13 to handle AdditionalProperties and union
+func (a *OneOfObject13) UnmarshalXML(d *xml.Decoder, start xml.StartElement) error {
+	// Capture the full XML element for the union
+	raw, err := CaptureXMLElement(d, start)
+	if err != nil {
+		return err
+	}
+	a.xunion = raw
+
+	// Now parse the captured XML to extract properties and additional properties
+	knownFields := map[string]bool{
+		"type": true,
+	}
+
+	innerDecoder := xml.NewDecoder(bytes.NewReader(raw))
+	// Skip the start element
+	if _, err := innerDecoder.Token(); err != nil {
+		return err
+	}
+
+	for {
+		tok, err := innerDecoder.Token()
+		if err != nil {
+			return err
+		}
+		switch t := tok.(type) {
+		case xml.StartElement:
+			switch t.Name.Local {
+			case "type":
+				if err := innerDecoder.DecodeElement(&a.Type, &t); err != nil {
+					return fmt.Errorf("error reading 'type': %w", err)
+				}
+			default:
+				if !knownFields[t.Name.Local] {
+					if a.AdditionalProperties == nil {
+						a.AdditionalProperties = make(map[string]interface{})
+					}
+					var val interface{}
+					if err := innerDecoder.DecodeElement(&val, &t); err != nil {
+						return fmt.Errorf("error unmarshaling field %s: %w", t.Name.Local, err)
+					}
+					a.AdditionalProperties[t.Name.Local] = val
+				} else {
+					if err := innerDecoder.Skip(); err != nil {
+						return err
+					}
+				}
+			}
+		case xml.EndElement:
+			return nil
+		}
+	}
+}
+
 // Override default JSON handling for OneOfObject13 to handle AdditionalProperties and union
 func (a OneOfObject13) MarshalJSON() ([]byte, error) {
 	var err error
@@ -1823,4 +3595,27 @@ func (a OneOfObject13) MarshalJSON() ([]byte, error) {
 		}
 	}
 	return json.Marshal(object)
+}
+
+// Override default XML handling for OneOfObject13 to handle AdditionalProperties and union
+func (a OneOfObject13) MarshalXML(e *xml.Encoder, start xml.StartElement) error {
+	if len(a.xunion) > 0 {
+		return a.xunion.MarshalXML(e, start)
+	}
+
+	// No union data; marshal properties and additional properties
+	if err := e.EncodeToken(start); err != nil {
+		return err
+	}
+
+	if err := e.EncodeElement(a.Type, xml.StartElement{Name: xml.Name{Local: "type"}}); err != nil {
+		return fmt.Errorf("error marshaling 'type': %w", err)
+	}
+
+	for fieldName, field := range a.AdditionalProperties {
+		if err := e.EncodeElement(field, xml.StartElement{Name: xml.Name{Local: fieldName}}); err != nil {
+			return fmt.Errorf("error marshaling '%s': %w", fieldName, err)
+		}
+	}
+	return e.EncodeToken(start.End())
 }

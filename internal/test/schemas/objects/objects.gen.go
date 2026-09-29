@@ -7,6 +7,7 @@ import (
 	"bytes"
 	"context"
 	"encoding/json"
+	"encoding/xml"
 	"fmt"
 	"io"
 	"net/http"
@@ -18,34 +19,34 @@ import (
 
 // AdditionalPropertiesObject1 Has additional properties of type int
 type AdditionalPropertiesObject1 struct {
-	Id                   int            `json:"id"`
-	Name                 string         `json:"name"`
-	Optional             *string        `json:"optional,omitempty"`
+	Id                   int            `json:"id" xml:"id"`
+	Name                 string         `json:"name" xml:"name"`
+	Optional             *string        `json:"optional,omitempty" xml:"optional"`
 	AdditionalProperties map[string]int `json:"-"`
 }
 
 // AdditionalPropertiesObject2 Does not allow additional properties
 type AdditionalPropertiesObject2 struct {
-	Id   int    `json:"id"`
-	Name string `json:"name"`
+	Id   int    `json:"id" xml:"id"`
+	Name string `json:"name" xml:"name"`
 }
 
 // AdditionalPropertiesObject3 Allows any additional property
 type AdditionalPropertiesObject3 struct {
-	Name                 string                 `json:"name"`
+	Name                 string                 `json:"name" xml:"name"`
 	AdditionalProperties map[string]interface{} `json:"-"`
 }
 
 // AdditionalPropertiesObject4 Has anonymous field which has additional properties
 type AdditionalPropertiesObject4 struct {
-	Inner                AdditionalPropertiesObject4_Inner `json:"inner"`
-	Name                 string                            `json:"name"`
+	Inner                AdditionalPropertiesObject4_Inner `json:"inner" xml:"inner"`
+	Name                 string                            `json:"name" xml:"name"`
 	AdditionalProperties map[string]interface{}            `json:"-"`
 }
 
 // AdditionalPropertiesObject4_Inner defines model for AdditionalPropertiesObject4.Inner.
 type AdditionalPropertiesObject4_Inner struct {
-	Name                 string                 `json:"name"`
+	Name                 string                 `json:"name" xml:"name"`
 	AdditionalProperties map[string]interface{} `json:"-"`
 }
 
@@ -60,37 +61,37 @@ type AdditionalPropertiesObject7 map[string]*SchemaObjectNullable
 
 // ObjectWithJsonField defines model for ObjectWithJsonField.
 type ObjectWithJsonField struct {
-	Name   string          `json:"name"`
-	Value1 json.RawMessage `json:"value1"`
-	Value2 json.RawMessage `json:"value2,omitempty"`
+	Name   string          `json:"name" xml:"name"`
+	Value1 json.RawMessage `json:"value1" xml:"value1"`
+	Value2 json.RawMessage `json:"value2,omitempty" xml:"value2"`
 }
 
 // SchemaObject defines model for SchemaObject.
 type SchemaObject struct {
-	FirstName string `json:"firstName"`
+	FirstName string `json:"firstName" xml:"firstName"`
 
 	// ReadOnlyRequiredProp This property is required and readOnly, so the go model should have it as a pointer,
 	// as it will not be included when it is sent from client to server.
-	ReadOnlyRequiredProp  *string `json:"readOnlyRequiredProp,omitempty"`
-	Role                  string  `json:"role"`
-	WriteOnlyRequiredProp *int    `json:"writeOnlyRequiredProp,omitempty"`
+	ReadOnlyRequiredProp  *string `json:"readOnlyRequiredProp,omitempty" xml:"readOnlyRequiredProp"`
+	Role                  string  `json:"role" xml:"role"`
+	WriteOnlyRequiredProp *int    `json:"writeOnlyRequiredProp,omitempty" xml:"writeOnlyRequiredProp"`
 }
 
 // SchemaObjectNullable defines model for SchemaObjectNullable.
 type SchemaObjectNullable struct {
-	FirstName string `json:"firstName"`
+	FirstName string `json:"firstName" xml:"firstName"`
 
 	// ReadOnlyRequiredProp This property is required and readOnly, so the go model should have it as a pointer,
 	// as it will not be included when it is sent from client to server.
-	ReadOnlyRequiredProp  *string `json:"readOnlyRequiredProp,omitempty"`
-	Role                  string  `json:"role"`
-	WriteOnlyRequiredProp *int    `json:"writeOnlyRequiredProp,omitempty"`
+	ReadOnlyRequiredProp  *string `json:"readOnlyRequiredProp,omitempty" xml:"readOnlyRequiredProp"`
+	Role                  string  `json:"role" xml:"role"`
+	WriteOnlyRequiredProp *int    `json:"writeOnlyRequiredProp,omitempty" xml:"writeOnlyRequiredProp"`
 }
 
 // Test200JSONResponseBody_Item defines parameters for Test.
 type Test200JSONResponseBody_Item struct {
-	Field1               *string                `json:"field1,omitempty"`
-	Field2               *string                `json:"field2,omitempty"`
+	Field1               *string                `json:"field1,omitempty" xml:"field1"`
+	Field2               *string                `json:"field2,omitempty" xml:"field2"`
 	AdditionalProperties map[string]interface{} `json:"-"`
 }
 
@@ -188,6 +189,84 @@ func (a AdditionalPropertiesObject1) MarshalJSON() ([]byte, error) {
 	return json.Marshal(object)
 }
 
+// Override default XML handling for AdditionalPropertiesObject1 to handle AdditionalProperties
+func (a *AdditionalPropertiesObject1) UnmarshalXML(d *xml.Decoder, start xml.StartElement) error {
+	knownFields := map[string]bool{
+		"id":       true,
+		"name":     true,
+		"optional": true,
+	}
+
+	for {
+		tok, err := d.Token()
+		if err != nil {
+			return err
+		}
+		switch t := tok.(type) {
+		case xml.StartElement:
+			switch t.Name.Local {
+			case "id":
+				if err := d.DecodeElement(&a.Id, &t); err != nil {
+					return fmt.Errorf("error reading 'id': %w", err)
+				}
+			case "name":
+				if err := d.DecodeElement(&a.Name, &t); err != nil {
+					return fmt.Errorf("error reading 'name': %w", err)
+				}
+			case "optional":
+				if err := d.DecodeElement(&a.Optional, &t); err != nil {
+					return fmt.Errorf("error reading 'optional': %w", err)
+				}
+			default:
+				if !knownFields[t.Name.Local] {
+					if a.AdditionalProperties == nil {
+						a.AdditionalProperties = make(map[string]int)
+					}
+					var val int
+					if err := d.DecodeElement(&val, &t); err != nil {
+						return fmt.Errorf("error unmarshaling field %s: %w", t.Name.Local, err)
+					}
+					a.AdditionalProperties[t.Name.Local] = val
+				} else {
+					if err := d.Skip(); err != nil {
+						return err
+					}
+				}
+			}
+		case xml.EndElement:
+			return nil
+		}
+	}
+}
+
+// Override default XML handling for AdditionalPropertiesObject1 to handle AdditionalProperties
+func (a AdditionalPropertiesObject1) MarshalXML(e *xml.Encoder, start xml.StartElement) error {
+	if err := e.EncodeToken(start); err != nil {
+		return err
+	}
+
+	if err := e.EncodeElement(a.Id, xml.StartElement{Name: xml.Name{Local: "id"}}); err != nil {
+		return fmt.Errorf("error marshaling 'id': %w", err)
+	}
+
+	if err := e.EncodeElement(a.Name, xml.StartElement{Name: xml.Name{Local: "name"}}); err != nil {
+		return fmt.Errorf("error marshaling 'name': %w", err)
+	}
+
+	if a.Optional != nil {
+		if err := e.EncodeElement(a.Optional, xml.StartElement{Name: xml.Name{Local: "optional"}}); err != nil {
+			return fmt.Errorf("error marshaling 'optional': %w", err)
+		}
+	}
+
+	for fieldName, field := range a.AdditionalProperties {
+		if err := e.EncodeElement(field, xml.StartElement{Name: xml.Name{Local: fieldName}}); err != nil {
+			return fmt.Errorf("error marshaling '%s': %w", fieldName, err)
+		}
+	}
+	return e.EncodeToken(start.End())
+}
+
 // Getter for additional properties for AdditionalPropertiesObject3. Returns the specified
 // element and whether it was found
 func (a AdditionalPropertiesObject3) Get(fieldName string) (value interface{}, found bool) {
@@ -252,6 +331,64 @@ func (a AdditionalPropertiesObject3) MarshalJSON() ([]byte, error) {
 		}
 	}
 	return json.Marshal(object)
+}
+
+// Override default XML handling for AdditionalPropertiesObject3 to handle AdditionalProperties
+func (a *AdditionalPropertiesObject3) UnmarshalXML(d *xml.Decoder, start xml.StartElement) error {
+	knownFields := map[string]bool{
+		"name": true,
+	}
+
+	for {
+		tok, err := d.Token()
+		if err != nil {
+			return err
+		}
+		switch t := tok.(type) {
+		case xml.StartElement:
+			switch t.Name.Local {
+			case "name":
+				if err := d.DecodeElement(&a.Name, &t); err != nil {
+					return fmt.Errorf("error reading 'name': %w", err)
+				}
+			default:
+				if !knownFields[t.Name.Local] {
+					if a.AdditionalProperties == nil {
+						a.AdditionalProperties = make(map[string]interface{})
+					}
+					var val interface{}
+					if err := d.DecodeElement(&val, &t); err != nil {
+						return fmt.Errorf("error unmarshaling field %s: %w", t.Name.Local, err)
+					}
+					a.AdditionalProperties[t.Name.Local] = val
+				} else {
+					if err := d.Skip(); err != nil {
+						return err
+					}
+				}
+			}
+		case xml.EndElement:
+			return nil
+		}
+	}
+}
+
+// Override default XML handling for AdditionalPropertiesObject3 to handle AdditionalProperties
+func (a AdditionalPropertiesObject3) MarshalXML(e *xml.Encoder, start xml.StartElement) error {
+	if err := e.EncodeToken(start); err != nil {
+		return err
+	}
+
+	if err := e.EncodeElement(a.Name, xml.StartElement{Name: xml.Name{Local: "name"}}); err != nil {
+		return fmt.Errorf("error marshaling 'name': %w", err)
+	}
+
+	for fieldName, field := range a.AdditionalProperties {
+		if err := e.EncodeElement(field, xml.StartElement{Name: xml.Name{Local: fieldName}}); err != nil {
+			return fmt.Errorf("error marshaling '%s': %w", fieldName, err)
+		}
+	}
+	return e.EncodeToken(start.End())
 }
 
 // Getter for additional properties for AdditionalPropertiesObject4. Returns the specified
@@ -333,6 +470,73 @@ func (a AdditionalPropertiesObject4) MarshalJSON() ([]byte, error) {
 	return json.Marshal(object)
 }
 
+// Override default XML handling for AdditionalPropertiesObject4 to handle AdditionalProperties
+func (a *AdditionalPropertiesObject4) UnmarshalXML(d *xml.Decoder, start xml.StartElement) error {
+	knownFields := map[string]bool{
+		"inner": true,
+		"name":  true,
+	}
+
+	for {
+		tok, err := d.Token()
+		if err != nil {
+			return err
+		}
+		switch t := tok.(type) {
+		case xml.StartElement:
+			switch t.Name.Local {
+			case "inner":
+				if err := d.DecodeElement(&a.Inner, &t); err != nil {
+					return fmt.Errorf("error reading 'inner': %w", err)
+				}
+			case "name":
+				if err := d.DecodeElement(&a.Name, &t); err != nil {
+					return fmt.Errorf("error reading 'name': %w", err)
+				}
+			default:
+				if !knownFields[t.Name.Local] {
+					if a.AdditionalProperties == nil {
+						a.AdditionalProperties = make(map[string]interface{})
+					}
+					var val interface{}
+					if err := d.DecodeElement(&val, &t); err != nil {
+						return fmt.Errorf("error unmarshaling field %s: %w", t.Name.Local, err)
+					}
+					a.AdditionalProperties[t.Name.Local] = val
+				} else {
+					if err := d.Skip(); err != nil {
+						return err
+					}
+				}
+			}
+		case xml.EndElement:
+			return nil
+		}
+	}
+}
+
+// Override default XML handling for AdditionalPropertiesObject4 to handle AdditionalProperties
+func (a AdditionalPropertiesObject4) MarshalXML(e *xml.Encoder, start xml.StartElement) error {
+	if err := e.EncodeToken(start); err != nil {
+		return err
+	}
+
+	if err := e.EncodeElement(a.Inner, xml.StartElement{Name: xml.Name{Local: "inner"}}); err != nil {
+		return fmt.Errorf("error marshaling 'inner': %w", err)
+	}
+
+	if err := e.EncodeElement(a.Name, xml.StartElement{Name: xml.Name{Local: "name"}}); err != nil {
+		return fmt.Errorf("error marshaling 'name': %w", err)
+	}
+
+	for fieldName, field := range a.AdditionalProperties {
+		if err := e.EncodeElement(field, xml.StartElement{Name: xml.Name{Local: fieldName}}); err != nil {
+			return fmt.Errorf("error marshaling '%s': %w", fieldName, err)
+		}
+	}
+	return e.EncodeToken(start.End())
+}
+
 // Getter for additional properties for AdditionalPropertiesObject4_Inner. Returns the specified
 // element and whether it was found
 func (a AdditionalPropertiesObject4_Inner) Get(fieldName string) (value interface{}, found bool) {
@@ -397,6 +601,64 @@ func (a AdditionalPropertiesObject4_Inner) MarshalJSON() ([]byte, error) {
 		}
 	}
 	return json.Marshal(object)
+}
+
+// Override default XML handling for AdditionalPropertiesObject4_Inner to handle AdditionalProperties
+func (a *AdditionalPropertiesObject4_Inner) UnmarshalXML(d *xml.Decoder, start xml.StartElement) error {
+	knownFields := map[string]bool{
+		"name": true,
+	}
+
+	for {
+		tok, err := d.Token()
+		if err != nil {
+			return err
+		}
+		switch t := tok.(type) {
+		case xml.StartElement:
+			switch t.Name.Local {
+			case "name":
+				if err := d.DecodeElement(&a.Name, &t); err != nil {
+					return fmt.Errorf("error reading 'name': %w", err)
+				}
+			default:
+				if !knownFields[t.Name.Local] {
+					if a.AdditionalProperties == nil {
+						a.AdditionalProperties = make(map[string]interface{})
+					}
+					var val interface{}
+					if err := d.DecodeElement(&val, &t); err != nil {
+						return fmt.Errorf("error unmarshaling field %s: %w", t.Name.Local, err)
+					}
+					a.AdditionalProperties[t.Name.Local] = val
+				} else {
+					if err := d.Skip(); err != nil {
+						return err
+					}
+				}
+			}
+		case xml.EndElement:
+			return nil
+		}
+	}
+}
+
+// Override default XML handling for AdditionalPropertiesObject4_Inner to handle AdditionalProperties
+func (a AdditionalPropertiesObject4_Inner) MarshalXML(e *xml.Encoder, start xml.StartElement) error {
+	if err := e.EncodeToken(start); err != nil {
+		return err
+	}
+
+	if err := e.EncodeElement(a.Name, xml.StartElement{Name: xml.Name{Local: "name"}}); err != nil {
+		return fmt.Errorf("error marshaling 'name': %w", err)
+	}
+
+	for fieldName, field := range a.AdditionalProperties {
+		if err := e.EncodeElement(field, xml.StartElement{Name: xml.Name{Local: fieldName}}); err != nil {
+			return fmt.Errorf("error marshaling '%s': %w", fieldName, err)
+		}
+	}
+	return e.EncodeToken(start.End())
 }
 
 // Getter for additional properties for Test200JSONResponseBody_Item. Returns the specified
@@ -480,6 +742,77 @@ func (a Test200JSONResponseBody_Item) MarshalJSON() ([]byte, error) {
 		}
 	}
 	return json.Marshal(object)
+}
+
+// Override default XML handling for Test200JSONResponseBody_Item to handle AdditionalProperties
+func (a *Test200JSONResponseBody_Item) UnmarshalXML(d *xml.Decoder, start xml.StartElement) error {
+	knownFields := map[string]bool{
+		"field1": true,
+		"field2": true,
+	}
+
+	for {
+		tok, err := d.Token()
+		if err != nil {
+			return err
+		}
+		switch t := tok.(type) {
+		case xml.StartElement:
+			switch t.Name.Local {
+			case "field1":
+				if err := d.DecodeElement(&a.Field1, &t); err != nil {
+					return fmt.Errorf("error reading 'field1': %w", err)
+				}
+			case "field2":
+				if err := d.DecodeElement(&a.Field2, &t); err != nil {
+					return fmt.Errorf("error reading 'field2': %w", err)
+				}
+			default:
+				if !knownFields[t.Name.Local] {
+					if a.AdditionalProperties == nil {
+						a.AdditionalProperties = make(map[string]interface{})
+					}
+					var val interface{}
+					if err := d.DecodeElement(&val, &t); err != nil {
+						return fmt.Errorf("error unmarshaling field %s: %w", t.Name.Local, err)
+					}
+					a.AdditionalProperties[t.Name.Local] = val
+				} else {
+					if err := d.Skip(); err != nil {
+						return err
+					}
+				}
+			}
+		case xml.EndElement:
+			return nil
+		}
+	}
+}
+
+// Override default XML handling for Test200JSONResponseBody_Item to handle AdditionalProperties
+func (a Test200JSONResponseBody_Item) MarshalXML(e *xml.Encoder, start xml.StartElement) error {
+	if err := e.EncodeToken(start); err != nil {
+		return err
+	}
+
+	if a.Field1 != nil {
+		if err := e.EncodeElement(a.Field1, xml.StartElement{Name: xml.Name{Local: "field1"}}); err != nil {
+			return fmt.Errorf("error marshaling 'field1': %w", err)
+		}
+	}
+
+	if a.Field2 != nil {
+		if err := e.EncodeElement(a.Field2, xml.StartElement{Name: xml.Name{Local: "field2"}}); err != nil {
+			return fmt.Errorf("error marshaling 'field2': %w", err)
+		}
+	}
+
+	for fieldName, field := range a.AdditionalProperties {
+		if err := e.EncodeElement(field, xml.StartElement{Name: xml.Name{Local: fieldName}}); err != nil {
+			return fmt.Errorf("error marshaling '%s': %w", fieldName, err)
+		}
+	}
+	return e.EncodeToken(start.End())
 }
 
 // RequestEditorFn is the function signature for the RequestEditor callback function

@@ -21,62 +21,62 @@ import (
 
 // Client defines model for Client.
 type Client struct {
-	Id   *float32 `json:"id,omitempty"`
-	Name string   `json:"name"`
+	Id   *float32 `json:"id,omitempty" xml:"id"`
+	Name string   `json:"name" xml:"name"`
 }
 
 // ClientWithExtension defines model for ClientWithExtension.
 type ClientWithExtension struct {
 	// Deprecated: this property has been marked as deprecated upstream, but no `x-deprecated-reason` was set
-	DeprecatedWithoutReason *string  `json:"deprecated_without_reason,omitempty"`
-	Id                      *float32 `json:"id,omitempty"`
+	DeprecatedWithoutReason *string  `json:"deprecated_without_reason,omitempty" xml:"deprecated_without_reason"`
+	Id                      *float32 `json:"id,omitempty" xml:"id"`
 	// Deprecated: Don't use because reasons
-	Name string `json:"name"`
+	Name string `json:"name" xml:"name"`
 }
 
 // DeprecatedObject defines model for DeprecatedObject.
 //
 // Deprecated: Don't use because reasons
 type DeprecatedObject struct {
-	ThisIsFine *string `json:"this_is_fine,omitempty"`
+	ThisIsFine *string `json:"this_is_fine,omitempty" xml:"this_is_fine"`
 }
 
 // DeprecatedProperty defines model for DeprecatedProperty.
 type DeprecatedProperty struct {
 	// NewProp Use this now!
-	NewProp string `json:"newProp"`
+	NewProp string `json:"newProp" xml:"newProp"`
 	// Deprecated: this property has been marked as deprecated upstream, but no `x-deprecated-reason` was set
-	OldProp1 *string `json:"oldProp1,omitempty"`
+	OldProp1 *string `json:"oldProp1,omitempty" xml:"oldProp1"`
 
 	// OldProp2 It used to do this and that
 	// Deprecated: this property has been marked as deprecated upstream, but no `x-deprecated-reason` was set
-	OldProp2 *string `json:"oldProp2,omitempty"`
+	OldProp2 *string `json:"oldProp2,omitempty" xml:"oldProp2"`
 	// Deprecated: Use NewProp instead!
-	OldProp3 *string `json:"oldProp3,omitempty"`
+	OldProp3 *string `json:"oldProp3,omitempty" xml:"oldProp3"`
 
 	// OldProp4 It used to do this and that
 	// Deprecated: Use NewProp instead!
-	OldProp4 *string `json:"oldProp4,omitempty"`
+	OldProp4 *string `json:"oldProp4,omitempty" xml:"oldProp4"`
 }
 
 // LegacyResponse defines model for LegacyResponse.
 type LegacyResponse struct {
-	Result *string `json:"result,omitempty"`
+	Result *string `json:"result,omitempty" xml:"result"`
 }
 
 // GetDeprecatedFieldParams defines parameters for GetDeprecatedField.
 type GetDeprecatedFieldParams struct {
 	// Deprecated: Use new_filter instead.
-	OldFilter *string `form:"old_filter,omitempty" json:"old_filter,omitempty"`
-	NewFilter *string `form:"new_filter,omitempty" json:"new_filter,omitempty"`
+	OldFilter *string `form:"old_filter,omitempty" json:"old_filter,omitempty" xml:"old_filter"`
+	NewFilter *string `form:"new_filter,omitempty" json:"new_filter,omitempty" xml:"new_filter"`
 }
 
 // GetDeprecatedParamsOldIdParams defines parameters for GetDeprecatedParamsOldId.
 type GetDeprecatedParamsOldIdParams struct {
 	// Deprecated: Use Authorization instead.
-	OldHeader *string `json:"old_header,omitempty"`
+	OldHeader *string `json:"old_header,omitempty" xml:"old_header"`
 	// Deprecated: Use session header instead.
-	OldCookie *string `form:"old_cookie,omitempty" json:"old_cookie,omitempty"`
+	OldCookie *string `form:"old_cookie,omitempty" json:"old_cookie,omitempty" xml:"old_cookie"`
 }
 
 // PostClientsJSONRequestBody defines body for PostClients for application/json ContentType.
@@ -771,14 +771,14 @@ type PostClientsResponse struct {
 	// JSON200 the response for an HTTP 200 `application/json` response
 	JSON200 *struct {
 		// Deprecated: This field and its type are both deprecated.
-		DeprecatedRefAndField *DeprecatedObject `json:"deprecated_ref_and_field,omitempty"`
+		DeprecatedRefAndField *DeprecatedObject `json:"deprecated_ref_and_field,omitempty" xml:"deprecated_ref_and_field"`
 	}
 }
 
 // GetJSON200 returns the response for an HTTP 200 `application/json` response
 func (r PostClientsResponse) GetJSON200() *struct {
 	// Deprecated: This field and its type are both deprecated.
-	DeprecatedRefAndField *DeprecatedObject `json:"deprecated_ref_and_field,omitempty"`
+	DeprecatedRefAndField *DeprecatedObject `json:"deprecated_ref_and_field,omitempty" xml:"deprecated_ref_and_field"`
 } {
 	return r.JSON200
 }
@@ -817,15 +817,15 @@ type GetDeprecatedEndpointResponse struct {
 	HTTPResponse *http.Response
 	// JSON200 the response for an HTTP 200 `application/json` response
 	JSON200 *struct {
-		IsDeprecated  *ClientWithExtension `json:"is_deprecated,omitempty"`
-		NotDeprecated *string              `json:"not_deprecated,omitempty"`
+		IsDeprecated  *ClientWithExtension `json:"is_deprecated,omitempty" xml:"is_deprecated"`
+		NotDeprecated *string              `json:"not_deprecated,omitempty" xml:"not_deprecated"`
 	}
 }
 
 // GetJSON200 returns the response for an HTTP 200 `application/json` response
 func (r GetDeprecatedEndpointResponse) GetJSON200() *struct {
-	IsDeprecated  *ClientWithExtension `json:"is_deprecated,omitempty"`
-	NotDeprecated *string              `json:"not_deprecated,omitempty"`
+	IsDeprecated  *ClientWithExtension `json:"is_deprecated,omitempty" xml:"is_deprecated"`
+	NotDeprecated *string              `json:"not_deprecated,omitempty" xml:"not_deprecated"`
 } {
 	return r.JSON200
 }
@@ -899,22 +899,22 @@ type GetDeprecatedFieldResponse struct {
 	// JSON200 the response for an HTTP 200 `application/json` response
 	JSON200 *struct {
 		// Deprecated: Don't use because reasons
-		DeprecatedObject *DeprecatedObject `json:"deprecated_object,omitempty"`
+		DeprecatedObject *DeprecatedObject `json:"deprecated_object,omitempty" xml:"deprecated_object"`
 		// Deprecated: this property has been marked as deprecated upstream, but no `x-deprecated-reason` was set
-		DeprecatedOnAllof *Client              `json:"deprecated_on_allof,omitempty"`
-		IsDeprecated      *ClientWithExtension `json:"is_deprecated,omitempty"`
-		NotDeprecated     *string              `json:"not_deprecated,omitempty"`
+		DeprecatedOnAllof *Client              `json:"deprecated_on_allof,omitempty" xml:"deprecated_on_allof"`
+		IsDeprecated      *ClientWithExtension `json:"is_deprecated,omitempty" xml:"is_deprecated"`
+		NotDeprecated     *string              `json:"not_deprecated,omitempty" xml:"not_deprecated"`
 	}
 }
 
 // GetJSON200 returns the response for an HTTP 200 `application/json` response
 func (r GetDeprecatedFieldResponse) GetJSON200() *struct {
 	// Deprecated: Don't use because reasons
-	DeprecatedObject *DeprecatedObject `json:"deprecated_object,omitempty"`
+	DeprecatedObject *DeprecatedObject `json:"deprecated_object,omitempty" xml:"deprecated_object"`
 	// Deprecated: this property has been marked as deprecated upstream, but no `x-deprecated-reason` was set
-	DeprecatedOnAllof *Client              `json:"deprecated_on_allof,omitempty"`
-	IsDeprecated      *ClientWithExtension `json:"is_deprecated,omitempty"`
-	NotDeprecated     *string              `json:"not_deprecated,omitempty"`
+	DeprecatedOnAllof *Client              `json:"deprecated_on_allof,omitempty" xml:"deprecated_on_allof"`
+	IsDeprecated      *ClientWithExtension `json:"is_deprecated,omitempty" xml:"is_deprecated"`
+	NotDeprecated     *string              `json:"not_deprecated,omitempty" xml:"not_deprecated"`
 } {
 	return r.JSON200
 }
@@ -959,7 +959,7 @@ type GetDeprecatedParamsOldIdResponse struct {
 	HTTPResponse *http.Response
 	// JSON200 the response for an HTTP 200 `application/json` response
 	JSON200 *struct {
-		Result *string `json:"result,omitempty"`
+		Result *string `json:"result,omitempty" xml:"result"`
 	}
 	// Headers200 the parsed response headers for an HTTP 200 response
 	Headers200 *GetDeprecatedParamsOldIdResponse200Headers
@@ -967,7 +967,7 @@ type GetDeprecatedParamsOldIdResponse struct {
 
 // GetJSON200 returns the response for an HTTP 200 `application/json` response
 func (r GetDeprecatedParamsOldIdResponse) GetJSON200() *struct {
-	Result *string `json:"result,omitempty"`
+	Result *string `json:"result,omitempty" xml:"result"`
 } {
 	return r.JSON200
 }
@@ -1227,7 +1227,7 @@ func ParsePostClientsResponse(rsp *http.Response) (*PostClientsResponse, error) 
 	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
 		var dest struct {
 			// Deprecated: This field and its type are both deprecated.
-			DeprecatedRefAndField *DeprecatedObject `json:"deprecated_ref_and_field,omitempty"`
+			DeprecatedRefAndField *DeprecatedObject `json:"deprecated_ref_and_field,omitempty" xml:"deprecated_ref_and_field"`
 		}
 		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
 			return nil, err
@@ -1255,8 +1255,8 @@ func ParseGetDeprecatedEndpointResponse(rsp *http.Response) (*GetDeprecatedEndpo
 	switch {
 	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
 		var dest struct {
-			IsDeprecated  *ClientWithExtension `json:"is_deprecated,omitempty"`
-			NotDeprecated *string              `json:"not_deprecated,omitempty"`
+			IsDeprecated  *ClientWithExtension `json:"is_deprecated,omitempty" xml:"is_deprecated"`
+			NotDeprecated *string              `json:"not_deprecated,omitempty" xml:"not_deprecated"`
 		}
 		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
 			return nil, err
@@ -1301,11 +1301,11 @@ func ParseGetDeprecatedFieldResponse(rsp *http.Response) (*GetDeprecatedFieldRes
 	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
 		var dest struct {
 			// Deprecated: Don't use because reasons
-			DeprecatedObject *DeprecatedObject `json:"deprecated_object,omitempty"`
+			DeprecatedObject *DeprecatedObject `json:"deprecated_object,omitempty" xml:"deprecated_object"`
 			// Deprecated: this property has been marked as deprecated upstream, but no `x-deprecated-reason` was set
-			DeprecatedOnAllof *Client              `json:"deprecated_on_allof,omitempty"`
-			IsDeprecated      *ClientWithExtension `json:"is_deprecated,omitempty"`
-			NotDeprecated     *string              `json:"not_deprecated,omitempty"`
+			DeprecatedOnAllof *Client              `json:"deprecated_on_allof,omitempty" xml:"deprecated_on_allof"`
+			IsDeprecated      *ClientWithExtension `json:"is_deprecated,omitempty" xml:"is_deprecated"`
+			NotDeprecated     *string              `json:"not_deprecated,omitempty" xml:"not_deprecated"`
 		}
 		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
 			return nil, err
@@ -1333,7 +1333,7 @@ func ParseGetDeprecatedParamsOldIdResponse(rsp *http.Response) (*GetDeprecatedPa
 	switch {
 	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
 		var dest struct {
-			Result *string `json:"result,omitempty"`
+			Result *string `json:"result,omitempty" xml:"result"`
 		}
 		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
 			return nil, err
@@ -1789,7 +1789,7 @@ type LegacyResponseResponseHeaders struct {
 }
 type LegacyResponseJSONResponse struct {
 	Body struct {
-		Result *string `json:"result,omitempty"`
+		Result *string `json:"result,omitempty" xml:"result"`
 	}
 
 	Headers LegacyResponseResponseHeaders
@@ -1805,7 +1805,7 @@ type PostClientsResponseObject interface {
 
 type PostClients200JSONResponse struct {
 	// Deprecated: This field and its type are both deprecated.
-	DeprecatedRefAndField *DeprecatedObject `json:"deprecated_ref_and_field,omitempty"`
+	DeprecatedRefAndField *DeprecatedObject `json:"deprecated_ref_and_field,omitempty" xml:"deprecated_ref_and_field"`
 }
 
 func (response PostClients200JSONResponse) VisitPostClientsResponse(w http.ResponseWriter) error {
@@ -1828,8 +1828,8 @@ type GetDeprecatedEndpointResponseObject interface {
 }
 
 type GetDeprecatedEndpoint200JSONResponse struct {
-	IsDeprecated  *ClientWithExtension `json:"is_deprecated,omitempty"`
-	NotDeprecated *string              `json:"not_deprecated,omitempty"`
+	IsDeprecated  *ClientWithExtension `json:"is_deprecated,omitempty" xml:"is_deprecated"`
+	NotDeprecated *string              `json:"not_deprecated,omitempty" xml:"not_deprecated"`
 }
 
 func (response GetDeprecatedEndpoint200JSONResponse) VisitGetDeprecatedEndpointResponse(w http.ResponseWriter) error {
@@ -1870,11 +1870,11 @@ type GetDeprecatedFieldResponseObject interface {
 
 type GetDeprecatedField200JSONResponse struct {
 	// Deprecated: Don't use because reasons
-	DeprecatedObject *DeprecatedObject `json:"deprecated_object,omitempty"`
+	DeprecatedObject *DeprecatedObject `json:"deprecated_object,omitempty" xml:"deprecated_object"`
 	// Deprecated: this property has been marked as deprecated upstream, but no `x-deprecated-reason` was set
-	DeprecatedOnAllof *Client              `json:"deprecated_on_allof,omitempty"`
-	IsDeprecated      *ClientWithExtension `json:"is_deprecated,omitempty"`
-	NotDeprecated     *string              `json:"not_deprecated,omitempty"`
+	DeprecatedOnAllof *Client              `json:"deprecated_on_allof,omitempty" xml:"deprecated_on_allof"`
+	IsDeprecated      *ClientWithExtension `json:"is_deprecated,omitempty" xml:"is_deprecated"`
+	NotDeprecated     *string              `json:"not_deprecated,omitempty" xml:"not_deprecated"`
 }
 
 func (response GetDeprecatedField200JSONResponse) VisitGetDeprecatedFieldResponse(w http.ResponseWriter) error {
@@ -1905,7 +1905,7 @@ type GetDeprecatedParamsOldId200ResponseHeaders struct {
 
 type GetDeprecatedParamsOldId200JSONResponse struct {
 	Body struct {
-		Result *string `json:"result,omitempty"`
+		Result *string `json:"result,omitempty" xml:"result"`
 	}
 	Headers GetDeprecatedParamsOldId200ResponseHeaders
 }

@@ -926,6 +926,16 @@ func Generate(spec *openapi3.T, opts Configuration) (string, error) {
 	// remove any byte-order-marks which break Go-Code
 	goCode := SanitizeCode(buf.String())
 
+	// Emit the XML helper definitions only if the generated code uses them.
+	// Nothing configures this beyond skip-xml-helpers: `format: date` resolves
+	// to XMLDate via the type mapping and unions carry an `xunion RawMessage`,
+	// so we look for the resulting references rather than dropping unused
+	// types into every generated file.
+	goCode, err = appendXMLHelpersIfUsed(t, goCode, opts.OutputOptions.SkipXMLHelpers)
+	if err != nil {
+		return "", err
+	}
+
 	// The generation code produces unindented horrors. Use the Go Imports
 	// to make it all pretty.
 	if opts.OutputOptions.SkipFmt {
@@ -945,6 +955,47 @@ func Generate(spec *openapi3.T, opts Configuration) (string, error) {
 		return goCode, fmt.Errorf("error formatting Go code: %w", err)
 	}
 	return string(outBytes), nil
+}
+
+// xmlDateRef, xmlRawMessageRef and xmlDiscriminatorRef match references to
+// the generated XMLDate, RawMessage and setXMLDiscriminator helpers. Qualified references (externalRef0.XMLDate,
+// json.RawMessage) belong to another package, so they must not count here.
+var (
+	xmlDateRef          = regexp.MustCompile(`(^|[^\w.])XMLDate\b`)
+	xmlRawMessageRef    = regexp.MustCompile(`(^|[^\w.])(RawMessage|CaptureXMLElement)\b`)
+	xmlDiscriminatorRef = regexp.MustCompile(`(^|[^\w.])setXMLDiscriminator\(`)
+)
+
+// appendXMLHelpersIfUsed appends the XML helper definitions
+// to goCode when the generated code references them, unless skip is set. Go
+// allows a definition to trail its uses, so appending is safe, and it keeps the
+// check to a single pass over the finished output rather than threading a flag
+// through every schema walk. Each check runs against the code before anything
+// is appended, so the helpers' own bodies never count as a use.
+func appendXMLHelpersIfUsed(t *template.Template, goCode string, skip bool) (string, error) {
+	if skip {
+		return goCode, nil
+	}
+
+	var templates []string
+	if xmlRawMessageRef.MatchString(goCode) {
+		templates = append(templates, "xml-raw-message.tmpl")
+	}
+	if xmlDateRef.MatchString(goCode) {
+		templates = append(templates, "xml-date.tmpl")
+	}
+	if xmlDiscriminatorRef.MatchString(goCode) {
+		templates = append(templates, "xml-discriminator.tmpl")
+	}
+	if len(templates) == 0 {
+		return goCode, nil
+	}
+
+	helpers, err := GenerateTemplates(templates, t, nil)
+	if err != nil {
+		return "", fmt.Errorf("error generating XML helper definitions: %w", err)
+	}
+	return goCode + helpers, nil
 }
 
 // collectComponentTypes returns the TypeDefinitions collected from

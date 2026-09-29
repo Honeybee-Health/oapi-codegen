@@ -5,12 +5,12 @@ package xorder
 
 // Client defines model for Client.
 type Client struct {
-	AName *string  `json:"a_name,omitempty"`
-	Id    *float32 `json:"id,omitempty"`
+	AName *string  `json:"a_name,omitempty" xml:"a_name"`
+	Id    *float32 `json:"id,omitempty" xml:"id"`
 }
 
 // ClientWithExtension defines model for ClientWithExtension.
 type ClientWithExtension struct {
-	Id    *float32 `json:"id,omitempty"`
-	AName *string  `json:"a_name,omitempty"`
+	Id    *float32 `json:"id,omitempty" xml:"id"`
+	AName *string  `json:"a_name,omitempty" xml:"a_name"`
 }

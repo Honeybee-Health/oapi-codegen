@@ -81,7 +81,7 @@ func TestDefaultTypeMapping_Completeness(t *testing.T) {
 	assert.Equal(t, "string", dm.String.Resolve("").Type)
 	assert.Equal(t, "[]byte", dm.String.Resolve("byte").Type)
 	assert.Equal(t, "openapi_types.Email", dm.String.Resolve("email").Type)
-	assert.Equal(t, "openapi_types.Date", dm.String.Resolve("date").Type)
+	assert.Equal(t, "XMLDate", dm.String.Resolve("date").Type)
 	assert.Equal(t, "time.Time", dm.String.Resolve("date-time").Type)
 	assert.Equal(t, "openapi_types.Duration", dm.String.Resolve("duration").Type)
 	assert.Equal(t, "json.RawMessage", dm.String.Resolve("json").Type)
@@ -124,7 +124,7 @@ components:
 
 	code, err := Generate(swagger, opts)
 	require.NoError(t, err)
-	assert.Contains(t, code, "Backoff openapi_types.Duration `json:\"backoff\"`")
+	assert.Contains(t, code, "Backoff openapi_types.Duration `json:\"backoff\" xml:\"backoff\"`")
 	assert.Contains(t, code, `openapi_types "github.com/oapi-codegen/runtime/types"`)
 
 	// The pre-duration behavior is a plain string; restore it by mapping
@@ -138,6 +138,6 @@ components:
 	}
 	code, err = Generate(swagger, opts)
 	require.NoError(t, err)
-	assert.Contains(t, code, "Backoff string `json:\"backoff\"`")
+	assert.Contains(t, code, "Backoff string `json:\"backoff\" xml:\"backoff\"`")
 	assert.NotContains(t, code, "openapi_types.Duration")
 }

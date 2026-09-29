@@ -4,8 +4,10 @@
 package aggregatesanyof
 
 import (
+	"bytes"
 	"context"
 	"encoding/json"
+	"encoding/xml"
 	"fmt"
 	"io"
 	"net/http"
@@ -72,45 +74,46 @@ func (e Issue1189TestFieldC1) Valid() bool {
 
 // GetRefPetsDto defines model for GetRefPetsDto.
 type GetRefPetsDto struct {
-	Data *GetRefPetsDto_Data `json:"data,omitempty"`
+	Data *GetRefPetsDto_Data `json:"data,omitempty" xml:"data"`
 }
 
 // GetRefPetsDto_Data defines model for GetRefPetsDto.Data.
 type GetRefPetsDto_Data struct {
-	union json.RawMessage
+	union  json.RawMessage
+	xunion RawMessage
 }
 
 // InlineCat This is a cat (inline anyOf case)
 type InlineCat struct {
-	Breed *string `json:"breed,omitempty"`
-	Color *string `json:"color,omitempty"`
-	Id    *string `json:"id,omitempty"`
-	Name  *string `json:"name,omitempty"`
-	Purrs *bool   `json:"purrs,omitempty"`
+	Breed *string `json:"breed,omitempty" xml:"breed"`
+	Color *string `json:"color,omitempty" xml:"color"`
+	Id    *string `json:"id,omitempty" xml:"id"`
+	Name  *string `json:"name,omitempty" xml:"name"`
+	Purrs *bool   `json:"purrs,omitempty" xml:"purrs"`
 }
 
 // InlineDog This is a dog (inline anyOf case)
 type InlineDog struct {
-	Barks *bool   `json:"barks,omitempty"`
-	Breed *string `json:"breed,omitempty"`
-	Color *string `json:"color,omitempty"`
-	Id    *string `json:"id,omitempty"`
-	Name  *string `json:"name,omitempty"`
+	Barks *bool   `json:"barks,omitempty" xml:"barks"`
+	Breed *string `json:"breed,omitempty" xml:"breed"`
+	Color *string `json:"color,omitempty" xml:"color"`
+	Id    *string `json:"id,omitempty" xml:"id"`
+	Name  *string `json:"name,omitempty" xml:"name"`
 }
 
 // InlineRat This is a rat (inline anyOf case)
 type InlineRat struct {
-	Color   *string `json:"color,omitempty"`
-	Id      *string `json:"id,omitempty"`
-	Name    *string `json:"name,omitempty"`
-	Squeaks *bool   `json:"squeaks,omitempty"`
+	Color   *string `json:"color,omitempty" xml:"color"`
+	Id      *string `json:"id,omitempty" xml:"id"`
+	Name    *string `json:"name,omitempty" xml:"name"`
+	Squeaks *bool   `json:"squeaks,omitempty" xml:"squeaks"`
 }
 
 // Issue1189Test defines model for Issue1189Test.
 type Issue1189Test struct {
-	FieldA *Issue1189Test_FieldA `json:"fieldA,omitempty"`
-	FieldB *Issue1189TestFieldB  `json:"fieldB,omitempty"`
-	FieldC *Issue1189Test_FieldC `json:"fieldC,omitempty"`
+	FieldA *Issue1189Test_FieldA `json:"fieldA,omitempty" xml:"fieldA"`
+	FieldB *Issue1189TestFieldB  `json:"fieldB,omitempty" xml:"fieldB"`
+	FieldC *Issue1189Test_FieldC `json:"fieldC,omitempty" xml:"fieldC"`
 }
 
 // Issue1189TestFieldA0 defines model for Issue1189Test.FieldA.0.
@@ -121,7 +124,8 @@ type Issue1189TestFieldA1 string
 
 // Issue1189Test_FieldA defines model for Issue1189Test.FieldA.
 type Issue1189Test_FieldA struct {
-	union json.RawMessage
+	union  json.RawMessage
+	xunion RawMessage
 }
 
 // Issue1189TestFieldB defines model for Issue1189Test.FieldB.
@@ -135,29 +139,32 @@ type Issue1189TestFieldC1 string
 
 // Issue1189Test_FieldC defines model for Issue1189Test.FieldC.
 type Issue1189Test_FieldC struct {
-	union json.RawMessage
+	union  json.RawMessage
+	xunion RawMessage
 }
 
 // ParamAnyOf defines model for ParamAnyOf.
 type ParamAnyOf struct {
-	union json.RawMessage
+	union  json.RawMessage
+	xunion RawMessage
 }
 
 // ParamAnyOf0 defines model for ParamAnyOf.0.
 type ParamAnyOf0 struct {
-	Item1 string `json:"item1"`
-	Item2 string `json:"item2"`
+	Item1 string `json:"item1" xml:"item1"`
+	Item2 string `json:"item2" xml:"item2"`
 }
 
 // ParamAnyOf1 defines model for ParamAnyOf.1.
 type ParamAnyOf1 struct {
-	Item2 *string `json:"item2,omitempty"`
-	Item3 *string `json:"item3,omitempty"`
+	Item2 *string `json:"item2,omitempty" xml:"item2"`
+	Item3 *string `json:"item3,omitempty" xml:"item3"`
 }
 
 // ParamOneOf defines model for ParamOneOf.
 type ParamOneOf struct {
-	union json.RawMessage
+	union  json.RawMessage
+	xunion RawMessage
 }
 
 // ParamOneOf0 defines model for ParamOneOf.0.
@@ -168,53 +175,74 @@ type ParamOneOf1 = string
 
 // RefCat This is a cat ($ref anyOf case)
 type RefCat struct {
-	Breed *string `json:"breed,omitempty"`
-	Color *string `json:"color,omitempty"`
-	Id    *string `json:"id,omitempty"`
-	Name  *string `json:"name,omitempty"`
-	Purrs *bool   `json:"purrs,omitempty"`
+	Breed *string `json:"breed,omitempty" xml:"breed"`
+	Color *string `json:"color,omitempty" xml:"color"`
+	Id    *string `json:"id,omitempty" xml:"id"`
+	Name  *string `json:"name,omitempty" xml:"name"`
+	Purrs *bool   `json:"purrs,omitempty" xml:"purrs"`
 }
 
 // RefDog This is a dog ($ref anyOf case)
 type RefDog struct {
-	Barks *bool   `json:"barks,omitempty"`
-	Breed *string `json:"breed,omitempty"`
-	Color *string `json:"color,omitempty"`
-	Id    *string `json:"id,omitempty"`
-	Name  *string `json:"name,omitempty"`
+	Barks *bool   `json:"barks,omitempty" xml:"barks"`
+	Breed *string `json:"breed,omitempty" xml:"breed"`
+	Color *string `json:"color,omitempty" xml:"color"`
+	Id    *string `json:"id,omitempty" xml:"id"`
+	Name  *string `json:"name,omitempty" xml:"name"`
 }
 
 // RefRat This is a rat ($ref anyOf case)
 type RefRat struct {
-	Color   *string `json:"color,omitempty"`
-	Id      *string `json:"id,omitempty"`
-	Name    *string `json:"name,omitempty"`
-	Squeaks *bool   `json:"squeaks,omitempty"`
+	Color   *string `json:"color,omitempty" xml:"color"`
+	Id      *string `json:"id,omitempty" xml:"id"`
+	Name    *string `json:"name,omitempty" xml:"name"`
+	Squeaks *bool   `json:"squeaks,omitempty" xml:"squeaks"`
 }
 
 // GetInlinePets200JSONResponseBody_Data_Item defines parameters for GetInlinePets.
 type GetInlinePets200JSONResponseBody_Data_Item struct {
-	union json.RawMessage
+	union  json.RawMessage
+	xunion RawMessage
 }
 
 // GetParamTestParams defines parameters for GetParamTest.
 type GetParamTestParams struct {
-	Test  *ParamAnyOf   `form:"test,omitempty" json:"test,omitempty"`
-	Test2 *[]ParamOneOf `form:"test2,omitempty" json:"test2,omitempty"`
+	Test  *ParamAnyOf   `form:"test,omitempty" json:"test,omitempty" xml:"test"`
+	Test2 *[]ParamOneOf `form:"test2,omitempty" json:"test2,omitempty" xml:"test2"`
 }
 
 // AsRefCat returns the union data inside the GetRefPetsDto_Data as a RefCat
 func (t GetRefPetsDto_Data) AsRefCat() (RefCat, error) {
 	var body RefCat
-	err := json.Unmarshal(t.union, &body)
-	return body, err
+	if len(t.union) > 0 {
+		err := json.Unmarshal(t.union, &body)
+		if err != nil {
+			return body, err
+		}
+	}
+	if len(t.xunion) > 0 {
+		err := xml.Unmarshal(t.xunion, &body)
+		if err != nil {
+			return body, err
+		}
+	}
+	return body, nil
 }
 
 // FromRefCat overwrites any union data inside the GetRefPetsDto_Data as the provided RefCat
 func (t *GetRefPetsDto_Data) FromRefCat(v RefCat) error {
 	b, err := json.Marshal(v)
+	if err != nil {
+		return err
+	}
 	t.union = b
-	return err
+	b, err = xml.Marshal(v)
+	if err != nil {
+		return err
+	}
+	t.xunion = b
+
+	return nil
 }
 
 // MergeRefCat performs a merge with any union data inside the GetRefPetsDto_Data, using the provided RefCat
@@ -226,21 +254,49 @@ func (t *GetRefPetsDto_Data) MergeRefCat(v RefCat) error {
 
 	merged, err := runtime.JSONMerge(t.union, b)
 	t.union = merged
+
+	// For XML, re-marshal the merged result
+	bx, errx := xml.Marshal(v)
+	if errx != nil {
+		return errx
+	}
+	t.xunion = bx
+
 	return err
 }
 
 // AsRefDog returns the union data inside the GetRefPetsDto_Data as a RefDog
 func (t GetRefPetsDto_Data) AsRefDog() (RefDog, error) {
 	var body RefDog
-	err := json.Unmarshal(t.union, &body)
-	return body, err
+	if len(t.union) > 0 {
+		err := json.Unmarshal(t.union, &body)
+		if err != nil {
+			return body, err
+		}
+	}
+	if len(t.xunion) > 0 {
+		err := xml.Unmarshal(t.xunion, &body)
+		if err != nil {
+			return body, err
+		}
+	}
+	return body, nil
 }
 
 // FromRefDog overwrites any union data inside the GetRefPetsDto_Data as the provided RefDog
 func (t *GetRefPetsDto_Data) FromRefDog(v RefDog) error {
 	b, err := json.Marshal(v)
+	if err != nil {
+		return err
+	}
 	t.union = b
-	return err
+	b, err = xml.Marshal(v)
+	if err != nil {
+		return err
+	}
+	t.xunion = b
+
+	return nil
 }
 
 // MergeRefDog performs a merge with any union data inside the GetRefPetsDto_Data, using the provided RefDog
@@ -252,21 +308,49 @@ func (t *GetRefPetsDto_Data) MergeRefDog(v RefDog) error {
 
 	merged, err := runtime.JSONMerge(t.union, b)
 	t.union = merged
+
+	// For XML, re-marshal the merged result
+	bx, errx := xml.Marshal(v)
+	if errx != nil {
+		return errx
+	}
+	t.xunion = bx
+
 	return err
 }
 
 // AsRefRat returns the union data inside the GetRefPetsDto_Data as a RefRat
 func (t GetRefPetsDto_Data) AsRefRat() (RefRat, error) {
 	var body RefRat
-	err := json.Unmarshal(t.union, &body)
-	return body, err
+	if len(t.union) > 0 {
+		err := json.Unmarshal(t.union, &body)
+		if err != nil {
+			return body, err
+		}
+	}
+	if len(t.xunion) > 0 {
+		err := xml.Unmarshal(t.xunion, &body)
+		if err != nil {
+			return body, err
+		}
+	}
+	return body, nil
 }
 
 // FromRefRat overwrites any union data inside the GetRefPetsDto_Data as the provided RefRat
 func (t *GetRefPetsDto_Data) FromRefRat(v RefRat) error {
 	b, err := json.Marshal(v)
+	if err != nil {
+		return err
+	}
 	t.union = b
-	return err
+	b, err = xml.Marshal(v)
+	if err != nil {
+		return err
+	}
+	t.xunion = b
+
+	return nil
 }
 
 // MergeRefRat performs a merge with any union data inside the GetRefPetsDto_Data, using the provided RefRat
@@ -278,6 +362,14 @@ func (t *GetRefPetsDto_Data) MergeRefRat(v RefRat) error {
 
 	merged, err := runtime.JSONMerge(t.union, b)
 	t.union = merged
+
+	// For XML, re-marshal the merged result
+	bx, errx := xml.Marshal(v)
+	if errx != nil {
+		return errx
+	}
+	t.xunion = bx
+
 	return err
 }
 
@@ -291,18 +383,59 @@ func (t *GetRefPetsDto_Data) UnmarshalJSON(b []byte) error {
 	return err
 }
 
+func (t GetRefPetsDto_Data) MarshalXML(e *xml.Encoder, start xml.StartElement) error {
+	if len(t.xunion) > 0 {
+		return t.xunion.MarshalXML(e, start)
+	}
+	if err := e.EncodeToken(start); err != nil {
+		return err
+	}
+	return e.EncodeToken(start.End())
+}
+
+func (t *GetRefPetsDto_Data) UnmarshalXML(d *xml.Decoder, start xml.StartElement) error {
+	var err error
+
+	t.xunion, err = CaptureXMLElement(d, start)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
 // AsIssue1189TestFieldA0 returns the union data inside the Issue1189Test_FieldA as a Issue1189TestFieldA0
 func (t Issue1189Test_FieldA) AsIssue1189TestFieldA0() (Issue1189TestFieldA0, error) {
 	var body Issue1189TestFieldA0
-	err := json.Unmarshal(t.union, &body)
-	return body, err
+	if len(t.union) > 0 {
+		err := json.Unmarshal(t.union, &body)
+		if err != nil {
+			return body, err
+		}
+	}
+	if len(t.xunion) > 0 {
+		err := xml.Unmarshal(t.xunion, &body)
+		if err != nil {
+			return body, err
+		}
+	}
+	return body, nil
 }
 
 // FromIssue1189TestFieldA0 overwrites any union data inside the Issue1189Test_FieldA as the provided Issue1189TestFieldA0
 func (t *Issue1189Test_FieldA) FromIssue1189TestFieldA0(v Issue1189TestFieldA0) error {
 	b, err := json.Marshal(v)
+	if err != nil {
+		return err
+	}
 	t.union = b
-	return err
+	b, err = xml.Marshal(v)
+	if err != nil {
+		return err
+	}
+	t.xunion = b
+
+	return nil
 }
 
 // MergeIssue1189TestFieldA0 performs a merge with any union data inside the Issue1189Test_FieldA, using the provided Issue1189TestFieldA0
@@ -314,21 +447,49 @@ func (t *Issue1189Test_FieldA) MergeIssue1189TestFieldA0(v Issue1189TestFieldA0)
 
 	merged, err := runtime.JSONMerge(t.union, b)
 	t.union = merged
+
+	// For XML, re-marshal the merged result
+	bx, errx := xml.Marshal(v)
+	if errx != nil {
+		return errx
+	}
+	t.xunion = bx
+
 	return err
 }
 
 // AsIssue1189TestFieldA1 returns the union data inside the Issue1189Test_FieldA as a Issue1189TestFieldA1
 func (t Issue1189Test_FieldA) AsIssue1189TestFieldA1() (Issue1189TestFieldA1, error) {
 	var body Issue1189TestFieldA1
-	err := json.Unmarshal(t.union, &body)
-	return body, err
+	if len(t.union) > 0 {
+		err := json.Unmarshal(t.union, &body)
+		if err != nil {
+			return body, err
+		}
+	}
+	if len(t.xunion) > 0 {
+		err := xml.Unmarshal(t.xunion, &body)
+		if err != nil {
+			return body, err
+		}
+	}
+	return body, nil
 }
 
 // FromIssue1189TestFieldA1 overwrites any union data inside the Issue1189Test_FieldA as the provided Issue1189TestFieldA1
 func (t *Issue1189Test_FieldA) FromIssue1189TestFieldA1(v Issue1189TestFieldA1) error {
 	b, err := json.Marshal(v)
+	if err != nil {
+		return err
+	}
 	t.union = b
-	return err
+	b, err = xml.Marshal(v)
+	if err != nil {
+		return err
+	}
+	t.xunion = b
+
+	return nil
 }
 
 // MergeIssue1189TestFieldA1 performs a merge with any union data inside the Issue1189Test_FieldA, using the provided Issue1189TestFieldA1
@@ -340,6 +501,14 @@ func (t *Issue1189Test_FieldA) MergeIssue1189TestFieldA1(v Issue1189TestFieldA1)
 
 	merged, err := runtime.JSONMerge(t.union, b)
 	t.union = merged
+
+	// For XML, re-marshal the merged result
+	bx, errx := xml.Marshal(v)
+	if errx != nil {
+		return errx
+	}
+	t.xunion = bx
+
 	return err
 }
 
@@ -353,18 +522,59 @@ func (t *Issue1189Test_FieldA) UnmarshalJSON(b []byte) error {
 	return err
 }
 
+func (t Issue1189Test_FieldA) MarshalXML(e *xml.Encoder, start xml.StartElement) error {
+	if len(t.xunion) > 0 {
+		return t.xunion.MarshalXML(e, start)
+	}
+	if err := e.EncodeToken(start); err != nil {
+		return err
+	}
+	return e.EncodeToken(start.End())
+}
+
+func (t *Issue1189Test_FieldA) UnmarshalXML(d *xml.Decoder, start xml.StartElement) error {
+	var err error
+
+	t.xunion, err = CaptureXMLElement(d, start)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
 // AsIssue1189TestFieldC0 returns the union data inside the Issue1189Test_FieldC as a Issue1189TestFieldC0
 func (t Issue1189Test_FieldC) AsIssue1189TestFieldC0() (Issue1189TestFieldC0, error) {
 	var body Issue1189TestFieldC0
-	err := json.Unmarshal(t.union, &body)
-	return body, err
+	if len(t.union) > 0 {
+		err := json.Unmarshal(t.union, &body)
+		if err != nil {
+			return body, err
+		}
+	}
+	if len(t.xunion) > 0 {
+		err := xml.Unmarshal(t.xunion, &body)
+		if err != nil {
+			return body, err
+		}
+	}
+	return body, nil
 }
 
 // FromIssue1189TestFieldC0 overwrites any union data inside the Issue1189Test_FieldC as the provided Issue1189TestFieldC0
 func (t *Issue1189Test_FieldC) FromIssue1189TestFieldC0(v Issue1189TestFieldC0) error {
 	b, err := json.Marshal(v)
+	if err != nil {
+		return err
+	}
 	t.union = b
-	return err
+	b, err = xml.Marshal(v)
+	if err != nil {
+		return err
+	}
+	t.xunion = b
+
+	return nil
 }
 
 // MergeIssue1189TestFieldC0 performs a merge with any union data inside the Issue1189Test_FieldC, using the provided Issue1189TestFieldC0
@@ -376,21 +586,49 @@ func (t *Issue1189Test_FieldC) MergeIssue1189TestFieldC0(v Issue1189TestFieldC0)
 
 	merged, err := runtime.JSONMerge(t.union, b)
 	t.union = merged
+
+	// For XML, re-marshal the merged result
+	bx, errx := xml.Marshal(v)
+	if errx != nil {
+		return errx
+	}
+	t.xunion = bx
+
 	return err
 }
 
 // AsIssue1189TestFieldC1 returns the union data inside the Issue1189Test_FieldC as a Issue1189TestFieldC1
 func (t Issue1189Test_FieldC) AsIssue1189TestFieldC1() (Issue1189TestFieldC1, error) {
 	var body Issue1189TestFieldC1
-	err := json.Unmarshal(t.union, &body)
-	return body, err
+	if len(t.union) > 0 {
+		err := json.Unmarshal(t.union, &body)
+		if err != nil {
+			return body, err
+		}
+	}
+	if len(t.xunion) > 0 {
+		err := xml.Unmarshal(t.xunion, &body)
+		if err != nil {
+			return body, err
+		}
+	}
+	return body, nil
 }
 
 // FromIssue1189TestFieldC1 overwrites any union data inside the Issue1189Test_FieldC as the provided Issue1189TestFieldC1
 func (t *Issue1189Test_FieldC) FromIssue1189TestFieldC1(v Issue1189TestFieldC1) error {
 	b, err := json.Marshal(v)
+	if err != nil {
+		return err
+	}
 	t.union = b
-	return err
+	b, err = xml.Marshal(v)
+	if err != nil {
+		return err
+	}
+	t.xunion = b
+
+	return nil
 }
 
 // MergeIssue1189TestFieldC1 performs a merge with any union data inside the Issue1189Test_FieldC, using the provided Issue1189TestFieldC1
@@ -402,6 +640,14 @@ func (t *Issue1189Test_FieldC) MergeIssue1189TestFieldC1(v Issue1189TestFieldC1)
 
 	merged, err := runtime.JSONMerge(t.union, b)
 	t.union = merged
+
+	// For XML, re-marshal the merged result
+	bx, errx := xml.Marshal(v)
+	if errx != nil {
+		return errx
+	}
+	t.xunion = bx
+
 	return err
 }
 
@@ -415,18 +661,59 @@ func (t *Issue1189Test_FieldC) UnmarshalJSON(b []byte) error {
 	return err
 }
 
+func (t Issue1189Test_FieldC) MarshalXML(e *xml.Encoder, start xml.StartElement) error {
+	if len(t.xunion) > 0 {
+		return t.xunion.MarshalXML(e, start)
+	}
+	if err := e.EncodeToken(start); err != nil {
+		return err
+	}
+	return e.EncodeToken(start.End())
+}
+
+func (t *Issue1189Test_FieldC) UnmarshalXML(d *xml.Decoder, start xml.StartElement) error {
+	var err error
+
+	t.xunion, err = CaptureXMLElement(d, start)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
 // AsParamAnyOf0 returns the union data inside the ParamAnyOf as a ParamAnyOf0
 func (t ParamAnyOf) AsParamAnyOf0() (ParamAnyOf0, error) {
 	var body ParamAnyOf0
-	err := json.Unmarshal(t.union, &body)
-	return body, err
+	if len(t.union) > 0 {
+		err := json.Unmarshal(t.union, &body)
+		if err != nil {
+			return body, err
+		}
+	}
+	if len(t.xunion) > 0 {
+		err := xml.Unmarshal(t.xunion, &body)
+		if err != nil {
+			return body, err
+		}
+	}
+	return body, nil
 }
 
 // FromParamAnyOf0 overwrites any union data inside the ParamAnyOf as the provided ParamAnyOf0
 func (t *ParamAnyOf) FromParamAnyOf0(v ParamAnyOf0) error {
 	b, err := json.Marshal(v)
+	if err != nil {
+		return err
+	}
 	t.union = b
-	return err
+	b, err = xml.Marshal(v)
+	if err != nil {
+		return err
+	}
+	t.xunion = b
+
+	return nil
 }
 
 // MergeParamAnyOf0 performs a merge with any union data inside the ParamAnyOf, using the provided ParamAnyOf0
@@ -438,21 +725,49 @@ func (t *ParamAnyOf) MergeParamAnyOf0(v ParamAnyOf0) error {
 
 	merged, err := runtime.JSONMerge(t.union, b)
 	t.union = merged
+
+	// For XML, re-marshal the merged result
+	bx, errx := xml.Marshal(v)
+	if errx != nil {
+		return errx
+	}
+	t.xunion = bx
+
 	return err
 }
 
 // AsParamAnyOf1 returns the union data inside the ParamAnyOf as a ParamAnyOf1
 func (t ParamAnyOf) AsParamAnyOf1() (ParamAnyOf1, error) {
 	var body ParamAnyOf1
-	err := json.Unmarshal(t.union, &body)
-	return body, err
+	if len(t.union) > 0 {
+		err := json.Unmarshal(t.union, &body)
+		if err != nil {
+			return body, err
+		}
+	}
+	if len(t.xunion) > 0 {
+		err := xml.Unmarshal(t.xunion, &body)
+		if err != nil {
+			return body, err
+		}
+	}
+	return body, nil
 }
 
 // FromParamAnyOf1 overwrites any union data inside the ParamAnyOf as the provided ParamAnyOf1
 func (t *ParamAnyOf) FromParamAnyOf1(v ParamAnyOf1) error {
 	b, err := json.Marshal(v)
+	if err != nil {
+		return err
+	}
 	t.union = b
-	return err
+	b, err = xml.Marshal(v)
+	if err != nil {
+		return err
+	}
+	t.xunion = b
+
+	return nil
 }
 
 // MergeParamAnyOf1 performs a merge with any union data inside the ParamAnyOf, using the provided ParamAnyOf1
@@ -464,6 +779,14 @@ func (t *ParamAnyOf) MergeParamAnyOf1(v ParamAnyOf1) error {
 
 	merged, err := runtime.JSONMerge(t.union, b)
 	t.union = merged
+
+	// For XML, re-marshal the merged result
+	bx, errx := xml.Marshal(v)
+	if errx != nil {
+		return errx
+	}
+	t.xunion = bx
+
 	return err
 }
 
@@ -477,18 +800,59 @@ func (t *ParamAnyOf) UnmarshalJSON(b []byte) error {
 	return err
 }
 
+func (t ParamAnyOf) MarshalXML(e *xml.Encoder, start xml.StartElement) error {
+	if len(t.xunion) > 0 {
+		return t.xunion.MarshalXML(e, start)
+	}
+	if err := e.EncodeToken(start); err != nil {
+		return err
+	}
+	return e.EncodeToken(start.End())
+}
+
+func (t *ParamAnyOf) UnmarshalXML(d *xml.Decoder, start xml.StartElement) error {
+	var err error
+
+	t.xunion, err = CaptureXMLElement(d, start)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
 // AsParamOneOf0 returns the union data inside the ParamOneOf as a ParamOneOf0
 func (t ParamOneOf) AsParamOneOf0() (ParamOneOf0, error) {
 	var body ParamOneOf0
-	err := json.Unmarshal(t.union, &body)
-	return body, err
+	if len(t.union) > 0 {
+		err := json.Unmarshal(t.union, &body)
+		if err != nil {
+			return body, err
+		}
+	}
+	if len(t.xunion) > 0 {
+		err := xml.Unmarshal(t.xunion, &body)
+		if err != nil {
+			return body, err
+		}
+	}
+	return body, nil
 }
 
 // FromParamOneOf0 overwrites any union data inside the ParamOneOf as the provided ParamOneOf0
 func (t *ParamOneOf) FromParamOneOf0(v ParamOneOf0) error {
 	b, err := json.Marshal(v)
+	if err != nil {
+		return err
+	}
 	t.union = b
-	return err
+	b, err = xml.Marshal(v)
+	if err != nil {
+		return err
+	}
+	t.xunion = b
+
+	return nil
 }
 
 // MergeParamOneOf0 performs a merge with any union data inside the ParamOneOf, using the provided ParamOneOf0
@@ -500,21 +864,49 @@ func (t *ParamOneOf) MergeParamOneOf0(v ParamOneOf0) error {
 
 	merged, err := runtime.JSONMerge(t.union, b)
 	t.union = merged
+
+	// For XML, re-marshal the merged result
+	bx, errx := xml.Marshal(v)
+	if errx != nil {
+		return errx
+	}
+	t.xunion = bx
+
 	return err
 }
 
 // AsParamOneOf1 returns the union data inside the ParamOneOf as a ParamOneOf1
 func (t ParamOneOf) AsParamOneOf1() (ParamOneOf1, error) {
 	var body ParamOneOf1
-	err := json.Unmarshal(t.union, &body)
-	return body, err
+	if len(t.union) > 0 {
+		err := json.Unmarshal(t.union, &body)
+		if err != nil {
+			return body, err
+		}
+	}
+	if len(t.xunion) > 0 {
+		err := xml.Unmarshal(t.xunion, &body)
+		if err != nil {
+			return body, err
+		}
+	}
+	return body, nil
 }
 
 // FromParamOneOf1 overwrites any union data inside the ParamOneOf as the provided ParamOneOf1
 func (t *ParamOneOf) FromParamOneOf1(v ParamOneOf1) error {
 	b, err := json.Marshal(v)
+	if err != nil {
+		return err
+	}
 	t.union = b
-	return err
+	b, err = xml.Marshal(v)
+	if err != nil {
+		return err
+	}
+	t.xunion = b
+
+	return nil
 }
 
 // MergeParamOneOf1 performs a merge with any union data inside the ParamOneOf, using the provided ParamOneOf1
@@ -526,6 +918,14 @@ func (t *ParamOneOf) MergeParamOneOf1(v ParamOneOf1) error {
 
 	merged, err := runtime.JSONMerge(t.union, b)
 	t.union = merged
+
+	// For XML, re-marshal the merged result
+	bx, errx := xml.Marshal(v)
+	if errx != nil {
+		return errx
+	}
+	t.xunion = bx
+
 	return err
 }
 
@@ -539,18 +939,59 @@ func (t *ParamOneOf) UnmarshalJSON(b []byte) error {
 	return err
 }
 
+func (t ParamOneOf) MarshalXML(e *xml.Encoder, start xml.StartElement) error {
+	if len(t.xunion) > 0 {
+		return t.xunion.MarshalXML(e, start)
+	}
+	if err := e.EncodeToken(start); err != nil {
+		return err
+	}
+	return e.EncodeToken(start.End())
+}
+
+func (t *ParamOneOf) UnmarshalXML(d *xml.Decoder, start xml.StartElement) error {
+	var err error
+
+	t.xunion, err = CaptureXMLElement(d, start)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
 // AsInlineCat returns the union data inside the GetInlinePets200JSONResponseBody_Data_Item as a InlineCat
 func (t GetInlinePets200JSONResponseBody_Data_Item) AsInlineCat() (InlineCat, error) {
 	var body InlineCat
-	err := json.Unmarshal(t.union, &body)
-	return body, err
+	if len(t.union) > 0 {
+		err := json.Unmarshal(t.union, &body)
+		if err != nil {
+			return body, err
+		}
+	}
+	if len(t.xunion) > 0 {
+		err := xml.Unmarshal(t.xunion, &body)
+		if err != nil {
+			return body, err
+		}
+	}
+	return body, nil
 }
 
 // FromInlineCat overwrites any union data inside the GetInlinePets200JSONResponseBody_Data_Item as the provided InlineCat
 func (t *GetInlinePets200JSONResponseBody_Data_Item) FromInlineCat(v InlineCat) error {
 	b, err := json.Marshal(v)
+	if err != nil {
+		return err
+	}
 	t.union = b
-	return err
+	b, err = xml.Marshal(v)
+	if err != nil {
+		return err
+	}
+	t.xunion = b
+
+	return nil
 }
 
 // MergeInlineCat performs a merge with any union data inside the GetInlinePets200JSONResponseBody_Data_Item, using the provided InlineCat
@@ -562,21 +1003,49 @@ func (t *GetInlinePets200JSONResponseBody_Data_Item) MergeInlineCat(v InlineCat)
 
 	merged, err := runtime.JSONMerge(t.union, b)
 	t.union = merged
+
+	// For XML, re-marshal the merged result
+	bx, errx := xml.Marshal(v)
+	if errx != nil {
+		return errx
+	}
+	t.xunion = bx
+
 	return err
 }
 
 // AsInlineDog returns the union data inside the GetInlinePets200JSONResponseBody_Data_Item as a InlineDog
 func (t GetInlinePets200JSONResponseBody_Data_Item) AsInlineDog() (InlineDog, error) {
 	var body InlineDog
-	err := json.Unmarshal(t.union, &body)
-	return body, err
+	if len(t.union) > 0 {
+		err := json.Unmarshal(t.union, &body)
+		if err != nil {
+			return body, err
+		}
+	}
+	if len(t.xunion) > 0 {
+		err := xml.Unmarshal(t.xunion, &body)
+		if err != nil {
+			return body, err
+		}
+	}
+	return body, nil
 }
 
 // FromInlineDog overwrites any union data inside the GetInlinePets200JSONResponseBody_Data_Item as the provided InlineDog
 func (t *GetInlinePets200JSONResponseBody_Data_Item) FromInlineDog(v InlineDog) error {
 	b, err := json.Marshal(v)
+	if err != nil {
+		return err
+	}
 	t.union = b
-	return err
+	b, err = xml.Marshal(v)
+	if err != nil {
+		return err
+	}
+	t.xunion = b
+
+	return nil
 }
 
 // MergeInlineDog performs a merge with any union data inside the GetInlinePets200JSONResponseBody_Data_Item, using the provided InlineDog
@@ -588,21 +1057,49 @@ func (t *GetInlinePets200JSONResponseBody_Data_Item) MergeInlineDog(v InlineDog)
 
 	merged, err := runtime.JSONMerge(t.union, b)
 	t.union = merged
+
+	// For XML, re-marshal the merged result
+	bx, errx := xml.Marshal(v)
+	if errx != nil {
+		return errx
+	}
+	t.xunion = bx
+
 	return err
 }
 
 // AsInlineRat returns the union data inside the GetInlinePets200JSONResponseBody_Data_Item as a InlineRat
 func (t GetInlinePets200JSONResponseBody_Data_Item) AsInlineRat() (InlineRat, error) {
 	var body InlineRat
-	err := json.Unmarshal(t.union, &body)
-	return body, err
+	if len(t.union) > 0 {
+		err := json.Unmarshal(t.union, &body)
+		if err != nil {
+			return body, err
+		}
+	}
+	if len(t.xunion) > 0 {
+		err := xml.Unmarshal(t.xunion, &body)
+		if err != nil {
+			return body, err
+		}
+	}
+	return body, nil
 }
 
 // FromInlineRat overwrites any union data inside the GetInlinePets200JSONResponseBody_Data_Item as the provided InlineRat
 func (t *GetInlinePets200JSONResponseBody_Data_Item) FromInlineRat(v InlineRat) error {
 	b, err := json.Marshal(v)
+	if err != nil {
+		return err
+	}
 	t.union = b
-	return err
+	b, err = xml.Marshal(v)
+	if err != nil {
+		return err
+	}
+	t.xunion = b
+
+	return nil
 }
 
 // MergeInlineRat performs a merge with any union data inside the GetInlinePets200JSONResponseBody_Data_Item, using the provided InlineRat
@@ -614,6 +1111,14 @@ func (t *GetInlinePets200JSONResponseBody_Data_Item) MergeInlineRat(v InlineRat)
 
 	merged, err := runtime.JSONMerge(t.union, b)
 	t.union = merged
+
+	// For XML, re-marshal the merged result
+	bx, errx := xml.Marshal(v)
+	if errx != nil {
+		return errx
+	}
+	t.xunion = bx
+
 	return err
 }
 
@@ -625,6 +1130,27 @@ func (t GetInlinePets200JSONResponseBody_Data_Item) MarshalJSON() ([]byte, error
 func (t *GetInlinePets200JSONResponseBody_Data_Item) UnmarshalJSON(b []byte) error {
 	err := t.union.UnmarshalJSON(b)
 	return err
+}
+
+func (t GetInlinePets200JSONResponseBody_Data_Item) MarshalXML(e *xml.Encoder, start xml.StartElement) error {
+	if len(t.xunion) > 0 {
+		return t.xunion.MarshalXML(e, start)
+	}
+	if err := e.EncodeToken(start); err != nil {
+		return err
+	}
+	return e.EncodeToken(start.End())
+}
+
+func (t *GetInlinePets200JSONResponseBody_Data_Item) UnmarshalXML(d *xml.Decoder, start xml.StartElement) error {
+	var err error
+
+	t.xunion, err = CaptureXMLElement(d, start)
+	if err != nil {
+		return err
+	}
+
+	return nil
 }
 
 // RequestEditorFn is the function signature for the RequestEditor callback function
@@ -1007,13 +1533,13 @@ type GetInlinePetsResponse struct {
 	HTTPResponse *http.Response
 	// JSON200 the response for an HTTP 200 `application/json` response
 	JSON200 *struct {
-		Data *[]GetInlinePets200JSONResponseBody_Data_Item `json:"data,omitempty"`
+		Data *[]GetInlinePets200JSONResponseBody_Data_Item `json:"data,omitempty" xml:"data"`
 	}
 }
 
 // GetJSON200 returns the response for an HTTP 200 `application/json` response
 func (r GetInlinePetsResponse) GetJSON200() *struct {
-	Data *[]GetInlinePets200JSONResponseBody_Data_Item `json:"data,omitempty"`
+	Data *[]GetInlinePets200JSONResponseBody_Data_Item `json:"data,omitempty" xml:"data"`
 } {
 	return r.JSON200
 }
@@ -1231,7 +1757,7 @@ func ParseGetInlinePetsResponse(rsp *http.Response) (*GetInlinePetsResponse, err
 	switch {
 	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
 		var dest struct {
-			Data *[]GetInlinePets200JSONResponseBody_Data_Item `json:"data,omitempty"`
+			Data *[]GetInlinePets200JSONResponseBody_Data_Item `json:"data,omitempty" xml:"data"`
 		}
 		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
 			return nil, err
@@ -1448,4 +1974,99 @@ func RegisterHandlersWithOptions(router EchoRouter, si ServerInterface, options 
 	router.GET(options.BaseURL+"/issue1189/test", wrapper.GetIssue1189Test, options.OperationMiddlewares["getIssue1189Test"]...)
 	router.GET(options.BaseURL+"/param/test", wrapper.GetParamTest, options.OperationMiddlewares["getParamTest"]...)
 
+}
+
+type RawMessage []byte
+
+// MarshalJSON returns the raw bytes as JSON.
+func (r RawMessage) MarshalJSON() ([]byte, error) {
+	if r == nil {
+		return []byte("null"), nil
+	}
+	return r, nil
+}
+
+// UnmarshalJSON sets the raw bytes from JSON input.
+func (r *RawMessage) UnmarshalJSON(data []byte) error {
+	*r = append((*r)[0:0], data...)
+	return nil
+}
+
+// MarshalXML encodes the raw XML message into the encoder, re-wrapping
+// it within the provided start element.
+func (r RawMessage) MarshalXML(e *xml.Encoder, start xml.StartElement) error {
+	if len(r) == 0 {
+		return nil
+	}
+
+	d := xml.NewDecoder(bytes.NewReader(r))
+	// Skip the original start element from the stored raw XML
+	_, err := d.Token()
+	if err != nil {
+		return err
+	}
+
+	// Write the caller-provided start element
+	if err := e.EncodeToken(start); err != nil {
+		return err
+	}
+
+	// Copy all inner tokens until we reach the matching end element
+	depth := 1
+	for {
+		tok, err := d.Token()
+		if err != nil {
+			return err
+		}
+		switch tok.(type) {
+		case xml.StartElement:
+			depth++
+		case xml.EndElement:
+			depth--
+			if depth == 0 {
+				return e.EncodeToken(start.End())
+			}
+		}
+		if err := e.EncodeToken(xml.CopyToken(tok)); err != nil {
+			return err
+		}
+	}
+}
+
+// UnmarshalXML captures a full XML element (including children) into raw bytes.
+func (r *RawMessage) UnmarshalXML(d *xml.Decoder, start xml.StartElement) error {
+	data, err := CaptureXMLElement(d, start)
+	if err != nil {
+		return err
+	}
+	*r = data
+	return nil
+}
+
+// CaptureXMLElement reads an entire XML element from the decoder and returns it as bytes.
+func CaptureXMLElement(d *xml.Decoder, start xml.StartElement) ([]byte, error) {
+	buf := new(bytes.Buffer)
+	encoder := xml.NewEncoder(buf)
+
+	if err := encoder.EncodeToken(start); err != nil {
+		return nil, err
+	}
+
+	for {
+		tok, err := d.Token()
+		if err != nil {
+			return nil, err
+		}
+
+		if err = encoder.EncodeToken(tok); err != nil {
+			return nil, err
+		}
+
+		if end, ok := tok.(xml.EndElement); ok && end.Name == start.Name {
+			encoder.Flush()
+			break
+		}
+	}
+
+	return buf.Bytes(), nil
 }

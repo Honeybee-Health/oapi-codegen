@@ -1,0 +1,6 @@
+package: xml_marshal
+generate:
+  models: true
+output-options:
+  skip-prune: true
+output: xml_marshal.gen.go

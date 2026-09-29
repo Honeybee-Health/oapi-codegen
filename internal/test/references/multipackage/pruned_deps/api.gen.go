@@ -20,12 +20,12 @@ import (
 // Thing defines model for Thing.
 type Thing struct {
 	// Name just a name
-	Name string `json:"name"`
+	Name string `json:"name" xml:"name"`
 }
 
 // ThingList Object containing list of Things
 type ThingList struct {
-	Keys []Thing `json:"keys"`
+	Keys []Thing `json:"keys" xml:"keys"`
 }
 
 // N404 defines model for 404.

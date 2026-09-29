@@ -7,6 +7,7 @@ import (
 	"bytes"
 	"context"
 	"encoding/json"
+	"encoding/xml"
 	"fmt"
 	"io"
 	"net/http"
@@ -18,30 +19,30 @@ import (
 
 // Bar defines model for Bar.
 type Bar struct {
-	Value *string `json:"value,omitempty"`
+	Value *string `json:"value,omitempty" xml:"value"`
 }
 
 // Bar2 defines model for Bar2.
 type Bar2 struct {
-	Value *float32 `json:"value,omitempty"`
+	Value *float32 `json:"value,omitempty" xml:"value"`
 }
 
 // CreateItemResponse defines model for CreateItemResponse.
 type CreateItemResponse struct {
-	Id   *string `json:"id,omitempty"`
-	Name *string `json:"name,omitempty"`
+	Id   *string `json:"id,omitempty" xml:"id"`
+	Name *string `json:"name,omitempty" xml:"name"`
 }
 
 // GetStatusResponse defines model for GetStatusResponse.
 type GetStatusResponse struct {
-	Status    *string `json:"status,omitempty"`
-	Timestamp *string `json:"timestamp,omitempty"`
+	Status    *string `json:"status,omitempty" xml:"status"`
+	Timestamp *string `json:"timestamp,omitempty" xml:"timestamp"`
 }
 
 // JsonPatch defines model for JsonPatch.
 type JsonPatch = []struct {
-	Op   *string `json:"op,omitempty"`
-	Path *string `json:"path,omitempty"`
+	Op   *string `json:"op,omitempty" xml:"op"`
+	Path *string `json:"path,omitempty" xml:"path"`
 }
 
 // ListItemsResponse defines model for ListItemsResponse.
@@ -52,29 +53,29 @@ type Metadata = string
 
 // Order defines model for Order.
 type Order struct {
-	Id      *string `json:"id,omitempty"`
-	Product *string `json:"product,omitempty"`
+	Id      *string `json:"id,omitempty" xml:"id"`
+	Product *string `json:"product,omitempty" xml:"product"`
 }
 
 // Outcome defines model for Outcome.
 type Outcome struct {
-	Value *string `json:"value,omitempty"`
+	Value *string `json:"value,omitempty" xml:"value"`
 }
 
 // Payload defines model for Payload.
 type Payload struct {
-	Content *string `json:"content,omitempty"`
+	Content *string `json:"content,omitempty" xml:"content"`
 }
 
 // Pet defines model for Pet.
 type Pet struct {
-	Id   *int    `json:"id,omitempty"`
-	Name *string `json:"name,omitempty"`
+	Id   *int    `json:"id,omitempty" xml:"id"`
+	Name *string `json:"name,omitempty" xml:"name"`
 }
 
 // QueryResponse defines model for QueryResponse.
 type QueryResponse struct {
-	Results *[]string `json:"results,omitempty"`
+	Results *[]string `json:"results,omitempty" xml:"results"`
 }
 
 // Qux defines model for Qux.
@@ -82,25 +83,25 @@ type Qux = CustomQux
 
 // CustomQux defines model for Qux.
 type CustomQux struct {
-	Label *string `json:"label,omitempty"`
+	Label *string `json:"label,omitempty" xml:"label"`
 }
 
 // SpecialName defines model for Renamer.
 type SpecialName struct {
-	Label *string `json:"label,omitempty"`
+	Label *string `json:"label,omitempty" xml:"label"`
 }
 
 // Resource defines model for Resource.
 type Resource struct {
-	Id     *string `json:"id,omitempty"`
-	Name   *string `json:"name,omitempty"`
-	Status *string `json:"status,omitempty"`
+	Id     *string `json:"id,omitempty" xml:"id"`
+	Name   *string `json:"name,omitempty" xml:"name"`
+	Status *string `json:"status,omitempty" xml:"status"`
 }
 
 // ResourceMVO defines model for Resource_MVO.
 type ResourceMVO struct {
-	Name   *string `json:"name,omitempty"`
-	Status *string `json:"status,omitempty"`
+	Name   *string `json:"name,omitempty" xml:"name"`
+	Status *string `json:"status,omitempty" xml:"status"`
 }
 
 // Widget defines model for Widget.
@@ -117,7 +118,8 @@ type N200ResourcePatchResponseJSONApplicationJSON = Resource
 
 // N200ResourcePatchResponseJSON2ApplicationJSONPatchPlusJSON defines model for 200Resource_Patch.
 type N200ResourcePatchResponseJSON2ApplicationJSONPatchPlusJSON struct {
-	union json.RawMessage
+	union  json.RawMessage
+	xunion RawMessage
 }
 
 // N200ResourcePatchApplicationJSONPatchPlusJSON1 defines model for 200ResourcePatch.ApplicationJSONPatchPlusJSON.1.
@@ -128,7 +130,8 @@ type N200ResourcePatchApplicationJSONPatchPlusJSON2 = string
 
 // N200ResourcePatchResponseJSON3ApplicationJSONPatchQueryPlusJSON defines model for 200Resource_Patch.
 type N200ResourcePatchResponseJSON3ApplicationJSONPatchQueryPlusJSON struct {
-	union json.RawMessage
+	union  json.RawMessage
+	xunion RawMessage
 }
 
 // N200ResourcePatchApplicationJSONPatchQueryPlusJSON1 defines model for 200ResourcePatch.ApplicationJSONPatchQueryPlusJSON.1.
@@ -142,62 +145,62 @@ type N200ResourcePatchResponseJSON4ApplicationMergePatchPlusJSON = Resource
 
 // BarResponse defines model for Bar.
 type BarResponse struct {
-	Value1 *Bar  `json:"value1,omitempty"`
-	Value2 *Bar2 `json:"value2,omitempty"`
+	Value1 *Bar  `json:"value1,omitempty" xml:"value1"`
+	Value2 *Bar2 `json:"value2,omitempty" xml:"value2"`
 }
 
 // OutcomeResult defines model for Outcome.
 type OutcomeResult struct {
-	Result *string `json:"result,omitempty"`
+	Result *string `json:"result,omitempty" xml:"result"`
 }
 
 // QuxResponse defines model for Qux.
 type QuxResponse struct {
-	Data *string `json:"data,omitempty"`
+	Data *string `json:"data,omitempty" xml:"data"`
 }
 
 // Renamer defines model for Renamer.
 type Renamer struct {
-	Data *string `json:"data,omitempty"`
+	Data *string `json:"data,omitempty" xml:"data"`
 }
 
 // ZapResponse defines model for Zap.
 type ZapResponse struct {
-	Result *string `json:"result,omitempty"`
+	Result *string `json:"result,omitempty" xml:"result"`
 }
 
 // BarRequestBody defines model for Bar.
 type BarRequestBody struct {
-	Value *int `json:"value,omitempty"`
+	Value *int `json:"value,omitempty" xml:"value"`
 }
 
 // OrderRequestBodyJSON defines model for Order.
 type OrderRequestBodyJSON struct {
-	Id      *string `json:"id,omitempty"`
-	Product *string `json:"product,omitempty"`
+	Id      *string `json:"id,omitempty" xml:"id"`
+	Product *string `json:"product,omitempty" xml:"product"`
 }
 
 // OrderRequestBodyJSON2 defines model for Order.
 type OrderRequestBodyJSON2 = []struct {
-	Op    *string `json:"op,omitempty"`
-	Path  *string `json:"path,omitempty"`
-	Value *string `json:"value,omitempty"`
+	Op    *string `json:"op,omitempty" xml:"op"`
+	Path  *string `json:"path,omitempty" xml:"path"`
+	Value *string `json:"value,omitempty" xml:"value"`
 }
 
 // OrderRequestBodyJSON3 defines model for Order.
 type OrderRequestBodyJSON3 struct {
-	Product *string `json:"product,omitempty"`
+	Product *string `json:"product,omitempty" xml:"product"`
 }
 
 // PayloadBody defines model for Payload.
 type PayloadBody struct {
-	Data *string `json:"data,omitempty"`
+	Data *string `json:"data,omitempty" xml:"data"`
 }
 
 // PetRequestBody defines model for Pet.
 type PetRequestBody struct {
-	Name    *string `json:"name,omitempty"`
-	Species *string `json:"species,omitempty"`
+	Name    *string `json:"name,omitempty" xml:"name"`
+	Species *string `json:"species,omitempty" xml:"species"`
 }
 
 // ResourceMVORequestBodyJSON defines model for Resource_MVO.
@@ -211,51 +214,51 @@ type ResourceMVORequestBodyJSON3 = ResourceMVO
 
 // PostFooJSONBody defines parameters for PostFoo.
 type PostFooJSONBody struct {
-	Value *int `json:"value,omitempty"`
+	Value *int `json:"value,omitempty" xml:"value"`
 }
 
 // PostFooParams defines parameters for PostFoo.
 type PostFooParams struct {
-	Bar *BarParameter `form:"bar,omitempty" json:"bar,omitempty"`
+	Bar *BarParameter `form:"bar,omitempty" json:"bar,omitempty" xml:"bar"`
 }
 
 // CreateItemJSONBody defines parameters for CreateItem.
 type CreateItemJSONBody struct {
-	Name *string `json:"name,omitempty"`
+	Name *string `json:"name,omitempty" xml:"name"`
 }
 
 // CreateOrderJSONBody defines parameters for CreateOrder.
 type CreateOrderJSONBody struct {
-	Id      *string `json:"id,omitempty"`
-	Product *string `json:"product,omitempty"`
+	Id      *string `json:"id,omitempty" xml:"id"`
+	Product *string `json:"product,omitempty" xml:"product"`
 }
 
 // CreateOrderApplicationJSONPatchPlusJSONBody defines parameters for CreateOrder.
 type CreateOrderApplicationJSONPatchPlusJSONBody = []struct {
-	Op    *string `json:"op,omitempty"`
-	Path  *string `json:"path,omitempty"`
-	Value *string `json:"value,omitempty"`
+	Op    *string `json:"op,omitempty" xml:"op"`
+	Path  *string `json:"path,omitempty" xml:"path"`
+	Value *string `json:"value,omitempty" xml:"value"`
 }
 
 // CreateOrderApplicationMergePatchPlusJSONBody defines parameters for CreateOrder.
 type CreateOrderApplicationMergePatchPlusJSONBody struct {
-	Product *string `json:"product,omitempty"`
+	Product *string `json:"product,omitempty" xml:"product"`
 }
 
 // SendPayloadJSONBody defines parameters for SendPayload.
 type SendPayloadJSONBody struct {
-	Data *string `json:"data,omitempty"`
+	Data *string `json:"data,omitempty" xml:"data"`
 }
 
 // CreatePetJSONBody defines parameters for CreatePet.
 type CreatePetJSONBody struct {
-	Name    *string `json:"name,omitempty"`
-	Species *string `json:"species,omitempty"`
+	Name    *string `json:"name,omitempty" xml:"name"`
+	Species *string `json:"species,omitempty" xml:"species"`
 }
 
 // QueryJSONBody defines parameters for Query.
 type QueryJSONBody struct {
-	Q *string `json:"q,omitempty"`
+	Q *string `json:"q,omitempty" xml:"q"`
 }
 
 // PatchResource200ApplicationJSONPatchPlusJSONResponseBody1 defines parameters for PatchResource.
@@ -318,15 +321,35 @@ type PostZapJSONRequestBody = Zap
 // AsResource returns the union data inside the N200ResourcePatchResponseJSON2ApplicationJSONPatchPlusJSON as a Resource
 func (t N200ResourcePatchResponseJSON2ApplicationJSONPatchPlusJSON) AsResource() (Resource, error) {
 	var body Resource
-	err := json.Unmarshal(t.union, &body)
-	return body, err
+	if len(t.union) > 0 {
+		err := json.Unmarshal(t.union, &body)
+		if err != nil {
+			return body, err
+		}
+	}
+	if len(t.xunion) > 0 {
+		err := xml.Unmarshal(t.xunion, &body)
+		if err != nil {
+			return body, err
+		}
+	}
+	return body, nil
 }
 
 // FromResource overwrites any union data inside the N200ResourcePatchResponseJSON2ApplicationJSONPatchPlusJSON as the provided Resource
 func (t *N200ResourcePatchResponseJSON2ApplicationJSONPatchPlusJSON) FromResource(v Resource) error {
 	b, err := json.Marshal(v)
+	if err != nil {
+		return err
+	}
 	t.union = b
-	return err
+	b, err = xml.Marshal(v)
+	if err != nil {
+		return err
+	}
+	t.xunion = b
+
+	return nil
 }
 
 // MergeResource performs a merge with any union data inside the N200ResourcePatchResponseJSON2ApplicationJSONPatchPlusJSON, using the provided Resource
@@ -338,21 +361,49 @@ func (t *N200ResourcePatchResponseJSON2ApplicationJSONPatchPlusJSON) MergeResour
 
 	merged, err := runtime.JSONMerge(t.union, b)
 	t.union = merged
+
+	// For XML, re-marshal the merged result
+	bx, errx := xml.Marshal(v)
+	if errx != nil {
+		return errx
+	}
+	t.xunion = bx
+
 	return err
 }
 
 // AsN200ResourcePatchApplicationJSONPatchPlusJSON1 returns the union data inside the N200ResourcePatchResponseJSON2ApplicationJSONPatchPlusJSON as a N200ResourcePatchApplicationJSONPatchPlusJSON1
 func (t N200ResourcePatchResponseJSON2ApplicationJSONPatchPlusJSON) AsN200ResourcePatchApplicationJSONPatchPlusJSON1() (N200ResourcePatchApplicationJSONPatchPlusJSON1, error) {
 	var body N200ResourcePatchApplicationJSONPatchPlusJSON1
-	err := json.Unmarshal(t.union, &body)
-	return body, err
+	if len(t.union) > 0 {
+		err := json.Unmarshal(t.union, &body)
+		if err != nil {
+			return body, err
+		}
+	}
+	if len(t.xunion) > 0 {
+		err := xml.Unmarshal(t.xunion, &body)
+		if err != nil {
+			return body, err
+		}
+	}
+	return body, nil
 }
 
 // FromN200ResourcePatchApplicationJSONPatchPlusJSON1 overwrites any union data inside the N200ResourcePatchResponseJSON2ApplicationJSONPatchPlusJSON as the provided N200ResourcePatchApplicationJSONPatchPlusJSON1
 func (t *N200ResourcePatchResponseJSON2ApplicationJSONPatchPlusJSON) FromN200ResourcePatchApplicationJSONPatchPlusJSON1(v N200ResourcePatchApplicationJSONPatchPlusJSON1) error {
 	b, err := json.Marshal(v)
+	if err != nil {
+		return err
+	}
 	t.union = b
-	return err
+	b, err = xml.Marshal(v)
+	if err != nil {
+		return err
+	}
+	t.xunion = b
+
+	return nil
 }
 
 // MergeN200ResourcePatchApplicationJSONPatchPlusJSON1 performs a merge with any union data inside the N200ResourcePatchResponseJSON2ApplicationJSONPatchPlusJSON, using the provided N200ResourcePatchApplicationJSONPatchPlusJSON1
@@ -364,21 +415,49 @@ func (t *N200ResourcePatchResponseJSON2ApplicationJSONPatchPlusJSON) MergeN200Re
 
 	merged, err := runtime.JSONMerge(t.union, b)
 	t.union = merged
+
+	// For XML, re-marshal the merged result
+	bx, errx := xml.Marshal(v)
+	if errx != nil {
+		return errx
+	}
+	t.xunion = bx
+
 	return err
 }
 
 // AsN200ResourcePatchApplicationJSONPatchPlusJSON2 returns the union data inside the N200ResourcePatchResponseJSON2ApplicationJSONPatchPlusJSON as a N200ResourcePatchApplicationJSONPatchPlusJSON2
 func (t N200ResourcePatchResponseJSON2ApplicationJSONPatchPlusJSON) AsN200ResourcePatchApplicationJSONPatchPlusJSON2() (N200ResourcePatchApplicationJSONPatchPlusJSON2, error) {
 	var body N200ResourcePatchApplicationJSONPatchPlusJSON2
-	err := json.Unmarshal(t.union, &body)
-	return body, err
+	if len(t.union) > 0 {
+		err := json.Unmarshal(t.union, &body)
+		if err != nil {
+			return body, err
+		}
+	}
+	if len(t.xunion) > 0 {
+		err := xml.Unmarshal(t.xunion, &body)
+		if err != nil {
+			return body, err
+		}
+	}
+	return body, nil
 }
 
 // FromN200ResourcePatchApplicationJSONPatchPlusJSON2 overwrites any union data inside the N200ResourcePatchResponseJSON2ApplicationJSONPatchPlusJSON as the provided N200ResourcePatchApplicationJSONPatchPlusJSON2
 func (t *N200ResourcePatchResponseJSON2ApplicationJSONPatchPlusJSON) FromN200ResourcePatchApplicationJSONPatchPlusJSON2(v N200ResourcePatchApplicationJSONPatchPlusJSON2) error {
 	b, err := json.Marshal(v)
+	if err != nil {
+		return err
+	}
 	t.union = b
-	return err
+	b, err = xml.Marshal(v)
+	if err != nil {
+		return err
+	}
+	t.xunion = b
+
+	return nil
 }
 
 // MergeN200ResourcePatchApplicationJSONPatchPlusJSON2 performs a merge with any union data inside the N200ResourcePatchResponseJSON2ApplicationJSONPatchPlusJSON, using the provided N200ResourcePatchApplicationJSONPatchPlusJSON2
@@ -390,6 +469,14 @@ func (t *N200ResourcePatchResponseJSON2ApplicationJSONPatchPlusJSON) MergeN200Re
 
 	merged, err := runtime.JSONMerge(t.union, b)
 	t.union = merged
+
+	// For XML, re-marshal the merged result
+	bx, errx := xml.Marshal(v)
+	if errx != nil {
+		return errx
+	}
+	t.xunion = bx
+
 	return err
 }
 
@@ -403,18 +490,59 @@ func (t *N200ResourcePatchResponseJSON2ApplicationJSONPatchPlusJSON) UnmarshalJS
 	return err
 }
 
+func (t N200ResourcePatchResponseJSON2ApplicationJSONPatchPlusJSON) MarshalXML(e *xml.Encoder, start xml.StartElement) error {
+	if len(t.xunion) > 0 {
+		return t.xunion.MarshalXML(e, start)
+	}
+	if err := e.EncodeToken(start); err != nil {
+		return err
+	}
+	return e.EncodeToken(start.End())
+}
+
+func (t *N200ResourcePatchResponseJSON2ApplicationJSONPatchPlusJSON) UnmarshalXML(d *xml.Decoder, start xml.StartElement) error {
+	var err error
+
+	t.xunion, err = CaptureXMLElement(d, start)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
 // AsResource returns the union data inside the N200ResourcePatchResponseJSON3ApplicationJSONPatchQueryPlusJSON as a Resource
 func (t N200ResourcePatchResponseJSON3ApplicationJSONPatchQueryPlusJSON) AsResource() (Resource, error) {
 	var body Resource
-	err := json.Unmarshal(t.union, &body)
-	return body, err
+	if len(t.union) > 0 {
+		err := json.Unmarshal(t.union, &body)
+		if err != nil {
+			return body, err
+		}
+	}
+	if len(t.xunion) > 0 {
+		err := xml.Unmarshal(t.xunion, &body)
+		if err != nil {
+			return body, err
+		}
+	}
+	return body, nil
 }
 
 // FromResource overwrites any union data inside the N200ResourcePatchResponseJSON3ApplicationJSONPatchQueryPlusJSON as the provided Resource
 func (t *N200ResourcePatchResponseJSON3ApplicationJSONPatchQueryPlusJSON) FromResource(v Resource) error {
 	b, err := json.Marshal(v)
+	if err != nil {
+		return err
+	}
 	t.union = b
-	return err
+	b, err = xml.Marshal(v)
+	if err != nil {
+		return err
+	}
+	t.xunion = b
+
+	return nil
 }
 
 // MergeResource performs a merge with any union data inside the N200ResourcePatchResponseJSON3ApplicationJSONPatchQueryPlusJSON, using the provided Resource
@@ -426,21 +554,49 @@ func (t *N200ResourcePatchResponseJSON3ApplicationJSONPatchQueryPlusJSON) MergeR
 
 	merged, err := runtime.JSONMerge(t.union, b)
 	t.union = merged
+
+	// For XML, re-marshal the merged result
+	bx, errx := xml.Marshal(v)
+	if errx != nil {
+		return errx
+	}
+	t.xunion = bx
+
 	return err
 }
 
 // AsN200ResourcePatchApplicationJSONPatchQueryPlusJSON1 returns the union data inside the N200ResourcePatchResponseJSON3ApplicationJSONPatchQueryPlusJSON as a N200ResourcePatchApplicationJSONPatchQueryPlusJSON1
 func (t N200ResourcePatchResponseJSON3ApplicationJSONPatchQueryPlusJSON) AsN200ResourcePatchApplicationJSONPatchQueryPlusJSON1() (N200ResourcePatchApplicationJSONPatchQueryPlusJSON1, error) {
 	var body N200ResourcePatchApplicationJSONPatchQueryPlusJSON1
-	err := json.Unmarshal(t.union, &body)
-	return body, err
+	if len(t.union) > 0 {
+		err := json.Unmarshal(t.union, &body)
+		if err != nil {
+			return body, err
+		}
+	}
+	if len(t.xunion) > 0 {
+		err := xml.Unmarshal(t.xunion, &body)
+		if err != nil {
+			return body, err
+		}
+	}
+	return body, nil
 }
 
 // FromN200ResourcePatchApplicationJSONPatchQueryPlusJSON1 overwrites any union data inside the N200ResourcePatchResponseJSON3ApplicationJSONPatchQueryPlusJSON as the provided N200ResourcePatchApplicationJSONPatchQueryPlusJSON1
 func (t *N200ResourcePatchResponseJSON3ApplicationJSONPatchQueryPlusJSON) FromN200ResourcePatchApplicationJSONPatchQueryPlusJSON1(v N200ResourcePatchApplicationJSONPatchQueryPlusJSON1) error {
 	b, err := json.Marshal(v)
+	if err != nil {
+		return err
+	}
 	t.union = b
-	return err
+	b, err = xml.Marshal(v)
+	if err != nil {
+		return err
+	}
+	t.xunion = b
+
+	return nil
 }
 
 // MergeN200ResourcePatchApplicationJSONPatchQueryPlusJSON1 performs a merge with any union data inside the N200ResourcePatchResponseJSON3ApplicationJSONPatchQueryPlusJSON, using the provided N200ResourcePatchApplicationJSONPatchQueryPlusJSON1
@@ -452,21 +608,49 @@ func (t *N200ResourcePatchResponseJSON3ApplicationJSONPatchQueryPlusJSON) MergeN
 
 	merged, err := runtime.JSONMerge(t.union, b)
 	t.union = merged
+
+	// For XML, re-marshal the merged result
+	bx, errx := xml.Marshal(v)
+	if errx != nil {
+		return errx
+	}
+	t.xunion = bx
+
 	return err
 }
 
 // AsN200ResourcePatchApplicationJSONPatchQueryPlusJSON2 returns the union data inside the N200ResourcePatchResponseJSON3ApplicationJSONPatchQueryPlusJSON as a N200ResourcePatchApplicationJSONPatchQueryPlusJSON2
 func (t N200ResourcePatchResponseJSON3ApplicationJSONPatchQueryPlusJSON) AsN200ResourcePatchApplicationJSONPatchQueryPlusJSON2() (N200ResourcePatchApplicationJSONPatchQueryPlusJSON2, error) {
 	var body N200ResourcePatchApplicationJSONPatchQueryPlusJSON2
-	err := json.Unmarshal(t.union, &body)
-	return body, err
+	if len(t.union) > 0 {
+		err := json.Unmarshal(t.union, &body)
+		if err != nil {
+			return body, err
+		}
+	}
+	if len(t.xunion) > 0 {
+		err := xml.Unmarshal(t.xunion, &body)
+		if err != nil {
+			return body, err
+		}
+	}
+	return body, nil
 }
 
 // FromN200ResourcePatchApplicationJSONPatchQueryPlusJSON2 overwrites any union data inside the N200ResourcePatchResponseJSON3ApplicationJSONPatchQueryPlusJSON as the provided N200ResourcePatchApplicationJSONPatchQueryPlusJSON2
 func (t *N200ResourcePatchResponseJSON3ApplicationJSONPatchQueryPlusJSON) FromN200ResourcePatchApplicationJSONPatchQueryPlusJSON2(v N200ResourcePatchApplicationJSONPatchQueryPlusJSON2) error {
 	b, err := json.Marshal(v)
+	if err != nil {
+		return err
+	}
 	t.union = b
-	return err
+	b, err = xml.Marshal(v)
+	if err != nil {
+		return err
+	}
+	t.xunion = b
+
+	return nil
 }
 
 // MergeN200ResourcePatchApplicationJSONPatchQueryPlusJSON2 performs a merge with any union data inside the N200ResourcePatchResponseJSON3ApplicationJSONPatchQueryPlusJSON, using the provided N200ResourcePatchApplicationJSONPatchQueryPlusJSON2
@@ -478,6 +662,14 @@ func (t *N200ResourcePatchResponseJSON3ApplicationJSONPatchQueryPlusJSON) MergeN
 
 	merged, err := runtime.JSONMerge(t.union, b)
 	t.union = merged
+
+	// For XML, re-marshal the merged result
+	bx, errx := xml.Marshal(v)
+	if errx != nil {
+		return errx
+	}
+	t.xunion = bx
+
 	return err
 }
 
@@ -489,6 +681,27 @@ func (t N200ResourcePatchResponseJSON3ApplicationJSONPatchQueryPlusJSON) Marshal
 func (t *N200ResourcePatchResponseJSON3ApplicationJSONPatchQueryPlusJSON) UnmarshalJSON(b []byte) error {
 	err := t.union.UnmarshalJSON(b)
 	return err
+}
+
+func (t N200ResourcePatchResponseJSON3ApplicationJSONPatchQueryPlusJSON) MarshalXML(e *xml.Encoder, start xml.StartElement) error {
+	if len(t.xunion) > 0 {
+		return t.xunion.MarshalXML(e, start)
+	}
+	if err := e.EncodeToken(start); err != nil {
+		return err
+	}
+	return e.EncodeToken(start.End())
+}
+
+func (t *N200ResourcePatchResponseJSON3ApplicationJSONPatchQueryPlusJSON) UnmarshalXML(d *xml.Decoder, start xml.StartElement) error {
+	var err error
+
+	t.xunion, err = CaptureXMLElement(d, start)
+	if err != nil {
+		return err
+	}
+
+	return nil
 }
 
 // RequestEditorFn is the function signature for the RequestEditor callback function
@@ -2064,15 +2277,15 @@ type ListEntitiesResponse struct {
 	HTTPResponse *http.Response
 	// JSON200 the response for an HTTP 200 `application/json` response
 	JSON200 *struct {
-		Data     *[]Widget `json:"data,omitempty"`
-		Metadata *Metadata `json:"metadata,omitempty"`
+		Data     *[]Widget `json:"data,omitempty" xml:"data"`
+		Metadata *Metadata `json:"metadata,omitempty" xml:"metadata"`
 	}
 }
 
 // GetJSON200 returns the response for an HTTP 200 `application/json` response
 func (r ListEntitiesResponse) GetJSON200() *struct {
-	Data     *[]Widget `json:"data,omitempty"`
-	Metadata *Metadata `json:"metadata,omitempty"`
+	Data     *[]Widget `json:"data,omitempty" xml:"data"`
+	Metadata *Metadata `json:"metadata,omitempty" xml:"metadata"`
 } {
 	return r.JSON200
 }
@@ -3178,8 +3391,8 @@ func ParseListEntitiesResponse(rsp *http.Response) (*ListEntitiesResponse, error
 	switch {
 	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
 		var dest struct {
-			Data     *[]Widget `json:"data,omitempty"`
-			Metadata *Metadata `json:"metadata,omitempty"`
+			Data     *[]Widget `json:"data,omitempty" xml:"data"`
+			Metadata *Metadata `json:"metadata,omitempty" xml:"metadata"`
 		}
 		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
 			return nil, err
@@ -3625,4 +3838,99 @@ func ParsePostZapResponse(rsp *http.Response) (*PostZapResponse, error) {
 	}
 
 	return response, nil
+}
+
+type RawMessage []byte
+
+// MarshalJSON returns the raw bytes as JSON.
+func (r RawMessage) MarshalJSON() ([]byte, error) {
+	if r == nil {
+		return []byte("null"), nil
+	}
+	return r, nil
+}
+
+// UnmarshalJSON sets the raw bytes from JSON input.
+func (r *RawMessage) UnmarshalJSON(data []byte) error {
+	*r = append((*r)[0:0], data...)
+	return nil
+}
+
+// MarshalXML encodes the raw XML message into the encoder, re-wrapping
+// it within the provided start element.
+func (r RawMessage) MarshalXML(e *xml.Encoder, start xml.StartElement) error {
+	if len(r) == 0 {
+		return nil
+	}
+
+	d := xml.NewDecoder(bytes.NewReader(r))
+	// Skip the original start element from the stored raw XML
+	_, err := d.Token()
+	if err != nil {
+		return err
+	}
+
+	// Write the caller-provided start element
+	if err := e.EncodeToken(start); err != nil {
+		return err
+	}
+
+	// Copy all inner tokens until we reach the matching end element
+	depth := 1
+	for {
+		tok, err := d.Token()
+		if err != nil {
+			return err
+		}
+		switch tok.(type) {
+		case xml.StartElement:
+			depth++
+		case xml.EndElement:
+			depth--
+			if depth == 0 {
+				return e.EncodeToken(start.End())
+			}
+		}
+		if err := e.EncodeToken(xml.CopyToken(tok)); err != nil {
+			return err
+		}
+	}
+}
+
+// UnmarshalXML captures a full XML element (including children) into raw bytes.
+func (r *RawMessage) UnmarshalXML(d *xml.Decoder, start xml.StartElement) error {
+	data, err := CaptureXMLElement(d, start)
+	if err != nil {
+		return err
+	}
+	*r = data
+	return nil
+}
+
+// CaptureXMLElement reads an entire XML element from the decoder and returns it as bytes.
+func CaptureXMLElement(d *xml.Decoder, start xml.StartElement) ([]byte, error) {
+	buf := new(bytes.Buffer)
+	encoder := xml.NewEncoder(buf)
+
+	if err := encoder.EncodeToken(start); err != nil {
+		return nil, err
+	}
+
+	for {
+		tok, err := d.Token()
+		if err != nil {
+			return nil, err
+		}
+
+		if err = encoder.EncodeToken(tok); err != nil {
+			return nil, err
+		}
+
+		if end, ok := tok.(xml.EndElement); ok && end.Name == start.Name {
+			encoder.Flush()
+			break
+		}
+	}
+
+	return buf.Bytes(), nil
 }
