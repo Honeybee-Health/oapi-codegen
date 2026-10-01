@@ -4,6 +4,9 @@ import (
 	"encoding/json"
 	"encoding/xml"
 	"testing"
+	"time"
+
+	openapi_types "github.com/oapi-codegen/runtime/types"
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
@@ -506,4 +509,137 @@ func TestDiscriminator_XMLEmptyUnion(t *testing.T) {
 
 func strPtr(s string) *string {
 	return &s
+}
+
+// ===== Date Tests =====
+//
+// `format: date` must serialize as CCYY-MM-DD in XML. The type it used to map
+// to (openapi_types.Date) defines UnmarshalText but no MarshalText, so XML
+// marshaling fell through to the embedded time.Time and emitted RFC3339 --
+// invalid for an xsd:date element. See PZR-254.
+
+func mustDate(t *testing.T, s string) XMLDate {
+	t.Helper()
+	parsed, err := time.Parse("2006-01-02", s)
+	require.NoError(t, err)
+	return XMLDate{Time: parsed}
+}
+
+func TestDateWrapper_XMLMarshalsAsPlainDate(t *testing.T) {
+	obj := DateWrapper{Date: mustDate(t, "2010-12-01")}
+
+	data, err := xml.Marshal(obj)
+	require.NoError(t, err)
+	assert.Equal(t, "<DateWrapper><Date>2010-12-01</Date></DateWrapper>", string(data))
+	assert.NotContains(t, string(data), "T00:00:00Z", "date must not render as an RFC3339 timestamp")
+}
+
+func TestDateWrapper_XMLRoundTrip(t *testing.T) {
+	input := "<DateWrapper><Date>2010-12-01</Date></DateWrapper>"
+
+	var obj DateWrapper
+	require.NoError(t, xml.Unmarshal([]byte(input), &obj))
+	assert.Equal(t, "2010-12-01", obj.Date.String())
+
+	out, err := xml.Marshal(obj)
+	require.NoError(t, err)
+	assert.Equal(t, input, string(out), "re-marshaling must reproduce the identical plain-date form")
+}
+
+func TestDateTimeWrapper_StaysRFC3339(t *testing.T) {
+	obj := DateTimeWrapper{DateTime: time.Date(2010, 12, 1, 13, 45, 30, 0, time.UTC)}
+
+	data, err := xml.Marshal(obj)
+	require.NoError(t, err)
+	assert.Equal(t, "<DateTimeWrapper><DateTime>2010-12-01T13:45:30Z</DateTime></DateTimeWrapper>", string(data))
+}
+
+func TestDateHolder_AllPositionsMarshalAsPlainDate(t *testing.T) {
+	attr := mustDate(t, "2003-03-03")
+	opt := mustDate(t, "2002-02-02")
+	list := []XMLDate{mustDate(t, "2004-04-04"), mustDate(t, "2005-05-05")}
+	obj := DateHolder{
+		RequiredDate: mustDate(t, "2001-01-01"),
+		OptionalDate: &opt,
+		DateList:     &list,
+		AttrDate:     &attr,
+		Stamp:        time.Date(2006, 6, 6, 7, 8, 9, 0, time.UTC),
+	}
+
+	data, err := xml.Marshal(obj)
+	require.NoError(t, err)
+	out := string(data)
+
+	// Attributes are the case a MarshalXML method could not have fixed:
+	// encoding/xml ignores xml.Marshaler for attributes and uses TextMarshaler.
+	assert.Contains(t, out, `attr_date="2003-03-03"`)
+	assert.Contains(t, out, "<required_date>2001-01-01</required_date>")
+	assert.Contains(t, out, "<optional_date>2002-02-02</optional_date>")
+	assert.Contains(t, out, "<date_list>2004-04-04</date_list>")
+	assert.Contains(t, out, "<date_list>2005-05-05</date_list>")
+	assert.Contains(t, out, "<stamp>2006-06-06T07:08:09Z</stamp>", "date-time must remain RFC3339")
+	assert.NotContains(t, out, "2001-01-01T", "dates must not carry a time component")
+}
+
+func TestDateHolder_XMLRoundTrip(t *testing.T) {
+	attr := mustDate(t, "2003-03-03")
+	opt := mustDate(t, "2002-02-02")
+	list := []XMLDate{mustDate(t, "2004-04-04")}
+	obj := DateHolder{
+		RequiredDate: mustDate(t, "2001-01-01"),
+		OptionalDate: &opt,
+		DateList:     &list,
+		AttrDate:     &attr,
+		Stamp:        time.Date(2006, 6, 6, 7, 8, 9, 0, time.UTC),
+	}
+
+	data, err := xml.Marshal(obj)
+	require.NoError(t, err)
+
+	var got DateHolder
+	require.NoError(t, xml.Unmarshal(data, &got))
+
+	assert.Equal(t, "2001-01-01", got.RequiredDate.String())
+	require.NotNil(t, got.OptionalDate)
+	assert.Equal(t, "2002-02-02", got.OptionalDate.String())
+	require.NotNil(t, got.AttrDate)
+	assert.Equal(t, "2003-03-03", got.AttrDate.String())
+	require.NotNil(t, got.DateList)
+	require.Len(t, *got.DateList, 1)
+	assert.Equal(t, "2004-04-04", (*got.DateList)[0].String())
+	assert.True(t, obj.Stamp.Equal(got.Stamp))
+}
+
+func TestDate_JSONUnchanged(t *testing.T) {
+	obj := DateWrapper{Date: mustDate(t, "2010-12-01")}
+
+	data, err := json.Marshal(obj)
+	require.NoError(t, err)
+	assert.JSONEq(t, `{"Date":"2010-12-01"}`, string(data))
+
+	var got DateWrapper
+	require.NoError(t, json.Unmarshal(data, &got))
+	assert.Equal(t, "2010-12-01", got.Date.String())
+}
+
+func TestDate_AliasedSchema(t *testing.T) {
+	// BirthDate is a bare `format: date` schema, generated via alias.
+	var bd BirthDate = mustDate(t, "1985-07-04")
+
+	data, err := xml.Marshal(struct {
+		XMLName xml.Name  `xml:"b"`
+		Value   BirthDate `xml:"v"`
+	}{Value: bd})
+	require.NoError(t, err)
+	assert.Equal(t, "<b><v>1985-07-04</v></b>", string(data))
+}
+
+func TestXMLDate_ConvertibleToRuntimeDate(t *testing.T) {
+	// The runtime's parameter binding detects dates by reflect-converting to
+	// types.Date. XMLDate must stay convertible or deepObject binding silently
+	// yields the zero date.
+	d := mustDate(t, "2010-12-01")
+	converted := openapi_types.Date(d)
+	assert.Equal(t, "2010-12-01", converted.String())
+	assert.Equal(t, d.Time, converted.Time)
 }

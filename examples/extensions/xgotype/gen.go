@@ -9,12 +9,12 @@ import (
 
 // Client defines model for Client.
 type Client struct {
-	Id   *float32 `json:"id,omitempty"`
-	Name string   `json:"name"`
+	Id   *float32 `json:"id,omitempty" xml:"id"`
+	Name string   `json:"name" xml:"name"`
 }
 
 // ClientWithExtension defines model for ClientWithExtension.
 type ClientWithExtension struct {
-	Id   *int64          `json:"id,omitempty"`
-	Name googleuuid.UUID `json:"name"`
+	Id   *int64          `json:"id,omitempty" xml:"id"`
+	Name googleuuid.UUID `json:"name" xml:"name"`
 }

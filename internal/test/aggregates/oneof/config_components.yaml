@@ -1,0 +1,10 @@
+# yaml-language-server: $schema=../../../../configuration-schema.json
+package: aggregatesoneof
+output: components.gen.go
+# components.yaml fold: comprehensive oneOf + anyOf marshaling / discriminator cases.
+generate:
+  models: true
+output-options:
+  skip-prune: true
+  # discriminator.gen.go emits the XML helpers for this package.
+  skip-xml-helpers: true

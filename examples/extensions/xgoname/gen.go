@@ -5,12 +5,12 @@ package xgoname
 
 // Client defines model for Client.
 type Client struct {
-	Id   *float32 `json:"id,omitempty"`
-	Name string   `json:"name"`
+	Id   *float32 `json:"id,omitempty" xml:"id"`
+	Name string   `json:"name" xml:"name"`
 }
 
 // ClientRenamedByExtension defines model for ClientWithExtension.
 type ClientRenamedByExtension struct {
-	AccountIdentifier *float32 `json:"id,omitempty"`
-	Name              string   `json:"name"`
+	AccountIdentifier *float32 `json:"id,omitempty" xml:"id"`
+	Name              string   `json:"name" xml:"name"`
 }

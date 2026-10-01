@@ -5,33 +5,33 @@ package xomitzero
 
 // Client defines model for Client.
 type Client struct {
-	Id   *float32 `json:"id,omitempty"`
-	Name string   `json:"name"`
+	Id   *float32 `json:"id,omitempty" xml:"id"`
+	Name string   `json:"name" xml:"name"`
 }
 
 // ClientWithExtension defines model for ClientWithExtension.
 type ClientWithExtension struct {
-	Id   *float32 `json:"id,omitempty,omitzero"`
-	Name string   `json:"name"`
+	Id   *float32 `json:"id,omitempty,omitzero" xml:"id"`
+	Name string   `json:"name" xml:"name"`
 }
 
 // ContainerTypeWithOptional defines model for ContainerTypeWithOptional.
 type ContainerTypeWithOptional struct {
-	HasIsZero *FieldWithCustomIsZeroMethod `json:"has_is_zero,omitempty,omitzero"`
+	HasIsZero *FieldWithCustomIsZeroMethod `json:"has_is_zero,omitempty,omitzero" xml:"has_is_zero"`
 }
 
 // ContainerTypeWithRequired defines model for ContainerTypeWithRequired.
 type ContainerTypeWithRequired struct {
-	HasIsZero FieldWithCustomIsZeroMethod `json:"has_is_zero,omitzero"`
+	HasIsZero FieldWithCustomIsZeroMethod `json:"has_is_zero,omitzero" xml:"has_is_zero"`
 }
 
 // FieldWithCustomIsZeroMethod defines model for FieldWithCustomIsZeroMethod.
 type FieldWithCustomIsZeroMethod struct {
-	Id    *string  `json:"id,omitempty"`
-	Value *float32 `json:"value,omitempty"`
+	Id    *string  `json:"id,omitempty" xml:"id"`
+	Value *float32 `json:"value,omitempty" xml:"value"`
 }
 
 // FieldWithOmitZeroOnRequiredField defines model for FieldWithOmitZeroOnRequiredField.
 type FieldWithOmitZeroOnRequiredField struct {
-	Id string `json:"id,omitzero"`
+	Id string `json:"id,omitzero" xml:"id"`
 }

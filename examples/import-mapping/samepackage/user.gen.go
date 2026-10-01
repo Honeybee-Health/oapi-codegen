@@ -5,5 +5,5 @@ package samepackage
 
 // User defines model for User.
 type User struct {
-	Name string `json:"name"`
+	Name string `json:"name" xml:"name"`
 }

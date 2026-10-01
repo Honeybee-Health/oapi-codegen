@@ -12,7 +12,8 @@ import (
 
 // Pong defines model for Pong.
 type Pong struct {
-	Ping string `json:"ping"`
+	// Ping Example: pong
+	Ping string `json:"ping" xml:"ping"`
 }
 
 // ServerInterface represents all server handlers.
@@ -158,7 +159,7 @@ func HandlerWithOptions(si ServerInterface, options GorillaServerOptions) http.H
 		ErrorHandlerFunc:   options.ErrorHandlerFunc,
 	}
 
-	r.HandleFunc(options.BaseURL+"/ping", wrapper.GetPing).Methods("GET")
+	r.HandleFunc(options.BaseURL+"/ping", wrapper.GetPing).Methods(http.MethodGet)
 
 	return r
 }
