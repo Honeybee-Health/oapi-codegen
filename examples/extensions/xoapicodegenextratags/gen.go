@@ -5,12 +5,12 @@ package xoapicodegenextratags
 
 // Client defines model for Client.
 type Client struct {
-	Id   float32 `json:"id"`
-	Name string  `json:"name"`
+	Id   float32 `json:"id" xml:"id"`
+	Name string  `json:"name" xml:"name"`
 }
 
 // ClientWithExtension defines model for ClientWithExtension.
 type ClientWithExtension struct {
-	Id   float32 `gorm:"primarykey" json:"id" safe-to-log:"true" validate:"required,min=1,max=256"`
-	Name string  `json:"name"`
+	Id   float32 `gorm:"primarykey" json:"id" safe-to-log:"true" validate:"required,min=1,max=256" xml:"id"`
+	Name string  `json:"name" xml:"name"`
 }

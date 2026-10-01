@@ -1,0 +1,8 @@
+
+// setXMLDiscriminator points a union variant's optional discriminator field at
+// value. The type parameter is inferred from the field, so this works for plain
+// strings and named enum types alike, including types from other packages.
+func setXMLDiscriminator[T ~string](field **T, value string) {
+	v := T(value)
+	*field = &v
+}

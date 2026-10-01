@@ -5,10 +5,10 @@ package onlymodels
 
 // Client defines model for Client.
 type Client struct {
-	Name string `json:"name"`
+	Name string `json:"name" xml:"name"`
 }
 
 // Unreferenced defines model for Unreferenced.
 type Unreferenced struct {
-	Id int `json:"id"`
+	Id int `json:"id" xml:"id"`
 }

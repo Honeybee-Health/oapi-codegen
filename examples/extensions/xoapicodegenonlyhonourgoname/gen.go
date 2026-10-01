@@ -5,6 +5,6 @@ package xoapicodegenonlyhonourgoname
 
 // TypeWithUnexportedField A struct will be output where one of the fields is not exported
 type TypeWithUnexportedField struct {
-	accountIdentifier *string `json:"-"`
-	Name              *string `json:"name,omitempty"`
+	accountIdentifier *string `json:"-" xml:"id"`
+	Name              *string `json:"name,omitempty" xml:"name"`
 }

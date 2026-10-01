@@ -6,41 +6,41 @@ package preferskipoptionalpointer
 // Client defines model for Client.
 type Client struct {
 	// Id This field is optional, but the `prefer-skip-optional-pointer` Output Option ensures that this should not have an optional pointer.
-	Id float32 `json:"id,omitempty"`
+	Id float32 `json:"id,omitempty" xml:"id"`
 
 	// Name This field is required, so will never have an optional pointer.
-	Name string `json:"name"`
+	Name string `json:"name" xml:"name"`
 }
 
 // ClientWithExtension defines model for ClientWithExtension.
 type ClientWithExtension struct {
 	// Id This field is optional, but the `prefer-skip-optional-pointer` Output Option ensures that this should not have an optional pointer.
-	Id float32 `json:"id,omitempty"`
+	Id float32 `json:"id,omitempty" xml:"id"`
 
 	// Name This field is required, so will never have an optional pointer.
-	Name string `json:"name"`
+	Name string `json:"name" xml:"name"`
 
 	// PointerId This field should have an optional pointer, as the field-level definition of `x-go-type-skip-optional-pointer` overrides the `prefer-skip-optional-pointer` Output Option.
-	PointerId *float32 `json:"pointer_id,omitempty"`
+	PointerId *float32 `json:"pointer_id,omitempty" xml:"pointer_id"`
 }
 
 // NestedType defines model for NestedType.
 type NestedType struct {
-	Client Client `json:"client,omitempty"`
+	Client Client `json:"client,omitempty" xml:"client"`
 }
 
 // ReferencedWithExtension defines model for ReferencedWithExtension.
 type ReferencedWithExtension struct {
-	Foo string `json:"foo,omitempty"`
+	Foo string `json:"foo,omitempty" xml:"foo"`
 }
 
 // ReferencedWithoutExtension defines model for ReferencedWithoutExtension.
 type ReferencedWithoutExtension struct {
-	Foo string `json:"foo,omitempty"`
+	Foo string `json:"foo,omitempty" xml:"foo"`
 }
 
 // ReferencesATypeWithAnExtensionInsideAllOf This type has a field which references - via an `allOf` - a type which should have an optional pointer, as the field-level definition of `x-go-type-skip-optional-pointer` overrides the `prefer-skip-optional-pointer` Output Option, as well as a field without that property.
 type ReferencesATypeWithAnExtensionInsideAllOf struct {
-	NoExtension          ReferencedWithoutExtension `json:"noExtension,omitempty"`
-	WithExtensionPointer *ReferencedWithExtension   `json:"withExtensionPointer,omitempty"`
+	NoExtension          ReferencedWithoutExtension `json:"noExtension,omitempty" xml:"noExtension"`
+	WithExtensionPointer *ReferencedWithExtension   `json:"withExtensionPointer,omitempty" xml:"withExtensionPointer"`
 }
